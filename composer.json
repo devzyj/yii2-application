@@ -1,18 +1,25 @@
 {
-    "name": "devzyj/yii2-admin",
-    "description": "Admin manager for Yii2",
-    "keywords": ["yii2", "admin"],
+    "name": "devzyj/yii2-application",
+    "description": "Web Application for Yii2",
+    "keywords": ["yii2", "application"],
     "type": "project",
     "license": "BSD-3-Clause",
     "minimum-stability": "stable",
     "require": {
-        "php": ">=5.4.0",
+        "php": ">=5.5.0",
         "yiisoft/yii2": "~2.0.6",
-        "yiisoft/yii2-bootstrap": "~2.0.0"
+        "yiisoft/yii2-bootstrap": "~2.0.0",
+        "yiisoft/yii2-swiftmailer": "~2.0.0 || ~2.1.0",
+        "devzyj/yii2-rest": "~1.0.0",
+        "devzyj/yii2-attribute-cache-behavior": "~1.0.0",
+        "lcobucci/jwt": "~3.2.0"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",
-        "yiisoft/yii2-gii": "~2.0.0"
+        "yiisoft/yii2-gii": "~2.0.0",
+        "yiisoft/yii2-faker": "~2.0.0",
+        "codeception/base": "^2.2.3",
+        "codeception/verify": "~0.3.1"
     },
     "config": {
         "process-timeout": 1800,
