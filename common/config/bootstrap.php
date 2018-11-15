@@ -5,8 +5,9 @@
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
 
-Yii::setAlias('@common', dirname(__DIR__));
-Yii::setAlias('@console', dirname(dirname(__DIR__)) . '/console');
-Yii::setAlias('@backend', dirname(dirname(__DIR__)) . '/backend');
-Yii::setAlias('@frontend', dirname(dirname(__DIR__)) . '/frontend');
-Yii::setAlias('@api', dirname(dirname(__DIR__)) . '/api');
+Yii::setAlias('@application', dirname(dirname(__DIR__)));
+Yii::setAlias('@common', '@application/common');
+Yii::setAlias('@console', '@application/console');
+Yii::setAlias('@backend', '@application/backend');
+Yii::setAlias('@frontend', '@application/frontend');
+Yii::setAlias('@api', '@application/api');

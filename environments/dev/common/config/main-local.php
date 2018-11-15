@@ -13,14 +13,14 @@ return [
     'components' => [
         'cache' => [
             'class' => 'yii\caching\FileCache',
-            'keyPrefix' => 'yii2admin',
+            'keyPrefix' => 'yii2application',
         ],
         'db' => [
             'class' => 'yii\db\Connection',
-            'dsn' => 'mysql:host=localhost;port=3306;dbname=yii2admin',
+            'dsn' => 'mysql:host=localhost;port=3306;dbname=yii2application',
             'username' => 'root',
-            'password' => '',
-            'tablePrefix' => 'yii2admin_',
+            'password' => '123456',
+            'tablePrefix' => 'app_',
             'charset' => 'utf8',
         ],
     ],

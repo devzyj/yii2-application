@@ -6,15 +6,13 @@
  */
 namespace api\components;
 
-use yii\web\IdentityInterface;
-
 /**
  * 访问接口的客户端标识类。
  * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
-class Identity extends \yii\base\Model implements IdentityInterface
+class Identity extends \api\models\Client implements \yii\web\IdentityInterface
 {
     /******************************* IdentityInterface *******************************/
     /**
@@ -22,7 +20,7 @@ class Identity extends \yii\base\Model implements IdentityInterface
      */
     public function getId()
     {
-        return null;
+        return $this->primaryKey;
     }
 
     /**
@@ -30,7 +28,7 @@ class Identity extends \yii\base\Model implements IdentityInterface
      */
     public static function findIdentity($id)
     {
-        return null;
+        return static::findOne($id);
     }
 
     /**
@@ -46,7 +44,7 @@ class Identity extends \yii\base\Model implements IdentityInterface
      */
     public function getAuthKey()
     {
-        return '';
+        return $this->identifier;
     }
 
     /**
@@ -54,6 +52,6 @@ class Identity extends \yii\base\Model implements IdentityInterface
      */
     public function validateAuthKey($authKey)
     {
-        return false;
+        return $this->identifier === $authKey;
     }
 }

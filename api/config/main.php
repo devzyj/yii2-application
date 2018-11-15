@@ -9,7 +9,12 @@ $config = [
     'id' => 'app-api',
     'basePath' => dirname(__DIR__),
     'controllerNamespace' => 'api\controllers',
-    'bootstrap' => ['log'],
+    'bootstrap' => [
+        'log', 
+        'cgi-bin',
+        'cgi-bin/v1', 
+        //'rbac/v1'
+    ],
     'components' => [
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
@@ -48,6 +53,24 @@ $config = [
             ],
         ],
     ],
+    'modules' => [
+        'cgi-bin' => [
+            'class' => 'apiCgi\Module',
+            'modules' => [
+                'v1' => [
+                    'class' => 'apiCgiV1\Module',
+                ],
+            ],
+        ],
+        /*'rbac' => [
+            'class' => 'apiRbac\Module',
+            'modules' => [
+                'v1' => [
+                    'class' => 'apiRbacV1\Module',
+                ],
+            ],
+        ],*/
+    ]
 ];
 
 // application.params
