@@ -36,9 +36,6 @@ $config = [
             'identityCookie' => ['name' => '_identity-app-backend', 'httpOnly' => true],
             //'identityCookie' => ['name' => '_identity-app-backend', 'httpOnly' => true, 'path' => '/admin'], // Shared Hosting Environment
         ],
-        'errorHandler' => [
-            'errorAction' => 'site/error',
-        ],
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,

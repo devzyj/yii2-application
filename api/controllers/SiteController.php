@@ -14,24 +14,12 @@ use Yii;
 class SiteController extends \yii\web\Controller
 {
     /**
-     * {@inheritdoc}
-     */
-    public function actions()
-    {
-        return [
-            'error' => [
-                'class' => 'yii\web\ErrorAction',
-            ],
-        ];
-    }
-
-    /**
      * Homepage.
      *
      * @return string
      */
     public function actionIndex()
     {
-        return Yii::$app->getUniqueId() . ' index page.';
+        return Yii::$app->id . ' index page.';
     }
 }

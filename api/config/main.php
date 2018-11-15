@@ -39,14 +39,13 @@ $config = [
             'enableSession' => false,
             'loginUrl' => null,
         ],
-        'errorHandler' => [
-            'errorAction' => 'site/error',
-        ],
         'urlManager' => [
             'enablePrettyUrl' => true,
             'enableStrictParsing' => true,
             'showScriptName' => false,
-            'rules' => [],
+            'rules' => [
+                '/' => 'site/index'
+            ],
         ],
     ],
 ];

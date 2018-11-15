@@ -31,9 +31,6 @@ $config = [
             'enableAutoLogin' => true,
             'identityCookie' => ['name' => '_identity-app-frontend', 'httpOnly' => true],
         ],
-        'errorHandler' => [
-            'errorAction' => 'site/error',
-        ],
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
