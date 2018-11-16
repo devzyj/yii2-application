@@ -54,17 +54,17 @@ class ClientController extends \apiCgiV1\components\ActiveController
                     'class' => 'devzyj\rest\behaviors\EagerLoadingBehavior',
                 ],
             ],
-            // 重置标识。
-            'reset-identifier' => [
+            // 重置ID。
+            'reset-id' => [
                 'class' => 'devzyj\rest\UpdateAction',
                 'modelClass' => $this->modelClass,
                 'checkAccess' => [$this, 'checkAccess'],
-                'scenario' => Client::SCENARIO_RESET_IDENTIFIER,
+                'scenario' => Client::SCENARIO_RESET_ID,
                 'checkModelAccess' => [$this, 'checkModelAccess'],
                 'notFoundMessage' => $this->notFoundMessage,
                 'on beforeProcessModel' => function ($event) {
-                    // 重置标识符时设置标识符为空。
-                    $event->object->identifier = null;
+                    // 重置ID时设置为空。
+                    $event->object->id = null;
                 }
             ],
             // 重置密钥。
@@ -97,7 +97,7 @@ class ClientController extends \apiCgiV1\components\ActiveController
     protected function verbs()
     {
         return ArrayHelper::merge(parent::verbs(), [
-            'reset-identifier' => ['PUT'],
+            'reset-id' => ['PUT'],
             'reset-secret' => ['PUT'],
             'delete-cache' => ['DELETE'],
         ]);

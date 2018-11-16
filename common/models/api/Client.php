@@ -10,13 +10,12 @@ use Yii;
 use devzyj\behaviors\ActiveCacheBehaviorTrait;
 
 /**
- * This is the model class for table "{{%client}}".
+ * This is the model class for table "{{%api_client}}".
  *
- * @property int $id 客户端ID
+ * @property string $id 客户端ID
  * @property string $name 客户端名称
- * @property string $description 客户端描述
- * @property string $identifier 客户端标识
  * @property string $secret 客户端密钥
+ * @property string $description 客户端描述
  * @property int $create_time 创建时间
  * @property int $status 客户端状态（0=禁用；1=可用）
  * @property int $token_expires_in 令牌过期时间（秒）
@@ -25,6 +24,7 @@ use devzyj\behaviors\ActiveCacheBehaviorTrait;
  * @property string $allowed_ips 允许访问的IPs
  * @property string $allowed_apis 允许访问的APIs
  *
+ * @property boolean $isValid 客户端是否有效。
  * @property array $allowedIPs 允许访问的IPs
  * @property array $allowedAPIs 允许访问的APIs
  *
@@ -50,7 +50,7 @@ class Client extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return '{{%client}}';
+        return '{{%api_client}}';
     }
 
     /**
@@ -68,9 +68,9 @@ class Client extends \yii\db\ActiveRecord
                 'class' => 'yii\behaviors\AttributesBehavior',
                 'preserveNonEmptyValues' => true,
                 'attributes' => [
-                    'identifier' => [
-                        self::EVENT_BEFORE_INSERT => [$this, 'generateIdentifier'],
-                        self::EVENT_BEFORE_UPDATE => [$this, 'generateIdentifier'],
+                    'id' => [
+                        self::EVENT_BEFORE_INSERT => [$this, 'generateId'],
+                        self::EVENT_BEFORE_UPDATE => [$this, 'generateId'],
                     ],
                     'secret' => [
                         self::EVENT_BEFORE_INSERT => [$this, 'generateSecret'],
@@ -78,10 +78,9 @@ class Client extends \yii\db\ActiveRecord
                     ],
                 ]
             ],
-            'identifierCacheBehavior' => [
+            'primaryKeyCacheBehavior' => [
                 'class' => 'devzyj\behaviors\ActiveCacheBehavior',
-                'baseModelCacheKey' => ['Api', 'Client', 'Identifier'],
-                'keyAttributes' => ['identifier'],
+                'baseModelCacheKey' => ['Api', 'Client', 'PrimaryKey'],
             ],
         ];
     }
@@ -114,40 +113,26 @@ class Client extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'name' => Yii::t('app', 'Name'),
-            'description' => Yii::t('app', 'Description'),
-            'identifier' => Yii::t('app', 'Identifier'),
-            'secret' => Yii::t('app', 'Secret'),
-            'create_time' => Yii::t('app', 'Create Time'),
-            'status' => Yii::t('app', 'Status'),
-            'token_expires_in' => Yii::t('app', 'Token Expires In'),
-            'rate_limit_count' => Yii::t('app', 'Rate Limit Count'),
-            'rate_limit_seconds' => Yii::t('app', 'Rate Limit Seconds'),
-            'allowed_ips' => Yii::t('app', 'Allowed IPs'),
-            'allowed_apis' => Yii::t('app', 'Allowed APIs'),
+            'id' => 'ID',
+            'name' => 'Name',
+            'secret' => 'Secret',
+            'description' => 'Description',
+            'create_time' => 'Create Time',
+            'status' => 'Status',
+            'token_expires_in' => 'Token Expires In',
+            'rate_limit_count' => 'Rate Limit Count',
+            'rate_limit_seconds' => 'Rate Limit Seconds',
+            'allowed_ips' => 'Allowed IPs',
+            'allowed_apis' => 'Allowed APIs',
         ];
-    }
-
-    /**
-     * 通过客户端标识，从缓存或者数据库中查找并返回一个客户端对像。
-     *
-     * @param string $identifier 客户端标识。
-     * @param integer $duration 设置缓存的持续时间（秒）。如果为 `null`，则使用默认值。
-     * @param \yii\caching\Dependency $dependency 设置缓存的依赖项。如果依赖项发生了变化，那么再次获取数据时，缓存将失效。
-     * @return static|null 匹配条件的 ActiveRecord 实例，如果没有匹配，则为 `null`。
-     */
-    public static function findOrSetOneByIdentifier($identifier, $duration = null, $dependency = null)
-    {
-        return static::findOrSetOneByAttribute($identifier, $duration, $dependency);
     }
     
     /**
-     * 生成客户端标识。
+     * 生成客户端ID。
      * 
      * @return string
      */
-    public function generateIdentifier()
+    public function generateId()
     {
         return substr(md5(microtime().rand(1000, 9999)), 8, 16);
     }
@@ -231,6 +216,29 @@ class Client extends \yii\db\ActiveRecord
         }
         
         return false;
+    }
+    
+    /**
+     * 获取客户端是否有效。
+     * 
+     * @return boolean
+     */
+    public function getIsValid()
+    {
+        return $this->status === self::STATUS_ENABLED;
+    }
+
+    /**
+     * 通过客户端ID，从缓存或者数据库中查找并返回一个客户端对像。
+     *
+     * @param string $id 客户端ID。
+     * @param integer $duration 设置缓存的持续时间（秒）。如果为 `null`，则使用默认值。
+     * @param \yii\caching\Dependency $dependency 设置缓存的依赖项。如果依赖项发生了变化，那么再次获取数据时，缓存将失效。
+     * @return static|null 匹配条件的 ActiveRecord 实例，如果没有匹配，则为 `null`。
+     */
+    public static function findOrSetOneById($id, $duration = null, $dependency = null)
+    {
+        return static::findOrSetOneByAttribute($id, $duration, $dependency);
     }
     
     /**

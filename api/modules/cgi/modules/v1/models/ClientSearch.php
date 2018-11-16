@@ -20,8 +20,8 @@ class ClientSearch extends Client
     public function rules()
     {
         return [
-            [['id', 'create_time', 'status', 'token_expires_in', 'rate_limit_count', 'rate_limit_seconds'], 'integer'],
-            [['name', 'description', 'identifier', 'secret', 'allowed_ips', 'allowed_apis'], 'string'],
+            [['create_time', 'status', 'token_expires_in', 'rate_limit_count', 'rate_limit_seconds'], 'integer'],
+            [['id', 'name', 'secret', 'description', 'allowed_ips', 'allowed_apis'], 'string'],
         ];
     }
 }

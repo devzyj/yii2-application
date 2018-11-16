@@ -7,7 +7,7 @@
 namespace apiCgiV1\models;
 
 /**
- * This is the model class for table "{{%client}}".
+ * This is the model class for table "{{%api_client}}".
  *
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
@@ -25,9 +25,9 @@ class Client extends \api\models\Client
     const SCENARIO_UPDATE = 'update';
     
     /**
-     * @var string 重置标识的场景名称。
+     * @var string 重置ID的场景名称。
      */
-    const SCENARIO_RESET_IDENTIFIER = 'resetIdentifier';
+    const SCENARIO_RESET_ID = 'resetId';
     
     /**
      * @var string 重置密钥的场景名称。
@@ -52,10 +52,10 @@ class Client extends \api\models\Client
             'name', 'description', 'status', 'token_expires_in', 'rate_limit_count', 'rate_limit_seconds', 'allowed_ips', 'allowed_apis'
         ];
     
-        // 重置标识的场景名称。
-        $scenarios[self::SCENARIO_RESET_IDENTIFIER] = [];
+        // 重置ID的场景。
+        $scenarios[self::SCENARIO_RESET_ID] = [];
     
-        // 重置密钥的场景名称。
+        // 重置密钥的场景。
         $scenarios[self::SCENARIO_RESET_SECRET] = [];
     
         // 返回修改后的场景列表。

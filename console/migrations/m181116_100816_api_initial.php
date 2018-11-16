@@ -8,21 +8,23 @@
 use yii\db\Migration;
 
 /**
- * Class m181115_081039_initial
+ * Class m181116_100816_api_initial
  */
-class m181115_081039_initial extends Migration
+class m181116_100816_api_initial extends Migration
 {
     /**
      * {@inheritdoc}
      */
     public function safeUp()
     {
-        $this->createTable('{{%client}}', [
-            'id' => $this->primaryKey(10)->unsigned()->comment('客户端ID'),
+        $clientTableName = '{{%api_client}}';
+        
+        // 创建表。
+        $this->createTable($clientTableName, [
+            'id' => $this->string(20)->notNull()->comment('客户端ID'),
             'name' => $this->string(50)->notNull()->unique()->comment('客户端名称'),
-            'description' => $this->string(255)->notNull()->defaultValue('')->comment('客户端描述'),
-            'identifier' => $this->string(20)->notNull()->unique()->comment('客户端标识'),
             'secret' => $this->string(32)->notNull()->unique()->comment('客户端密钥'),
+            'description' => $this->string(255)->notNull()->defaultValue('')->comment('客户端描述'),
             'create_time' => $this->integer(10)->unsigned()->notNull()->comment('创建时间'),
             'status' => $this->tinyInteger(1)->unsigned()->notNull()->defaultValue(0)->comment('客户端状态（0=禁用；1=可用）'),
             'token_expires_in' => $this->integer(10)->unsigned()->notNull()->defaultValue(0)->comment('令牌过期时间（秒）'),
@@ -30,13 +32,15 @@ class m181115_081039_initial extends Migration
             'rate_limit_seconds' => $this->integer(10)->unsigned()->notNull()->defaultValue(0)->comment('速率限制秒数'),
             'allowed_ips' => $this->text()->notNull()->defaultValue('')->comment('允许访问的 IPs'),
             'allowed_apis' => $this->text()->notNull()->defaultValue('')->comment('允许访问的 APIs'),
-        ], "COMMENT='RESTful API 客户端表'");
+            'PRIMARY KEY (`id`)',
+        ], "COMMENT='API - 客户端表'");
         
-        $this->insert('{{%client}}', [
-            'name' => 'administrator',
-            'description' => '超级管理员',
-            'identifier' => 'f4c22926e400ebca',
+        // 插入数据。
+        $this->insert($clientTableName, [
+            'id' => 'f4c22926e400ebca',
+            'name' => 'app-backend',
             'secret' => '692569f364854bc130687297c770c2c0',
+            'description' => '后台管理系统',
             'create_time' => time(),
             'status' => 1,
             'token_expires_in' => 604800,
@@ -52,6 +56,6 @@ class m181115_081039_initial extends Migration
      */
     public function safeDown()
     {
-        $this->dropTable($this->db->tablePrefix.'client');
+        $this->dropTable('{{%api_client}}');
     }
 }

@@ -44,7 +44,7 @@ class Identity extends \api\models\Client implements \yii\web\IdentityInterface
      */
     public function getAuthKey()
     {
-        return $this->identifier;
+        return null;
     }
 
     /**
@@ -52,6 +52,6 @@ class Identity extends \api\models\Client implements \yii\web\IdentityInterface
      */
     public function validateAuthKey($authKey)
     {
-        return $this->identifier === $authKey;
+        return false;
     }
 }

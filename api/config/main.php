@@ -11,8 +11,9 @@ $config = [
     'controllerNamespace' => 'api\controllers',
     'bootstrap' => [
         'log', 
-        'cgi-bin',
-        'cgi-bin/v1', 
+        'authorize',
+        //'cgi-bin',
+        //'cgi-bin/v1', 
         //'rbac/v1'
     ],
     'components' => [
@@ -32,15 +33,8 @@ $config = [
                 'application/json' => 'yii\web\JsonParser',
             ],
         ],
-        'response' => [
-            'formatters' => [
-                \yii\web\Response::FORMAT_JSON => [
-                    'prettyPrint' => YII_DEBUG,
-                ]
-            ],
-        ],
         'user' => [
-            'identityClass' => 'api\components\Identity',
+            //'identityClass' => 'api\components\Identity',
             'enableSession' => false,
             'loginUrl' => null,
         ],
@@ -54,7 +48,10 @@ $config = [
         ],
     ],
     'modules' => [
-        'cgi-bin' => [
+        'authorize' => [
+            'class' => 'apiAuthorize\Module',
+        ],
+        /*'cgi-bin' => [
             'class' => 'apiCgi\Module',
             'modules' => [
                 'v1' => [
@@ -62,7 +59,7 @@ $config = [
                 ],
             ],
         ],
-        /*'rbac' => [
+        'rbac' => [
             'class' => 'apiRbac\Module',
             'modules' => [
                 'v1' => [

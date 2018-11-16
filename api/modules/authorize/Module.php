@@ -4,12 +4,12 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace apiRbacV1;
+namespace apiAuthorize;
 
 use Yii;
 
 /**
- * rbac v1 接口模块。
+ * authorize 接口模块。
  * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
@@ -30,5 +30,27 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
         $urlRules = require_once(Yii::getAlias($this->urlRules));
         /* @var $app \yii\web\Application */
         $app->getUrlManager()->addRules($urlRules);
+    }
+    
+    /**
+     * 获取令牌签名 KEY。
+     * 
+     * @return string
+     */
+    public function getTokenSignKey()
+    {
+        // TODO
+        return 'asdfadsfasdf';
+    }
+    
+    /**
+     * 检查令牌。
+     * 
+     * @return boolean
+     */
+    public function checkToken()
+    {
+        // TODO
+        return false;
     }
 }

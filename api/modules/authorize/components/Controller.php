@@ -4,23 +4,18 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace api\components;
+namespace apiAuthorize\components;
 
 use yii\web\Response;
 
 /**
- * ApiController class.
+ * Controller class.
  * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
-class ApiController extends \yii\web\Controller
+class Controller extends \yii\web\Controller
 {
-    /**
-     * {@inheritdoc}
-     */
-    public $enableCsrfValidation = false;
-    
     /**
      * {@inheritdoc}
      */

@@ -7,7 +7,7 @@
 namespace api\models;
 
 /**
- * This is the model class for table "{{%client}}".
+ * This is the model class for table "{{%api_client}}".
  *
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0

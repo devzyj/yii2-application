@@ -5,6 +5,8 @@
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
 
+Yii::setAlias('@apiAuthorize', '@api/modules/authorize');
+
 Yii::setAlias('@apiCgi', '@api/modules/cgi');
 Yii::setAlias('@apiCgiV1', '@apiCgi/modules/v1');
 

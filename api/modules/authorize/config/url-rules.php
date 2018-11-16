@@ -6,6 +6,6 @@
  */
 
 return [
-    // generate access token.
-    "<module:({$this->uniqueId})>/token" => "<module>/token/create-json-web-token",
+    // 客户端授权，获取 ACCESS_TOKEN。
+    "POST <module:({$this->uniqueId})>/clients" => "<module>/default/client-credentials",
 ];

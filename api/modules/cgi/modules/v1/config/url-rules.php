@@ -12,5 +12,10 @@ return [
         'controller' => [
             "{$this->uniqueId}/client",
         ],
+        'extraPatterns' => [
+            'PUT {id}/rest-id' => 'reset-id',
+            'PUT {id}/rest-secret' => 'reset-secret',
+            'DELETE {id}/cache' => 'delete-cache',
+        ],
     ],
 ];
