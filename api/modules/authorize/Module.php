@@ -9,7 +9,7 @@ namespace apiAuthorize;
 use Yii;
 
 /**
- * authorize 接口模块。
+ * authorize 接口授权模块。
  * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
@@ -31,26 +31,28 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
         /* @var $app \yii\web\Application */
         $app->getUrlManager()->addRules($urlRules);
     }
-    
+
     /**
-     * 获取令牌签名 KEY。
-     * 
-     * @return string
+     * {@inheritdoc}
      */
-    public function getTokenSignKey()
+    public function init()
     {
-        // TODO
-        return 'asdfadsfasdf';
+        parent::init();
+        
+        // 设置令牌组件。
+        $this->set('token', [
+            'class' => 'apiAuthorize\components\Token',
+            'signKey' => Yii::$app->params['authorize.token.signKey'],
+        ]);
     }
     
     /**
-     * 检查令牌。
+     * 获取令牌组件。
      * 
-     * @return boolean
+     * @return \apiAuthorize\components\Token
      */
-    public function checkToken()
+    public function getToken()
     {
-        // TODO
-        return false;
+        return $this->get('token');
     }
 }

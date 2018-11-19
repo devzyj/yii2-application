@@ -9,12 +9,16 @@ return [
     // client rest api.
     [
         'class' => 'devzyj\rest\UrlRule',
+        'extraTokens' => [
+            '{id}' => '<id:[0-9a-zA-Z][0-9a-zA-Z]*>',
+            '{ids}' => '<ids:[0-9a-zA-Z][0-9a-zA-Z]*;[0-9a-zA-Z;]*>',
+        ],
         'controller' => [
             "{$this->uniqueId}/client",
         ],
         'extraPatterns' => [
-            'PUT {id}/rest-id' => 'reset-id',
-            'PUT {id}/rest-secret' => 'reset-secret',
+            'PUT {id}/reset-id' => 'reset-id',
+            'PUT {id}/reset-secret' => 'reset-secret',
             'DELETE {id}/cache' => 'delete-cache',
         ],
     ],

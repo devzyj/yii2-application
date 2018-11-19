@@ -4,11 +4,11 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace apiCgiV1\controllers;
+namespace apiCgiBinV1\controllers;
 
 use yii\helpers\ArrayHelper;
-use apiCgiV1\models\Client;
-use apiCgiV1\models\ClientSearch;
+use apiCgiBinV1\models\Client;
+use apiCgiBinV1\models\ClientSearch;
 
 /**
  * ClientController class.
@@ -16,7 +16,7 @@ use apiCgiV1\models\ClientSearch;
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
-class ClientController extends \apiCgiV1\components\ActiveController
+class ClientController extends \apiCgiBinV1\components\ActiveController
 {
     /**
      * {@inheritdoc}
@@ -58,31 +58,31 @@ class ClientController extends \apiCgiV1\components\ActiveController
             'reset-id' => [
                 'class' => 'devzyj\rest\UpdateAction',
                 'modelClass' => $this->modelClass,
-                'checkAccess' => [$this, 'checkAccess'],
-                'scenario' => Client::SCENARIO_RESET_ID,
+                'checkActionAccess' => [$this, 'checkActionAccess'],
                 'checkModelAccess' => [$this, 'checkModelAccess'],
+                'scenario' => Client::SCENARIO_RESET_ID,
                 'notFoundMessage' => $this->notFoundMessage,
                 'on beforeProcessModel' => function ($event) {
                     // 重置ID时设置为空。
                     $event->object->id = null;
-                }
+                },
             ],
             // 重置密钥。
             'reset-secret' => [
                 'class' => 'devzyj\rest\UpdateAction',
                 'modelClass' => $this->modelClass,
-                'checkAccess' => [$this, 'checkAccess'],
-                'scenario' => Client::SCENARIO_RESET_SECRET,
+                'checkActionAccess' => [$this, 'checkActionAccess'],
                 'checkModelAccess' => [$this, 'checkModelAccess'],
+                'scenario' => Client::SCENARIO_RESET_SECRET,
                 'notFoundMessage' => $this->notFoundMessage,
                 'on beforeProcessModel' => function ($event) {
                     // 重置密钥时设置密钥为空。
                     $event->object->secret = null;
-                }
+                },
             ],
             // 删除缓存。
             'delete-cache' => [
-                'class' => 'apiCgiV1\components\actions\clients\DeleteCacheAction',
+                'class' => 'apiCgiBinV1\components\actions\clients\DeleteCacheAction',
                 'modelClass' => $this->modelClass,
                 'checkActionAccess' => [$this, 'checkActionAccess'],
                 'checkModelAccess' => [$this, 'checkModelAccess'],

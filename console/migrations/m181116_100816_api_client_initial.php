@@ -6,21 +6,30 @@
  */
 
 use yii\db\Migration;
+use common\models\api\Client;
 
 /**
- * Class m181116_100816_api_initial
+ * Class m181116_100816_api_client_initial
  */
-class m181116_100816_api_initial extends Migration
+class m181116_100816_api_client_initial extends Migration
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function init()
+    {
+        $this->db = Client::getDb();
+        
+        parent::init();
+    }
+    
     /**
      * {@inheritdoc}
      */
     public function safeUp()
     {
-        $clientTableName = '{{%api_client}}';
-        
         // 创建表。
-        $this->createTable($clientTableName, [
+        $this->createTable(Client::tableName(), [
             'id' => $this->string(20)->notNull()->comment('客户端ID'),
             'name' => $this->string(50)->notNull()->unique()->comment('客户端名称'),
             'secret' => $this->string(32)->notNull()->unique()->comment('客户端密钥'),
@@ -36,11 +45,24 @@ class m181116_100816_api_initial extends Migration
         ], "COMMENT='API - 客户端表'");
         
         // 插入数据。
-        $this->insert($clientTableName, [
-            'id' => 'f4c22926e400ebca',
+        $this->insert(Client::tableName(), [
+            'id' => Client::generateId(), // e.g. 'f4c22926e400ebca'
             'name' => 'app-backend',
-            'secret' => '692569f364854bc130687297c770c2c0',
+            'secret' => Client::generateSecret(), // e.g. '692569f364854bc130687297c770c2c0'
             'description' => '后台管理系统',
+            'create_time' => time(),
+            'status' => 1,
+            'token_expires_in' => 604800,
+            'rate_limit_count' => 9999999,
+            'rate_limit_seconds' => 1,
+            'allowed_ips' => '*',
+            'allowed_apis' => '*',
+        ]);
+        $this->insert(Client::tableName(), [
+            'id' => Client::generateId(),
+            'name' => 'app-frontend',
+            'secret' => Client::generateSecret(),
+            'description' => '前端网站系统',
             'create_time' => time(),
             'status' => 1,
             'token_expires_in' => 604800,
@@ -56,6 +78,6 @@ class m181116_100816_api_initial extends Migration
      */
     public function safeDown()
     {
-        $this->dropTable('{{%api_client}}');
+        $this->dropTable(Client::tableName());
     }
 }

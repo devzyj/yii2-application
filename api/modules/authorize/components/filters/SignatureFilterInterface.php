@@ -11,6 +11,7 @@ namespace api\components\filters;
  *
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
+ * @deprecated 暂不使用。
  */
 interface SignatureFilterInterface
 {

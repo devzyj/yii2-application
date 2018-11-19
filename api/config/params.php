@@ -6,6 +6,8 @@
  */
 
 return [
+    // 超级客户端（IDs）。
+    'superClients' => [],
     // 允行批量操作的资源个数。
     'rest.batch.allowedCount' => 100,
     // 查询数据时，默认每页显示条数。

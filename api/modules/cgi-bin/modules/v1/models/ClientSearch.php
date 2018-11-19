@@ -4,7 +4,7 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace apiCgiV1\models;
+namespace apiCgiBinV1\models;
 
 /**
  * ClientSearch class.

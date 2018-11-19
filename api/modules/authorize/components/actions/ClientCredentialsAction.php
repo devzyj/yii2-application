@@ -10,8 +10,6 @@ use Yii;
 use yii\web\BadRequestHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\ForbiddenHttpException;
-use Lcobucci\JWT\Builder;
-use Lcobucci\JWT\Signer\Hmac\Sha256;
 use api\models\Client;
 
 /**
@@ -22,11 +20,6 @@ use api\models\Client;
  */
 class ClientCredentialsAction extends \yii\base\Action
 {
-    /**
-     * @var string 令牌加密 KEY。
-     */
-    public $signKey;
-    
     /**
      * 生成令牌。
      * 
@@ -54,51 +47,10 @@ class ClientCredentialsAction extends \yii\base\Action
             throw new ForbiddenHttpException('The `client_secret` is invalid.');
         }
         
+        /* @var $module \apiAuthorize\Module */
+        $module = $this->controller->module;
+
         // 生成并返回令牌。
-        return $this->generateToken($model);
-    }
-    
-    /**
-     * 生成并返回令牌。
-     * 
-     * @param Client $model
-     * @return array
-     */
-    protected function generateToken($model)
-    {
-        $request = Yii::$app->getRequest();
-        $grantType = 'client_credentials';
-        $issued = time();
-        $expiration = $issued + $model->token_expires_in;
-        
-        // JWT builder。
-        /* @var $builder \Lcobucci\JWT\Builder */
-        $builder = Yii::createObject(Builder::class);
-        
-        // 设置令牌参数。
-        $builder->setIssuer($request->hostName)
-            ->setAudience($model->name)
-            ->setSubject($grantType)
-            ->setIssuedAt($issued)
-            ->setExpiration($expiration);
-        
-        // 设置自定义参数。
-        $builder->set('grantType', $grantType)
-            ->set('client_id', $model->id);
-        
-        // 设置加密令牌。
-        if ($this->signKey !== null) {
-            $signer = new Sha256();
-            $builder->sign($signer, $this->signKey);
-        }
-        
-        // 生成 JWT。
-        $token = $builder->getToken();
-        
-        // 返回结果。
-        return [
-            'access_token' => (string) $token,
-            'expires_in' => $model->token_expires_in,
-        ];
+        return $module->getToken()->generateClientCredentials($model);
     }
 }

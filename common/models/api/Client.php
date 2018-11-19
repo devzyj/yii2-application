@@ -69,18 +69,19 @@ class Client extends \yii\db\ActiveRecord
                 'preserveNonEmptyValues' => true,
                 'attributes' => [
                     'id' => [
-                        self::EVENT_BEFORE_INSERT => [$this, 'generateId'],
-                        self::EVENT_BEFORE_UPDATE => [$this, 'generateId'],
+                        self::EVENT_BEFORE_INSERT => [static::className(), 'generateId'],
+                        self::EVENT_BEFORE_UPDATE => [static::className(), 'generateId'],
                     ],
                     'secret' => [
-                        self::EVENT_BEFORE_INSERT => [$this, 'generateSecret'],
-                        self::EVENT_BEFORE_UPDATE => [$this, 'generateSecret'],
+                        self::EVENT_BEFORE_INSERT => [static::className(), 'generateSecret'],
+                        self::EVENT_BEFORE_UPDATE => [static::className(), 'generateSecret'],
                     ],
                 ]
             ],
             'primaryKeyCacheBehavior' => [
                 'class' => 'devzyj\behaviors\ActiveCacheBehavior',
                 'baseModelCacheKey' => ['Api', 'Client', 'PrimaryKey'],
+                'defaultDuration' => 86400, // 24 hours
             ],
         ];
     }
@@ -132,7 +133,7 @@ class Client extends \yii\db\ActiveRecord
      * 
      * @return string
      */
-    public function generateId()
+    public static function generateId()
     {
         return substr(md5(microtime().rand(1000, 9999)), 8, 16);
     }
@@ -142,7 +143,7 @@ class Client extends \yii\db\ActiveRecord
      * 
      * @return string
      */
-    public function generateSecret()
+    public static function generateSecret()
     {
         return md5(microtime().rand(1000, 9999));
     }

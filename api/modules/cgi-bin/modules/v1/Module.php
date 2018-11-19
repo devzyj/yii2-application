@@ -4,12 +4,12 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace apiCgi;
+namespace apiCgiBinV1;
 
 use Yii;
 
 /**
- * cgi-bin 接口模块。
+ * cgi-bin v1 接口模块。
  * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
@@ -38,8 +38,12 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
     public function beforeAction($action)
     {
         // 设置身份认证类。
-        $user = Yii::$app->getUser();
-        $user->identityClass = 'apiCgi\components\Identity';
+        Yii::$app->set('user', [
+            'class' => 'yii\web\User',
+            'identityClass' => 'apiCgiBinV1\components\Identity',
+            'enableSession' => false,
+            'loginUrl' => null,
+        ]);
         
         return parent::beforeAction($action);
     }

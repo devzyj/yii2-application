@@ -4,15 +4,15 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace apiCgiV1\components;
+namespace apiCgiBin;
 
 /**
- * ActiveController class.
+ * cgi-bin 接口模块。
  * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
-class ActiveController extends \api\components\rest\ActiveController
+class Module extends \yii\base\Module
 {
     
 }

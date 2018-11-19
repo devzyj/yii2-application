@@ -7,8 +7,8 @@
 
 Yii::setAlias('@apiAuthorize', '@api/modules/authorize');
 
-Yii::setAlias('@apiCgi', '@api/modules/cgi');
-Yii::setAlias('@apiCgiV1', '@apiCgi/modules/v1');
+Yii::setAlias('@apiCgiBin', '@api/modules/cgi-bin');
+Yii::setAlias('@apiCgiBinV1', '@apiCgiBin/modules/v1');
 
 Yii::setAlias('@apiRbac', '@api/modules/rbac');
 Yii::setAlias('@apiRbacV1', '@apiRbac/modules/v1');

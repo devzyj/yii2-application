@@ -4,10 +4,11 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace api\components\rest;
+namespace apiCgiBinV1\components;
 
 use Yii;
 use yii\helpers\ArrayHelper;
+use yii\web\ForbiddenHttpException;
 
 /**
  * ActiveController class.
@@ -34,6 +35,30 @@ class ActiveController extends \devzyj\rest\ActiveController
     /**
      * {@inheritdoc}
      */
+    public function behaviors()
+    {
+        return ArrayHelper::merge(parent::behaviors(), [
+            // 身份验证。
+            'authenticator' => [
+                'authMethods' => [
+                    'yii\filters\auth\HttpBearerAuth',
+                    'yii\filters\auth\QueryParamAuth',
+                ]
+            ],
+            // 检查客户端状态。
+            'clientStatusFilter' => [
+                'class' => 'api\components\filters\ClientStatusFilter',
+            ],
+            // 检查客户端允许访问的 IPs。
+            'clientIpsFilter' => [
+                'class' => 'api\components\filters\ClientIpsFilter',
+            ],
+        ]);
+    }
+    
+    /**
+     * {@inheritdoc}
+     */
     public function actions()
     {
         return ArrayHelper::merge(parent::actions(), [
@@ -53,5 +78,21 @@ class ActiveController extends \devzyj\rest\ActiveController
                 },
             ],
         ]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function checkActionAccess($action, $params = [])
+    {
+        /* @var $identity \api\components\Identity */
+        if (!($user = Yii::$app->getUser()) || !($identity = $user->getIdentity(false))) {
+            throw new ForbiddenHttpException('Client must be logged in.');
+        }
+        
+        // 检查客户端允许访问的 API。
+        if (!$identity->checkClientAPIs($action->getUniqueId())) {
+            throw new ForbiddenHttpException('Client API limit.');
+        }
     }
 }
