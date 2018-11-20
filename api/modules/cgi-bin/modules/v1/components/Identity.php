@@ -8,6 +8,7 @@ namespace apiCgiBinV1\components;
 
 use Yii;
 use yii\filters\RateLimitInterface;
+use api\components\traits\RateLimitTrait;
 
 /**
  * 访问接口的客户端标识类。
@@ -17,6 +18,8 @@ use yii\filters\RateLimitInterface;
  */
 class Identity extends \api\components\Identity implements RateLimitInterface
 {
+    use RateLimitTrait;
+    
     /******************************* IdentityInterface *******************************/
     /**
      * {@inheritdoc}
@@ -32,59 +35,12 @@ class Identity extends \api\components\Identity implements RateLimitInterface
         }
     }
 
-    /************************************* RateLimitInterface *************************************/
-    /**
-     * 获取访问速率限制的缓存 KEY。
-     * 
-     * @return array
-     */
-    protected function getRateLimitCacheKey()
-    {
-        return ['Identity', 'RateLimit', $this->getId()];
-    }
-    
+    /******************************* RateLimitInterface *******************************/
     /**
      * {@inheritdoc}
      */
     public function getRateLimit($request, $action)
     {
-        $count = $this->rate_limit_count;
-        $seconds = $this->rate_limit_seconds ? $this->rate_limit_seconds : 1;
-        
-        // 在 `$seconds` 秒内最多 `$count` 次的 API 调用。
-        return [$count, $seconds];
-    }
-    
-    /**
-     * {@inheritdoc}
-     */
-    public function loadAllowance($request, $action)
-    {
-        // 返回剩余的允许请求数和最后一次速率限制检查时的时间戳。
-        $cache = Yii::$app->getCache();
-        if ($cache) {
-            $key = $this->getRateLimitCacheKey();
-            return $cache->get($key);
-        }
-    }
-    
-    /**
-     * {@inheritdoc}
-     */
-    public function saveAllowance($request, $action, $allowance, $timestamp)
-    {
-        if (!$this->getIsSuperAdministrator()) {
-            // 保存剩余的允许请求数和速率限制检查时的时间戳。
-            $cache = Yii::$app->getCache();
-            if ($cache) {
-                $key = $this->getRateLimitCacheKey();
-                $data = [$allowance, $timestamp];
-            
-                $rateLimit = $this->getRateLimit($request, $action);
-                $duration = isset($rateLimit[1]) ? $rateLimit[1] : null;
-            
-                $cache->set($key, $data, $duration);
-            }
-        }
+        return $this->getRateLimitContents();
     }
 }

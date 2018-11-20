@@ -62,6 +62,7 @@ class ClientController extends \apiCgiBinV1\components\ActiveController
                 'checkModelAccess' => [$this, 'checkModelAccess'],
                 'scenario' => Client::SCENARIO_RESET_ID,
                 'notFoundMessage' => $this->notFoundMessage,
+                'notFoundCode' => $this->notFoundCode,
                 'on beforeProcessModel' => function ($event) {
                     // 重置ID时设置为空。
                     $event->object->id = null;
@@ -75,6 +76,7 @@ class ClientController extends \apiCgiBinV1\components\ActiveController
                 'checkModelAccess' => [$this, 'checkModelAccess'],
                 'scenario' => Client::SCENARIO_RESET_SECRET,
                 'notFoundMessage' => $this->notFoundMessage,
+                'notFoundCode' => $this->notFoundCode,
                 'on beforeProcessModel' => function ($event) {
                     // 重置密钥时设置密钥为空。
                     $event->object->secret = null;
@@ -87,6 +89,7 @@ class ClientController extends \apiCgiBinV1\components\ActiveController
                 'checkActionAccess' => [$this, 'checkActionAccess'],
                 'checkModelAccess' => [$this, 'checkModelAccess'],
                 'notFoundMessage' => $this->notFoundMessage,
+                'notFoundCode' => $this->notFoundCode,
             ],
         ]);
     }

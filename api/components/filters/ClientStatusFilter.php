@@ -35,6 +35,11 @@ class ClientStatusFilter extends \yii\base\ActionFilter
      * @var string 错误信息。
      */
     public $errorMessage = 'Client is invalid.';
+
+    /**
+     * @var integer 错误编码。
+     */
+    public $errorCode = 0;
     
     /**
      * {@inheritdoc}
@@ -46,7 +51,7 @@ class ClientStatusFilter extends \yii\base\ActionFilter
         if (($user = Yii::$app->getUser()) && ($identity = $user->getIdentity(false))) {
             if ($identity instanceof \api\components\Identity) {
                 if (!$identity->checkClientStatus()) {
-                    throw new ForbiddenHttpException($this->errorMessage);
+                    throw new ForbiddenHttpException($this->errorMessage, $this->errorCode);
                 }
             }
         }

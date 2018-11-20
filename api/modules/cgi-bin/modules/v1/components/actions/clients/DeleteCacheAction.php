@@ -17,6 +17,26 @@ use yii\web\ServerErrorHttpException;
 class DeleteCacheAction extends \devzyj\rest\DeleteAction
 {
     /**
+     * @var string 删除模型缓存失败时的错误信息。
+     */
+    public $failedMessage = 'Failed to delete the object cache for unknown reason.';
+
+    /**
+     * @var integer 删除模型缓存失败时的错误编码。
+     */
+    public $failedCode = 0;
+
+    /**
+     * @var string 跳过删除模型缓存时的错误信息。
+     */
+    public $skippedMessage = 'Skipped delete the object cache for unknown reason.';
+    
+    /**
+     * @var integer 跳过删除模型缓存时的错误编码。
+     */
+    public $skippedCode = 0;
+    
+    /**
      * 删除模型缓存。
      * 
      * @param \apiCgiBinV1\models\Client $model 需要删除缓存的模型实例。
@@ -27,7 +47,7 @@ class DeleteCacheAction extends \devzyj\rest\DeleteAction
     {
         // 删除缓存。
         if ($model->deleteCache() === false) {
-            throw new ServerErrorHttpException('Failed to delete the object cache for unknown reason.');
+            throw new ServerErrorHttpException($this->failedMessage, $this->failedCode);
         }
     }
 }

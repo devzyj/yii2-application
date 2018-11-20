@@ -25,6 +25,7 @@ use devzyj\behaviors\ActiveCacheBehaviorTrait;
  * @property string $allowed_apis 允许访问的APIs
  *
  * @property boolean $isValid 客户端是否有效。
+ * @property array $rateLimitContents 客户端的速率限制
  * @property array $allowedIPs 允许访问的IPs
  * @property array $allowedAPIs 允许访问的APIs
  *
@@ -114,17 +115,17 @@ class Client extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'name' => 'Name',
-            'secret' => 'Secret',
-            'description' => 'Description',
-            'create_time' => 'Create Time',
-            'status' => 'Status',
-            'token_expires_in' => 'Token Expires In',
-            'rate_limit_count' => 'Rate Limit Count',
-            'rate_limit_seconds' => 'Rate Limit Seconds',
-            'allowed_ips' => 'Allowed IPs',
-            'allowed_apis' => 'Allowed APIs',
+            'id' => Yii::t('app', 'ID'),
+            'name' => Yii::t('app', 'Name'),
+            'secret' => Yii::t('app', 'Secret'),
+            'description' => Yii::t('app', 'Description'),
+            'create_time' => Yii::t('app', 'Create Time'),
+            'status' => Yii::t('app', 'Status'),
+            'token_expires_in' => Yii::t('app', 'Token Expires In'),
+            'rate_limit_count' => Yii::t('app', 'Rate Limit Count'),
+            'rate_limit_seconds' => Yii::t('app', 'Rate Limit Seconds'),
+            'allowed_ips' => Yii::t('app', 'Allowed IPs'),
+            'allowed_apis' => Yii::t('app', 'Allowed APIs'),
         ];
     }
     
@@ -149,7 +150,30 @@ class Client extends \yii\db\ActiveRecord
     }
     
     /**
-     * 获取允许访问的 IPs。
+     * 获取客户端是否有效。
+     * 
+     * @return boolean
+     */
+    public function getIsValid()
+    {
+        return $this->status === self::STATUS_ENABLED;
+    }
+
+    /**
+     * 获取客户端的速率限制。
+     *
+     * @return array
+     */
+    public function getRateLimitContents()
+    {
+        return [
+            $this->rate_limit_count,
+            $this->rate_limit_seconds ? $this->rate_limit_seconds : 1
+        ];
+    }
+    
+    /**
+     * 获取客户端允许访问的 IPs。
      *
      * @return array
      */
@@ -164,7 +188,7 @@ class Client extends \yii\db\ActiveRecord
     }
     
     /**
-     * 获取允许访问的 APIs。
+     * 获取客户端允许访问的 APIs。
      *
      * @return array
      */
@@ -179,7 +203,7 @@ class Client extends \yii\db\ActiveRecord
     }
     
     /**
-     * 检查允许访问的 IPs。
+     * 检查客户端允许访问的 IPs。
      * 
      * @param string $ip 需要检查的IP地址。
      * @return boolean
@@ -199,7 +223,7 @@ class Client extends \yii\db\ActiveRecord
     }
     
     /**
-     * 检查允许访问的 APIs。
+     * 检查客户端允许访问的 APIs。
      * 
      * @param string $api 需要检查的api接口。（以正斜杠 `/` 开始和结束的字符串）
      * @return boolean
@@ -218,16 +242,6 @@ class Client extends \yii\db\ActiveRecord
         
         return false;
     }
-    
-    /**
-     * 获取客户端是否有效。
-     * 
-     * @return boolean
-     */
-    public function getIsValid()
-    {
-        return $this->status === self::STATUS_ENABLED;
-    }
 
     /**
      * 通过客户端ID，从缓存或者数据库中查找并返回一个客户端对像。
@@ -243,7 +257,7 @@ class Client extends \yii\db\ActiveRecord
     }
     
     /**
-     * 删除缓存。
+     * 删除客户端缓存。
      * 
      * @return boolean 是否删除成功。
      */
