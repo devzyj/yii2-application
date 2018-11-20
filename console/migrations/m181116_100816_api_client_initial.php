@@ -41,8 +41,8 @@ class m181116_100816_api_client_initial extends Migration
             'rate_limit_seconds' => $this->integer(10)->unsigned()->notNull()->defaultValue(0)->comment('速率限制秒数'),
             'allowed_ips' => $this->text()->notNull()->defaultValue('')->comment('允许访问的 IPs'),
             'allowed_apis' => $this->text()->notNull()->defaultValue('')->comment('允许访问的 APIs'),
-            'PRIMARY KEY (`id`)',
         ], "COMMENT='API - 客户端表'");
+        $this->addPrimaryKey('pk_id', Client::tableName(), 'id');
         
         // 插入数据。
         $this->insert(Client::tableName(), [
