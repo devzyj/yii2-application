@@ -62,7 +62,7 @@ class User extends \yii\db\ActiveRecord
             [['account'], 'string', 'max' => 100],
             [['description'], 'string', 'max' => 255],
             [['account'], 'unique', 'targetAttribute' => ['client_id', 'account']],
-            [['client_id'], 'exist', 'skipOnError' => true, 'targetClass' => Client::className(), 'targetAttribute' => ['client_id' => 'id']],
+            [['client_id'], 'exist', 'skipOnError' => true, 'targetClass' => Client::class, 'targetAttribute' => ['client_id' => 'id']],
         ];
     }
 
@@ -87,7 +87,7 @@ class User extends \yii\db\ActiveRecord
      */
     public function getClient()
     {
-        return $this->hasOne(Client::className(), ['id' => 'client_id']);
+        return $this->hasOne(Client::class, ['id' => 'client_id']);
     }
 
     /**
@@ -95,7 +95,7 @@ class User extends \yii\db\ActiveRecord
      */
     public function getRoleUsers()
     {
-        return $this->hasMany(RoleUser::className(), ['user_id' => 'id']);
+        return $this->hasMany(RoleUser::class, ['user_id' => 'id']);
     }
 
     /**
@@ -105,6 +105,6 @@ class User extends \yii\db\ActiveRecord
      */
     public function getRoles()
     {
-        return $this->hasMany(Role::className(), ['id' => 'role_id'])->viaTable(RoleUser::tableName(), ['user_id' => 'id']);
+        return $this->hasMany(Role::class, ['id' => 'role_id'])->viaTable(RoleUser::tableName(), ['user_id' => 'id']);
     }
 }

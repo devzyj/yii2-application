@@ -6,7 +6,6 @@
  */
 
 use yii\db\Migration;
-use common\models\api\Client;
 
 /**
  * Class m181116_100816_api_client_initial
@@ -14,22 +13,21 @@ use common\models\api\Client;
 class m181116_100816_api_client_initial extends Migration
 {
     /**
-     * {@inheritdoc}
+     * @var array 全部数据表名。
      */
-    public function init()
-    {
-        $this->db = Client::getDb();
-        
-        parent::init();
-    }
+    protected $tables = [
+        'client' => '{{%api_client}}',
+    ];
     
     /**
      * {@inheritdoc}
      */
     public function safeUp()
     {
+        $tables = $this->tables;
+        
         // 创建表。
-        $this->createTable(Client::tableName(), [
+        $this->createTable($tables['client'], [
             'id' => $this->string(20)->notNull()->comment('客户端ID'),
             'name' => $this->string(50)->notNull()->unique()->comment('客户端名称'),
             'secret' => $this->string(32)->notNull()->unique()->comment('客户端密钥'),
@@ -42,14 +40,14 @@ class m181116_100816_api_client_initial extends Migration
             'allowed_ips' => $this->text()->notNull()->defaultValue('')->comment('允许访问的 IPs'),
             'allowed_apis' => $this->text()->notNull()->defaultValue('')->comment('允许访问的 APIs'),
         ], "COMMENT='API - 客户端表'");
-        $this->addPrimaryKey('pk_id', Client::tableName(), 'id');
+        $this->addPrimaryKey('pk_id', $tables['client'], 'id');
         
         // 插入数据。
-        $this->insert(Client::tableName(), [
-            'id' => Client::generateId(), // e.g. 'f4c22926e400ebca'
-            'name' => 'app-backend',
-            'secret' => Client::generateSecret(), // e.g. '692569f364854bc130687297c770c2c0'
-            'description' => '后台管理系统',
+        $this->insert($tables['client'], [
+            'id' => 'f4c22926e400ebca',
+            'name' => 'backend',
+            'secret' => '692569f364854bc130687297c770c2c0',
+            'description' => 'Backend Management System',
             'create_time' => time(),
             'status' => 1,
             'token_expires_in' => 604800,
@@ -58,11 +56,11 @@ class m181116_100816_api_client_initial extends Migration
             'allowed_ips' => '*',
             'allowed_apis' => '*',
         ]);
-        $this->insert(Client::tableName(), [
-            'id' => Client::generateId(),
-            'name' => 'app-frontend',
-            'secret' => Client::generateSecret(),
-            'description' => '前端网站系统',
+        $this->insert($tables['client'], [
+            'id' => 'c515b193487c3556',
+            'name' => 'frontend',
+            'secret' => '673b0438a0201fbed38a4dfaa32ddee9',
+            'description' => 'Frontend Website System',
             'create_time' => time(),
             'status' => 1,
             'token_expires_in' => 604800,
@@ -78,6 +76,8 @@ class m181116_100816_api_client_initial extends Migration
      */
     public function safeDown()
     {
-        $this->dropTable(Client::tableName());
+        $tables = $this->tables;
+        
+        $this->dropTable($tables['client']);
     }
 }

@@ -10,10 +10,10 @@ $config = [
     'basePath' => dirname(__DIR__),
     'controllerNamespace' => 'api\controllers',
     'bootstrap' => [
-        'log', 
+        'log',
         'authorize',
-        'cgi-bin/v1', 
-        //'rbac/v1'
+        'cgi-bin/v1',
+        'rbac/v1',
     ],
     'components' => [
         'log' => [
@@ -53,14 +53,14 @@ $config = [
                 ],
             ],
         ],
-        /*'rbac' => [
+        'rbac' => [
             'class' => 'apiRbac\Module',
             'modules' => [
                 'v1' => [
                     'class' => 'apiRbacV1\Module',
                 ],
             ],
-        ],*/
+        ],
     ]
 ];
 

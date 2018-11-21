@@ -54,8 +54,8 @@ class OperationPermission extends \yii\db\ActiveRecord
             [['operation_id', 'permission_id'], 'required'],
             [['operation_id', 'permission_id'], 'integer', 'integerOnly' => true],
             [['operation_id', 'permission_id'], 'unique', 'targetAttribute' => ['operation_id', 'permission_id']],
-            [['operation_id'], 'exist', 'skipOnError' => true, 'targetClass' => Operation::className(), 'targetAttribute' => ['operation_id' => 'id']],
-            [['permission_id'], 'exist', 'skipOnError' => true, 'targetClass' => Permission::className(), 'targetAttribute' => ['permission_id' => 'id']],
+            [['operation_id'], 'exist', 'skipOnError' => true, 'targetClass' => Operation::class, 'targetAttribute' => ['operation_id' => 'id']],
+            [['permission_id'], 'exist', 'skipOnError' => true, 'targetClass' => Permission::class, 'targetAttribute' => ['permission_id' => 'id']],
         ];
     }
 
@@ -78,7 +78,7 @@ class OperationPermission extends \yii\db\ActiveRecord
      */
     public function getOperation()
     {
-        return $this->hasOne(Operation::className(), ['id' => 'operation_id']);
+        return $this->hasOne(Operation::class, ['id' => 'operation_id']);
     }
 
     /**
@@ -88,6 +88,6 @@ class OperationPermission extends \yii\db\ActiveRecord
      */
     public function getPermission()
     {
-        return $this->hasOne(Permission::className(), ['id' => 'permission_id']);
+        return $this->hasOne(Permission::class, ['id' => 'permission_id']);
     }
 }

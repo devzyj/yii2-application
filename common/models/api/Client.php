@@ -70,12 +70,12 @@ class Client extends \yii\db\ActiveRecord
                 'preserveNonEmptyValues' => true,
                 'attributes' => [
                     'id' => [
-                        self::EVENT_BEFORE_INSERT => [static::className(), 'generateId'],
-                        self::EVENT_BEFORE_UPDATE => [static::className(), 'generateId'],
+                        self::EVENT_BEFORE_INSERT => [static::class, 'generateId'],
+                        self::EVENT_BEFORE_UPDATE => [static::class, 'generateId'],
                     ],
                     'secret' => [
-                        self::EVENT_BEFORE_INSERT => [static::className(), 'generateSecret'],
-                        self::EVENT_BEFORE_UPDATE => [static::className(), 'generateSecret'],
+                        self::EVENT_BEFORE_INSERT => [static::class, 'generateSecret'],
+                        self::EVENT_BEFORE_UPDATE => [static::class, 'generateSecret'],
                     ],
                 ]
             ],

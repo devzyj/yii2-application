@@ -19,10 +19,10 @@ use Yii;
  * @property int $status 角色状态（0=禁用；1=可用）
  *
  * @property Client $client 客户端
- * @property PermissionRole[] $permissionRoles 权限与角色关联
- * @property Permission[] $permissions 权限
  * @property RoleUser[] $roleUsers 角色与用户关联
  * @property User[] $users 用户
+ * @property PermissionRole[] $permissionRoles 权限与角色关联
+ * @property Permission[] $permissions 权限
  * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
@@ -78,7 +78,7 @@ class Role extends \yii\db\ActiveRecord
             [['description'], 'string', 'max' => 255],
             [['status'], 'boolean'],
             [['name'], 'unique', 'targetAttribute' => ['client_id', 'name']],
-            [['client_id'], 'exist', 'skipOnError' => true, 'targetClass' => Client::className(), 'targetAttribute' => ['client_id' => 'id']],
+            [['client_id'], 'exist', 'skipOnError' => true, 'targetClass' => Client::class, 'targetAttribute' => ['client_id' => 'id']],
         ];
     }
 
@@ -104,25 +104,7 @@ class Role extends \yii\db\ActiveRecord
      */
     public function getClient()
     {
-        return $this->hasOne(Client::className(), ['id' => 'client_id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getPermissionRoles()
-    {
-        return $this->hasMany(PermissionRole::className(), ['role_id' => 'id']);
-    }
-
-    /**
-     * 权限查询对像。
-     * 
-     * @return PermissionQuery
-     */
-    public function getPermissions()
-    {
-        return $this->hasMany(Permission::className(), ['id' => 'permission_id'])->viaTable(PermissionRole::tableName(), ['role_id' => 'id']);
+        return $this->hasOne(Client::class, ['id' => 'client_id']);
     }
 
     /**
@@ -130,7 +112,7 @@ class Role extends \yii\db\ActiveRecord
      */
     public function getRoleUsers()
     {
-        return $this->hasMany(RoleUser::className(), ['role_id' => 'id']);
+        return $this->hasMany(RoleUser::class, ['role_id' => 'id']);
     }
 
     /**
@@ -140,6 +122,24 @@ class Role extends \yii\db\ActiveRecord
      */
     public function getUsers()
     {
-        return $this->hasMany(User::className(), ['id' => 'user_id'])->viaTable(RoleUser::tableName(), ['role_id' => 'id']);
+        return $this->hasMany(User::class, ['id' => 'user_id'])->viaTable(RoleUser::tableName(), ['role_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPermissionRoles()
+    {
+        return $this->hasMany(PermissionRole::class, ['role_id' => 'id']);
+    }
+
+    /**
+     * 权限查询对像。
+     * 
+     * @return PermissionQuery
+     */
+    public function getPermissions()
+    {
+        return $this->hasMany(Permission::class, ['id' => 'permission_id'])->viaTable(PermissionRole::tableName(), ['role_id' => 'id']);
     }
 }

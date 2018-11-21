@@ -54,8 +54,8 @@ class PermissionRole extends \yii\db\ActiveRecord
             [['permission_id', 'role_id'], 'required'],
             [['permission_id', 'role_id'], 'integer', 'integerOnly' => true],
             [['permission_id', 'role_id'], 'unique', 'targetAttribute' => ['permission_id', 'role_id']],
-            [['permission_id'], 'exist', 'skipOnError' => true, 'targetClass' => Permission::className(), 'targetAttribute' => ['permission_id' => 'id']],
-            [['role_id'], 'exist', 'skipOnError' => true, 'targetClass' => Role::className(), 'targetAttribute' => ['role_id' => 'id']],
+            [['permission_id'], 'exist', 'skipOnError' => true, 'targetClass' => Permission::class, 'targetAttribute' => ['permission_id' => 'id']],
+            [['role_id'], 'exist', 'skipOnError' => true, 'targetClass' => Role::class, 'targetAttribute' => ['role_id' => 'id']],
         ];
     }
 
@@ -78,7 +78,7 @@ class PermissionRole extends \yii\db\ActiveRecord
      */
     public function getPermission()
     {
-        return $this->hasOne(Permission::className(), ['id' => 'permission_id']);
+        return $this->hasOne(Permission::class, ['id' => 'permission_id']);
     }
 
     /**
@@ -88,6 +88,6 @@ class PermissionRole extends \yii\db\ActiveRecord
      */
     public function getRole()
     {
-        return $this->hasOne(Role::className(), ['id' => 'role_id']);
+        return $this->hasOne(Role::class, ['id' => 'role_id']);
     }
 }

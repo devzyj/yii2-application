@@ -20,7 +20,7 @@ return [
             'dsn' => 'mysql:host=localhost;port=3306;dbname=yii2application',
             'username' => 'root',
             'password' => '',
-            'tablePrefix' => 'app_',
+            'tablePrefix' => '',
             'charset' => 'utf8',
         ],
     ],

@@ -54,8 +54,8 @@ class RoleUser extends \yii\db\ActiveRecord
             [['role_id', 'user_id'], 'required'],
             [['role_id', 'user_id'], 'integer', 'integerOnly' => true],
             [['role_id', 'user_id'], 'unique', 'targetAttribute' => ['role_id', 'user_id']],
-            [['role_id'], 'exist', 'skipOnError' => true, 'targetClass' => Role::className(), 'targetAttribute' => ['role_id' => 'id']],
-            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['User' => 'id']],
+            [['role_id'], 'exist', 'skipOnError' => true, 'targetClass' => Role::class, 'targetAttribute' => ['role_id' => 'id']],
+            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['User' => 'id']],
         ];
     }
 
@@ -78,7 +78,7 @@ class RoleUser extends \yii\db\ActiveRecord
      */
     public function getRole()
     {
-        return $this->hasOne(Role::className(), ['id' => 'role_id']);
+        return $this->hasOne(Role::class, ['id' => 'role_id']);
     }
 
     /**
@@ -88,6 +88,6 @@ class RoleUser extends \yii\db\ActiveRecord
      */
     public function getUser()
     {
-        return $this->hasOne(User::className(), ['id' => 'user_id']);
+        return $this->hasOne(User::class, ['id' => 'user_id']);
     }
 }
