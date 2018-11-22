@@ -10,7 +10,7 @@ use Yii;
 use yii\helpers\ArrayHelper;
 
 /**
- * LoadClientIdBehavior 是为数据模型加载适当的 [[$attribute]] 的行为。
+ * LoadClientIdBehavior 通过判断客户端类型，为数据模型加载适当的 [[$attribute]] 的行为。
  * 
  * 依次判断下列条件，只会满足一条：
  * 如果客户端没有登录，属性将会被设置为 `null`。
@@ -69,6 +69,7 @@ class LoadClientIdBehavior extends \yii\base\Behavior
         }
         
         // 如果是超级客户端，并且在 URL 中指定了 [[$clientIdParam]]，则优先使用。
+        // URL 中指定参数一般是在嵌套路由时使用。
         $clientId = Yii::$app->getRequest()->getQueryParam($this->clientIdParam);
         if ($clientId !== null) {
             // 设置属性为 URL 中指定的值。
@@ -76,7 +77,7 @@ class LoadClientIdBehavior extends \yii\base\Behavior
             return;
         }
         
-        // 如果是超级客户端，并且没有指定属性的值，则使用本客户端ID。
+        // 如果是超级客户端，并且没有指定属性的值，则使用当前调用接口的客户端ID。
         $clientId = $this->getModelAttribute($model, $this->attribute);
         if ($clientId === null) {
             // 设置属性为当前调用接口的客户端ID。

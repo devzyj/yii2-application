@@ -18,7 +18,7 @@ use apiRbacV1\models\Operation;
  */
 class CheckOperationAction extends \devzyj\rest\Action
 {
-    use CheckActionTrait;
+    use CheckOperationTrait;
     
     /**
      * 检查用户是否有操作使用权。
@@ -62,17 +62,14 @@ class CheckOperationAction extends \devzyj\rest\Action
         // 准备查询对像。
         $query = $this->prepareQuery($query, $model);
         
-        /* @var $modelClass \apiRbacV1\models\Operation */
-        $modelClass = $query->modelClass;
-        
         // 查询条件。
         $query->andWhere([
-            $modelClass::tableName() . '.code' => $code,
+            Operation::tableName() . '.code' => $code,
         ]);
         
         // 获取操作模型。
         $operation = $query->one();
-        if (empty($operation)) {
+        if (!$operation) {
             throw new ForbiddenHttpException('No access.');
         }
         

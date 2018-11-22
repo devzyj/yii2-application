@@ -65,6 +65,8 @@ class ResponseLogBehavior extends \yii\base\Behavior
     }
     
     /**
+     * 在发送响应后记录日志。
+     * 
      * @param \yii\base\Event $event
      * @see \yii\web\Response::send()
      */

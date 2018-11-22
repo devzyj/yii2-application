@@ -54,6 +54,14 @@ class Client extends \common\models\rbac\Client
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function extraFields()
+    {
+        return ['users', 'roles', 'permissions', 'operations'];
+    }
+    
+    /**
      * @return \yii\db\ActiveQuery
      */
     public function getUsers()

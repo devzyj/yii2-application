@@ -8,6 +8,8 @@ namespace apiCgiBinV1\components;
 
 use Yii;
 use yii\filters\RateLimitInterface;
+use api\components\filters\ClientStatusFilterInterface;
+use api\components\filters\ClientIpFilterInterface;
 use api\components\traits\RateLimitTrait;
 
 /**
@@ -16,7 +18,7 @@ use api\components\traits\RateLimitTrait;
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
-class Identity extends \api\components\Identity implements RateLimitInterface
+class Identity extends \api\components\Identity implements RateLimitInterface, ClientStatusFilterInterface, ClientIpFilterInterface
 {
     use RateLimitTrait;
     
@@ -42,5 +44,23 @@ class Identity extends \api\components\Identity implements RateLimitInterface
     public function getRateLimit($request, $action)
     {
         return $this->getRateLimitContents();
+    }
+
+    /******************************* ClientStatusFilterInterface *******************************/
+    /**
+     * {@inheritdoc}
+     */
+    public function checkClientStatus($action, $request)
+    {
+        return $this->getClientIsValid();
+    }
+
+    /******************************* ClientIpFilterInterface *******************************/
+    /**
+     * {@inheritdoc}
+     */
+    public function checkClientIp($ip, $action, $request)
+    {
+        return $this->checkClientAllowedIp($ip);
     }
 }

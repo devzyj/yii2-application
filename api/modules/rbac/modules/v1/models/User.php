@@ -51,6 +51,14 @@ class User extends \common\models\rbac\User
         // 返回修改后的场景列表。
         return $scenarios;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function extraFields()
+    {
+        return ['client', 'roles'];
+    }
     
     /**
      * 客户端查询对像。

@@ -45,13 +45,17 @@ class ActiveController extends \devzyj\rest\ActiveController
                     'yii\filters\auth\QueryParamAuth',
                 ]
             ],
-            // 检查客户端状态。
+            // 验证客户端状态是否有效。
             'clientStatusFilter' => [
                 'class' => 'api\components\filters\ClientStatusFilter',
             ],
-            // 检查客户端允许访问的 IPs。
-            'clientIpsFilter' => [
-                'class' => 'api\components\filters\ClientIpsFilter',
+            // 验证客户端 IP 是否被允许访问。
+            'clientIpFilter' => [
+                'class' => 'api\components\filters\ClientIpFilter',
+            ],
+            // 验证 RBAC 客户端是否有效。
+            'rbacClientFilter' => [
+                'class' => 'apiRbacV1\components\filters\ClientFilter',
             ],
         ]);
     }
@@ -82,16 +86,14 @@ class ActiveController extends \devzyj\rest\ActiveController
 
     /**
      * {@inheritdoc}
+     * 
+     * @throws \yii\web\ForbiddenHttpException 客户端没有登录，或者没有访问权限。
      */
     public function checkActionAccess($action, $params = [])
     {
         /* @var $identity \api\components\Identity */
-        if (!($user = Yii::$app->getUser()) || !($identity = $user->getIdentity(false))) {
-            throw new ForbiddenHttpException('Client must be logged in.');
-        }
-        
-        // 检查客户端允许访问的 API。
-        if (!$identity->checkClientAPIs($action->getUniqueId())) {
+        if (!($user = Yii::$app->getUser()) || !($identity = $user->getIdentity(false)) 
+                || !$identity->checkClientAllowedApi($action->getUniqueId())) {
             throw new ForbiddenHttpException('Client API limit.');
         }
     }
@@ -101,6 +103,23 @@ class ActiveController extends \devzyj\rest\ActiveController
      */
     public function checkModelAccess($model, $action, $params = [])
     {
-        
+        /* @var $identity \apiRbacV1\components\Identity */
+        if (!($user = Yii::$app->getUser()) || !($identity = $user->getIdentity(false)) 
+                || !($client = $identity->getRbacClient())) {
+            throw new ForbiddenHttpException('Resources limit.');
+        } elseif (!$client->getIsSuper()) {
+            if ($model instanceof \common\models\rbac\Client) {
+                // 如果模型是 RBAC 客户端，检查模型主键是否等于调用接口的客户端主键。
+                if ($model->getPrimaryKey() !== $client->getPrimaryKey()) {
+                    throw new ForbiddenHttpException('Resources limit.');
+                }
+            } else {
+                // 如果模型不是 RBAC 客户端，获取模型中的 `client_id` 属性值。
+                $clientId = ArrayHelper::getValue($model, 'client_id');
+                if ($clientId !== $client->getPrimaryKey()) {
+                    throw new ForbiddenHttpException('Resources limit.');
+                }
+            }
+        }
     }
 }

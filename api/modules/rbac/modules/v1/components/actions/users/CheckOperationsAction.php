@@ -19,7 +19,7 @@ use apiRbacV1\models\Operation;
 class CheckOperationsAction extends \devzyj\rest\Action
 {
     use BatchActionTrait;
-    use CheckActionTrait;
+    use CheckOperationTrait;
     
     /**
      * 检查用户是否有操作使用权。
@@ -65,12 +65,9 @@ class CheckOperationsAction extends \devzyj\rest\Action
         // 准备查询对像。
         $query = $this->prepareQuery($query, $model);
         
-        /* @var $modelClass \apiRbacV1\models\Operation */
-        $modelClass = $query->modelClass;
-        
         // 查询条件。
         $query->andWhere([
-            $modelClass::tableName() . '.code' => $codes,
+            Operation::tableName() . '.code' => $codes,
         ]);
 
         // 以 `code` 索引结果。

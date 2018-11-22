@@ -12,6 +12,9 @@ use yii\web\IdentityInterface;
 /**
  * 访问接口的客户端身份标识类。
  * 
+ * @property boolean $isSuperClient 是否超级客户端。
+ * @property boolean $clientIsValid 客户端是否有效，超级客户端始终有效。
+ * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
@@ -20,8 +23,6 @@ class Identity extends \api\models\Client implements IdentityInterface
     /**
      * 是否为超级客户端。
      * 
-     * 超级客户端不检查 `状态`、`IP`、`权限`。
-     *
      * @return boolean
      */
     public function getIsSuperClient()
@@ -30,11 +31,11 @@ class Identity extends \api\models\Client implements IdentityInterface
     }
     
     /**
-     * 检查客户端状态是否有效。
+     * 客户端是否有效。
      * 
      * @return boolean 是否有效，超级客户端始终有效。
      */
-    public function checkClientStatus()
+    public function getClientIsValid()
     {
         if ($this->getIsSuperClient()) {
             return true;
@@ -44,31 +45,31 @@ class Identity extends \api\models\Client implements IdentityInterface
     }
 
     /**
-     * 检查客户端 IP 是否被允许访问。
+     * 检查  IP 是否被允许。
      *
      * @return boolean 是否允许，超级客户端始终允许。
      */
-    public function checkClientIPs($ip)
+    public function checkClientAllowedIp($ip)
     {
         if ($this->getIsSuperClient()) {
             return true;
         }
         
-        return $this->checkAllowedIPs($ip);
+        return $this->checkAllowedIp($ip);
     }
 
     /**
-     * 检查客户端是否允许访问 API。
+     * 检查 API 是否被允许。
      *
      * @return boolean 是否允许，超级客户端始终允许。
      */
-    public function checkClientAPIs($api)
+    public function checkClientAllowedApi($api)
     {
         if ($this->getIsSuperClient()) {
             return true;
         }
 
-        return $this->checkAllowedAPIs($api);
+        return $this->checkAllowedApi($api);
     }
     
     /******************************* IdentityInterface *******************************/

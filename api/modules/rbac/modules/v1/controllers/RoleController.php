@@ -50,25 +50,40 @@ class RoleController extends \apiRbacV1\components\ActiveController
                     'class' => 'yii\data\ActiveDataFilter',
                     'searchModel' => $this->searchModelClass,
                 ],
+                // 通过判断客户端类型，为查询对像添加 `client_id` 过滤条件的行为。
+                'as queryClientIdBehavior' => [
+                    'class' => 'apiRbacV1\components\behaviors\QueryClientIdBehavior',
+                ],
+                // 为查询对像添加 URL 查询参数中的过滤条件的行为。
+                'as queryParamBehavior' => [
+                    'class' => 'apiRbacV1\components\behaviors\QueryParamBehavior',
+                    'paramMap' => [
+                        'clientid' => 'client_id',
+                    ],
+                ],
+                // 通过遍历查询条件中的数据表名，自动使用 [[joinWith()]]。
+                'as queryJoinWithBehavior' => [
+                    'class' => 'apiRbacV1\components\behaviors\QueryJoinWithBehavior',
+                ],
                 // 即时加载指定的额外资源。
                 'as eagerLoadingBehavior' => [
                     'class' => 'devzyj\rest\behaviors\EagerLoadingBehavior',
                 ],
             ],
             'create' => [
-                // 为数据模型加载适当的 `client_id` 的行为。
+                // 通过判断客户端类型，为数据模型加载适当的 `client_id` 的行为。
                 'as loadClientIdBehavior' => [
                     'class' => 'apiRbacV1\components\behaviors\LoadClientIdBehavior',
                 ]
             ],
             'batch-create' => [
-                // 为数据模型加载适当的 `client_id` 的行为。
+                // 通过判断客户端类型，为数据模型加载适当的 `client_id` 的行为。
                 'as loadClientIdBehavior' => [
                     'class' => 'apiRbacV1\components\behaviors\LoadClientIdBehavior',
                 ]
             ],
             'create-validate' => [
-                // 为数据模型加载适当的 `client_id` 的行为。
+                // 通过判断客户端类型，为数据模型加载适当的 `client_id` 的行为。
                 'as loadClientIdBehavior' => [
                     'class' => 'apiRbacV1\components\behaviors\LoadClientIdBehavior',
                 ]

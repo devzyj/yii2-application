@@ -6,14 +6,19 @@
  */
 namespace apiRbacV1\models;
 
+use apiRbacV1\components\behaviors\QueryJoinWithBehaviorInterface;
+use apiRbacV1\components\behaviors\QueryJoinWithBehaviorTrait;
+
 /**
  * 查询角色数据模型。
  * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
-class RoleSearch extends Role
+class RoleSearch extends Role implements QueryJoinWithBehaviorInterface
 {
+    use QueryJoinWithBehaviorTrait;
+    
     /**
      * {@inheritdoc}
      */
@@ -24,5 +29,4 @@ class RoleSearch extends Role
             [['name', 'description'], 'string'],
         ];
     }
-    
 }

@@ -7,12 +7,12 @@
 namespace apiRbacV1\components\actions\users;
 
 /**
- * CheckActionTrait
+ * CheckOperationTrait
  * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
-trait CheckActionTrait
+trait CheckOperationTrait
 {
     /**
      * 准备查询对像。
@@ -45,9 +45,9 @@ trait CheckActionTrait
                                     $model::tableName() . '.id' => $model->id,
                                 ]);
                             }
-                        ]);
+                        ], false);
                     }
-                ]);
+                ], false);
             },
         ], false);
         

@@ -45,13 +45,13 @@ class ActiveController extends \devzyj\rest\ActiveController
                     'yii\filters\auth\QueryParamAuth',
                 ]
             ],
-            // 检查客户端状态。
+            // 验证客户端状态是否有效。
             'clientStatusFilter' => [
                 'class' => 'api\components\filters\ClientStatusFilter',
             ],
-            // 检查客户端允许访问的 IPs。
-            'clientIpsFilter' => [
-                'class' => 'api\components\filters\ClientIpsFilter',
+            // 验证客户端 IP 是否被允许访问。
+            'clientIpFilter' => [
+                'class' => 'api\components\filters\ClientIpFilter',
             ],
         ]);
     }
@@ -82,16 +82,14 @@ class ActiveController extends \devzyj\rest\ActiveController
 
     /**
      * {@inheritdoc}
+     * 
+     * @throws \yii\web\ForbiddenHttpException 客户端没有登录，或者没有访问权限。
      */
     public function checkActionAccess($action, $params = [])
     {
         /* @var $identity \api\components\Identity */
-        if (!($user = Yii::$app->getUser()) || !($identity = $user->getIdentity(false))) {
-            throw new ForbiddenHttpException('Client must be logged in.');
-        }
-        
-        // 检查客户端允许访问的 API。
-        if (!$identity->checkClientAPIs($action->getUniqueId())) {
+        if (!($user = Yii::$app->getUser()) || !($identity = $user->getIdentity(false)) 
+                || !$identity->checkClientAllowedApi($action->getUniqueId())) {
             throw new ForbiddenHttpException('Client API limit.');
         }
     }

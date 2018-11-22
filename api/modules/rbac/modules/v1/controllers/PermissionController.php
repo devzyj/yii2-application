@@ -8,36 +8,36 @@ namespace apiRbacV1\controllers;
 
 use Yii;
 use yii\helpers\ArrayHelper;
-use apiRbacV1\models\User;
-use apiRbacV1\models\UserSearch;
+use apiRbacV1\models\Permission;
+use apiRbacV1\models\PermissionSearch;
 
 /**
- * 用户控制器。
+ * 权限控制器。
  * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
-class UserController extends \apiRbacV1\components\ActiveController
+class PermissionController extends \apiRbacV1\components\ActiveController
 {
     /**
      * {@inheritdoc}
      */
-    public $modelClass = User::class;
+    public $modelClass = Permission::class;
 
     /**
      * {@inheritdoc}
      */
-    public $searchModelClass = UserSearch::class;
-
-    /**
-     * {@inheritdoc}
-     */
-    public $createScenario = User::SCENARIO_INSERT;
+    public $searchModelClass = PermissionSearch::class;
     
     /**
      * {@inheritdoc}
      */
-    public $updateScenario = User::SCENARIO_UPDATE;
+    public $createScenario = Permission::SCENARIO_INSERT;
+    
+    /**
+     * {@inheritdoc}
+     */
+    public $updateScenario = Permission::SCENARIO_UPDATE;
     
     /**
      * {@inheritdoc}
@@ -88,6 +88,48 @@ class UserController extends \apiRbacV1\components\ActiveController
                     'class' => 'apiRbacV1\components\behaviors\LoadClientIdBehavior',
                 ]
             ],
+            // 分配操作。
+            'assign-operation' => [
+                'class' => 'apiRbacV1\components\actions\AssignAction',
+                'modelClass' => $this->modelClass,
+                'checkActionAccess' => [$this, 'checkActionAccess'],
+                'checkModelAccess' => [$this, 'checkModelAccess'],
+                'notFoundMessage' => $this->notFoundMessage,
+                'notFoundCode' => $this->notFoundCode,
+                'relationName' => 'operations',
+                'relationModelClass' => 'apiRbacV1\models\Operation',
+            ],
+            // 移除操作。
+            'remove-operation' => [
+                'class' => 'apiRbacV1\components\actions\RemoveAction',
+                'modelClass' => $this->modelClass,
+                'checkActionAccess' => [$this, 'checkActionAccess'],
+                'checkModelAccess' => [$this, 'checkModelAccess'],
+                'notFoundMessage' => $this->notFoundMessage,
+                'notFoundCode' => $this->notFoundCode,
+                'relationName' => 'operations',
+            ],
+            // 分配多个操作。
+            'assign-operations' => [
+                'class' => 'apiRbacV1\components\actions\AssignMultipleAction',
+                'modelClass' => $this->modelClass,
+                'checkActionAccess' => [$this, 'checkActionAccess'],
+                'checkModelAccess' => [$this, 'checkModelAccess'],
+                'notFoundMessage' => $this->notFoundMessage,
+                'notFoundCode' => $this->notFoundCode,
+                'relationName' => 'operations',
+                'relationModelClass' => 'apiRbacV1\models\Operation',
+            ],
+            // 移除多个操作。
+            'remove-operations' => [
+                'class' => 'apiRbacV1\components\actions\RemoveMultipleAction',
+                'modelClass' => $this->modelClass,
+                'checkActionAccess' => [$this, 'checkActionAccess'],
+                'checkModelAccess' => [$this, 'checkModelAccess'],
+                'notFoundMessage' => $this->notFoundMessage,
+                'notFoundCode' => $this->notFoundCode,
+                'relationName' => 'operations',
+            ],
             // 分配角色。
             'assign-role' => [
                 'class' => 'apiRbacV1\components\actions\AssignAction',
@@ -130,24 +172,6 @@ class UserController extends \apiRbacV1\components\ActiveController
                 'notFoundCode' => $this->notFoundCode,
                 'relationName' => 'roles',
             ],
-            // 检查操作。
-            'check-operation' => [
-                'class' => 'apiRbacV1\components\actions\users\CheckOperationAction',
-                'modelClass' => $this->modelClass,
-                'checkActionAccess' => [$this, 'checkActionAccess'],
-                'checkModelAccess' => [$this, 'checkModelAccess'],
-                'notFoundMessage' => $this->notFoundMessage,
-                'notFoundCode' => $this->notFoundCode,
-            ],
-            // 检查多个操作。
-            'check-operations' => [
-                'class' => 'apiRbacV1\components\actions\users\CheckOperationsAction',
-                'modelClass' => $this->modelClass,
-                'checkActionAccess' => [$this, 'checkActionAccess'],
-                'checkModelAccess' => [$this, 'checkModelAccess'],
-                'notFoundMessage' => $this->notFoundMessage,
-                'notFoundCode' => $this->notFoundCode,
-            ],
         ]);
     }
     
@@ -157,12 +181,14 @@ class UserController extends \apiRbacV1\components\ActiveController
     protected function verbs()
     {
         return ArrayHelper::merge(parent::verbs(), [
+            'assign-operation' => ['POST'],
+            'remove-operation' => ['DELETE'],
+            'assign-operations' => ['POST'],
+            'remove-operations' => ['DELETE'],
             'assign-role' => ['POST'],
             'remove-role' => ['DELETE'],
             'assign-roles' => ['POST'],
             'remove-roles' => ['DELETE'],
-            'check-operation' => ['GET'],
-            'check-operations' => ['GET'],
         ]);
     }
 }

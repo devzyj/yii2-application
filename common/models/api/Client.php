@@ -80,7 +80,8 @@ class Client extends \yii\db\ActiveRecord
                 ]
             ],
             'primaryKeyCacheBehavior' => [
-                'class' => 'devzyj\behaviors\ActiveCacheBehavior',
+                'class' => '\devzyj\behaviors\ActiveCacheBehavior',
+                //'cache' => Yii::createObject('\yii\caching\DummyCache'), // configure no cache
                 'baseModelCacheKey' => ['Api', 'Client', 'PrimaryKey'],
                 'defaultDuration' => 86400, // 24 hours
             ],
@@ -188,8 +189,25 @@ class Client extends \yii\db\ActiveRecord
     }
     
     /**
+     * 检查 IP 是否被允许。
+     * 
+     * @param string $ip 需要检查的IP地址。
+     * @return boolean
+     */
+    public function checkAllowedIp($ip)
+    {
+        foreach ($this->getAllowedIPs() as $allowed) {
+            if ($allowed === '*' || $allowed === $ip || (($pos = strpos($allowed, '*')) !== false && !strncmp($ip, $allowed, $pos))) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    /**
      * 获取客户端允许访问的 APIs。
-     *
+     * 
      * @return array
      */
     public function getAllowedAPIs()
@@ -203,40 +221,55 @@ class Client extends \yii\db\ActiveRecord
     }
     
     /**
-     * 检查客户端允许访问的 IPs。
+     * 确保 APIs 格式正确。
      * 
-     * @param string $ip 需要检查的IP地址。
-     * @return boolean
+     * 1. 不处理单个字符 `*`;
+     * 2. 字符串中如果有字符 `*`，则去除未尾的 `/`，并且在开头添加 '/'。
+     * 3. 字符串中如果没有字符 `*`，则在开头和未尾都添加 `/`。
+     * 
+     * 返回值的格式可能包括以下几种：
+     * [
+     *     '*',
+     *     '/api/user-*',
+     *     '/api/users/*',
+     *     '/api/users/create/'
+     * ]
+     * 
+     * @param array $list API列表。
+     * @return array 
      */
-    public function checkAllowedIPs($ip)
+    public function ensureAllowedAPIs($list)
     {
-        $allowedIPs = $this->getAllowedIPs();
-        if ($allowedIPs) {
-            foreach ($allowedIPs as $allowed) {
-                if ($allowed === '*' || $allowed === $ip || (($pos = strpos($allowed, '*')) !== false && !strncmp($ip, $allowed, $pos))) {
-                    return true;
-                }
+        foreach ($list as $key => $value) {
+            if ($value === '*') {
+                $list[$key] = $value;
+                continue;
             }
+            
+            $value = '/' . trim($value, '/');
+            if (strpos($value, '*') === false) {
+                $value .= '/';
+            }
+            
+            $list[$key] = $value;
         }
         
-        return false;
+        return $list;
     }
     
     /**
-     * 检查客户端允许访问的 APIs。
+     * 检查 API 是否被允许。
      * 
-     * @param string $api 需要检查的api接口。（以正斜杠 `/` 开始和结束的字符串）
+     * @param string $api 需要检查的 API。
      * @return boolean
      */
-    public function checkAllowedAPIs($api)
+    public function checkAllowedApi($api)
     {
-        $allowedAPIs = $this->getAllowedAPIs();
-        if ($allowedAPIs) {
-            $api = '/' . trim($api, '/') . '/';
-            foreach ($allowedAPIs as $allowed) {
-                if ($allowed === '*' || $allowed === $api || (($pos = strpos($allowed, '*')) !== false && !strncmp($api, $allowed, $pos))) {
-                    return true;
-                }
+        $api = '/' . trim($api, '/') . '/';
+        $list = $this->ensureAllowedAPIs($this->getAllowedAPIs());
+        foreach ($list as $allowed) {
+            if ($allowed === '*' || $allowed === $api || (($pos = strpos($allowed, '*')) !== false && !strncmp($api, $allowed, $pos))) {
+                return true;
             }
         }
         

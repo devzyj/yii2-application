@@ -35,6 +35,8 @@ class ActionLogBehavior extends \yii\base\Behavior
     }
     
     /**
+     * 在处理动作前记录日志。
+     * 
      * @param \yii\base\ActionEvent $event
      * @see \yii\base\Module::beforeAction()
      * @see \yii\base\Controller::beforeAction()

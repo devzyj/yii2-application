@@ -36,9 +36,9 @@ class ClientCredentialsAction extends \yii\base\Action
         /* @var $model Client */
         $model = Client::findOrSetOneById($params['client_id']);
         if (!$model || $params['client_secret'] !== $model->secret) {
-            throw new NotFoundHttpException('The `client_id` or `client_secret` invalid.');
+            throw new NotFoundHttpException('The `client_id` or `client_secret` is invalid.');
         } elseif (!$model->getIsValid()) {
-            throw new NotFoundHttpException('Client is invalid.');
+            throw new NotFoundHttpException('The client is invalid.');
         }
         
         /* @var $module \apiAuthorize\Module */

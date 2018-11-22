@@ -53,6 +53,14 @@ class Role extends \common\models\rbac\Role
         // 返回修改后的场景列表。
         return $scenarios;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function extraFields()
+    {
+        return ['client', 'users', 'permissions'];
+    }
     
     /**
      * 客户端查询对像。

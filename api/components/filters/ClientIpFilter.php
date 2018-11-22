@@ -10,42 +10,42 @@ use Yii;
 use yii\web\ForbiddenHttpException;
 
 /**
- * ClientStatusFilter 实现了验证客户端状态是否有效。
+ * ClientIpFilter 实现了验证客户端 IP 是否被允许访问。
  * 
  * ```php
  * public function behaviors()
  * {
  *     return [
- *         'clientStatusFilter' => [
- *             'class' => 'api\components\filters\ClientStatusFilter',
+ *         'clientIpFilter' => [
+ *             'class' => 'api\components\filters\ClientIpFilter',
  *         ],
  *     ];
  * }
  * ```
  * 
- * ClientStatusFilter 需要 [[user]] 实现 [[ClientStatusFilterInterface]]。
- * 如果 [[user]] 没有设置或没有实现 [[ClientStatusFilterInterface]]， ClientStatusFilter 将什么也不做。
+ * ClientIpFilter 需要 [[user]] 实现 [[ClientIpFilterInterface]]。
+ * 如果 [[user]] 没有设置或没有实现 [[ClientIpFilterInterface]]， ClientIpFilter 将什么也不做。
  * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
-class ClientStatusFilter extends \yii\base\ActionFilter
+class ClientIpFilter extends \yii\base\ActionFilter
 {
     /**
      * @var string 错误信息。
      */
-    public $errorMessage = 'Client is invalid.';
+    public $errorMessage = 'Client IP address limit.';
 
     /**
      * @var integer 错误编码。
      */
     public $errorCode = 0;
-
+    
     /**
      * @var \yii\web\Request 当前的请求。如果没有设置，将使用 `Yii::$app->getRequest()`。
      */
     public $request;
-    
+
     /**
      * {@inheritdoc}
      */
@@ -54,20 +54,21 @@ class ClientStatusFilter extends \yii\base\ActionFilter
         if ($this->request === null) {
             $this->request = Yii::$app->getRequest();
         }
-    
+        
         parent::init();
     }
     
     /**
      * {@inheritdoc}
      * 
-     * @throws \yii\web\ForbiddenHttpException 客户端状态不可用。
+     * @throws \yii\web\ForbiddenHttpException 客户端 IP 不被允许。
      */
     public function beforeAction($action)
     {
         if (($user = Yii::$app->getUser()) && ($identity = $user->getIdentity(false))) {
-            if ($identity instanceof ClientStatusFilterInterface) {
-                if (!$identity->checkClientStatus($action, $this->request)) {
+            if ($identity instanceof ClientIpFilterInterface) {
+                $ip = $this->request->getUserIP();
+                if (!$identity->checkClientIp($ip, $action, $this->request)) {
                     throw new ForbiddenHttpException($this->errorMessage, $this->errorCode);
                 }
             }

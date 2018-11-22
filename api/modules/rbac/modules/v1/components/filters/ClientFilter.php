@@ -4,23 +4,20 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace api\components\filters;
+namespace apiRbacV1\components\filters;
 
 use Yii;
 use yii\web\ForbiddenHttpException;
 
 /**
- * ClientIpsFilter 检查客户端允许访问的 IPs。
- * 
- * 必需设置 `user` 组件中的 `$identity` 为 [[\api\components\Identity]]。
- * 如果没有设置则跳过检查。
+ * ClientFilter 实现了验证 RBAC 客户端是否有效。
  * 
  * ```php
  * public function behaviors()
  * {
  *     return [
- *         'clientIpsFilter' => [
- *             'class' => 'api\components\filters\ClientIpsFilter',
+ *         'clientFilter' => [
+ *             'class' => 'apiRbacV1\components\filters\ClientFilter',
  *         ],
  *     ];
  * }
@@ -29,28 +26,45 @@ use yii\web\ForbiddenHttpException;
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
-class ClientIpsFilter extends \yii\base\ActionFilter
+class ClientFilter extends \yii\base\ActionFilter
 {
     /**
      * @var string 错误信息。
      */
-    public $errorMessage = 'Client IP address limit.';
+    public $errorMessage = 'Rbac client is invalid.';
 
     /**
      * @var integer 错误编码。
      */
     public $errorCode = 0;
+
+    /**
+     * @var \yii\web\Request 当前的请求。如果没有设置，将使用 `Yii::$app->getRequest()`。
+     */
+    public $request;
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function init()
+    {
+        if ($this->request === null) {
+            $this->request = Yii::$app->getRequest();
+        }
+    
+        parent::init();
+    }
     
     /**
      * {@inheritdoc}
      * 
-     * @throws \yii\web\ForbiddenHttpException 客户端访问的 IP 不被允许。
+     * @throws \yii\web\ForbiddenHttpException 客户端不可用。
      */
     public function beforeAction($action)
     {
         if (($user = Yii::$app->getUser()) && ($identity = $user->getIdentity(false))) {
-            if ($identity instanceof \api\components\Identity) {
-                if (!$identity->checkClientIPs(Yii::$app->getRequest()->getUserIP())) {
+            if ($identity instanceof \apiRbacV1\components\Identity) {
+                if (!$identity->getRbacClient()) {
                     throw new ForbiddenHttpException($this->errorMessage, $this->errorCode);
                 }
             }

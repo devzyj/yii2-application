@@ -12,6 +12,7 @@ use yii\helpers\ArrayHelper;
 /**
  * RateLimitTrait 实现了 [[yii\filters\RateLimitInterface]] 中的 [[loadAllowance()]] 和 [[saveAllowance()]] 方法。
  * 
+ * @see \yii\filters\RateLimitInterface
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */

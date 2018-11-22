@@ -53,6 +53,14 @@ class Operation extends \common\models\rbac\Operation
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function extraFields()
+    {
+        return ['client', 'permissions'];
+    }
+    
+    /**
      * 客户端查询对像。
      * 
      * @return ClientQuery

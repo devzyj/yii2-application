@@ -6,14 +6,19 @@
  */
 namespace apiRbacV1\models;
 
+use apiRbacV1\components\behaviors\QueryJoinWithBehaviorInterface;
+use apiRbacV1\components\behaviors\QueryJoinWithBehaviorTrait;
+
 /**
  * 查询客户端数据模型。
  * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
-class ClientSearch extends Client
+class ClientSearch extends Client implements QueryJoinWithBehaviorInterface
 {
+    use QueryJoinWithBehaviorTrait;
+    
     /**
      * {@inheritdoc}
      */
