@@ -35,6 +35,7 @@ use apiRbacV1\components\behaviors\QueryJoinWithBehaviorInterface;
  * @property string $operation_description 操作描述
  * @property int $operation_create_time 操作创建时间
  * @property int $operation_status 操作状态
+ * @property string $operation_data 操作额外数据
  * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
@@ -78,7 +79,7 @@ class ClientSearch extends Client implements QueryJoinWithBehaviorInterface
             [['permission_name', 'permission_description'], 'string'],
             // operation
             [['operation_id', 'operation_create_time', 'operation_status'], 'integer'],
-            [['operation_code', 'operation_name', 'operation_description'], 'string'],
+            [['operation_code', 'operation_name', 'operation_description', 'operation_data'], 'string'],
         ];
     }
     
@@ -121,6 +122,7 @@ class ClientSearch extends Client implements QueryJoinWithBehaviorInterface
             'operation_description' => OperationSearch::tableName() . '.description',
             'operation_create_time' => OperationSearch::tableName() . '.create_time',
             'operation_status' => OperationSearch::tableName() . '.status',
+            'operation_data' => OperationSearch::tableName() . '.data',
         ];
     }
     

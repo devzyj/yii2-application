@@ -25,6 +25,7 @@ use apiRbacV1\components\behaviors\QueryJoinWithBehaviorInterface;
  * @property string $operation_description 操作描述
  * @property int $operation_create_time 操作创建时间
  * @property int $operation_status 操作状态
+ * @property string $operation_data 操作额外数据
  * 
  * @property int $role_id 角色ID
  * @property string $role_name 角色名称
@@ -73,7 +74,7 @@ class PermissionSearch extends Permission implements QueryJoinWithBehaviorInterf
             [['client_name', 'client_identifier', 'client_description'], 'string'],
             // operation
             [['operation_id', 'operation_create_time', 'operation_status'], 'integer'],
-            [['operation_code', 'operation_name', 'operation_description'], 'string'],
+            [['operation_code', 'operation_name', 'operation_description', 'operation_data'], 'string'],
             // role
             [['role_id', 'role_create_time', 'role_status'], 'integer'],
             [['role_name', 'role_description'], 'string'],
@@ -111,6 +112,7 @@ class PermissionSearch extends Permission implements QueryJoinWithBehaviorInterf
             'operation_description' => OperationSearch::tableName() . '.description',
             'operation_create_time' => OperationSearch::tableName() . '.create_time',
             'operation_status' => OperationSearch::tableName() . '.status',
+            'operation_data' => OperationSearch::tableName() . '.data',
             // role
             'role_id' => RoleSearch::tableName() . '.id',
             'role_name' => RoleSearch::tableName() . '.name',

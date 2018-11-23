@@ -18,7 +18,8 @@ use devzyj\behaviors\ActiveCacheBehaviorTrait;
  * @property string $description 客户端描述
  * @property int $create_time 创建时间
  * @property int $status 客户端状态（0=禁用；1=可用）
- * @property int $token_expires_in 令牌过期时间（秒）
+ * @property int $token_expires_in 令牌的过期时间（秒）
+ * @property int $refresh_token_expires_in 刷新令牌的过期时间（秒）
  * @property int $rate_limit_count 速率限制次数
  * @property int $rate_limit_seconds 速率限制秒数
  * @property string $allowed_ips 允许访问的IPs
@@ -81,7 +82,7 @@ class Client extends \yii\db\ActiveRecord
             ],
             'primaryKeyCacheBehavior' => [
                 'class' => '\devzyj\behaviors\ActiveCacheBehavior',
-                //'cache' => Yii::createObject('\yii\caching\DummyCache'), // configure no cache
+                //'cache' => Yii::createObject('\yii\caching\DummyCache'), // configure to no cache
                 'baseModelCacheKey' => ['Api', 'Client', 'PrimaryKey'],
                 'defaultDuration' => 86400, // 24 hours
             ],
@@ -98,13 +99,13 @@ class Client extends \yii\db\ActiveRecord
             [['name'], 'trim'],
             [['description', 'allowed_ips', 'allowed_apis'], 'default', 'value' => ''],
             [['status'], 'default', 'value' => self::STATUS_DISABLED],
-            [['token_expires_in', 'rate_limit_count', 'rate_limit_seconds'], 'default', 'value' => 0],
+            [['token_expires_in', 'refresh_token_expires_in', 'rate_limit_count', 'rate_limit_seconds'], 'default', 'value' => 0],
             // 验证规则。
             [['name'], 'required'],
             [['name'], 'string', 'max' => 50],
             [['description'], 'string', 'max' => 255],
             [['status'], 'boolean'],
-            [['token_expires_in', 'rate_limit_count', 'rate_limit_seconds'], 'integer', 'integerOnly' => true, 'min' => 0],
+            [['token_expires_in', 'refresh_token_expires_in', 'rate_limit_count', 'rate_limit_seconds'], 'integer', 'integerOnly' => true, 'min' => 0],
             [['allowed_ips', 'allowed_apis'], 'string'],
             [['name'], 'unique'],
         ];
@@ -116,17 +117,18 @@ class Client extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'name' => Yii::t('app', 'Name'),
-            'secret' => Yii::t('app', 'Secret'),
-            'description' => Yii::t('app', 'Description'),
-            'create_time' => Yii::t('app', 'Create Time'),
-            'status' => Yii::t('app', 'Status'),
-            'token_expires_in' => Yii::t('app', 'Token Expires In'),
-            'rate_limit_count' => Yii::t('app', 'Rate Limit Count'),
-            'rate_limit_seconds' => Yii::t('app', 'Rate Limit Seconds'),
-            'allowed_ips' => Yii::t('app', 'Allowed IPs'),
-            'allowed_apis' => Yii::t('app', 'Allowed APIs'),
+            'id' => 'ID',
+            'name' => 'Name',
+            'secret' => 'Secret',
+            'description' => 'Description',
+            'create_time' => 'Create Time',
+            'status' => 'Status',
+            'token_expires_in' => 'Token Expires In',
+            'refresh_token_expires_in' => 'Refresh Token Expires In',
+            'rate_limit_count' => 'Rate Limit Count',
+            'rate_limit_seconds' => 'Rate Limit Seconds',
+            'allowed_ips' => 'Allowed IPs',
+            'allowed_apis' => 'Allowed APIs',
         ];
     }
     

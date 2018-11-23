@@ -53,10 +53,9 @@ class Identity extends \api\components\Identity implements RateLimitInterface, C
     {
         /* @var $module \apiAuthorize\Module */
         $module = Yii::$app->getModule('authorize');
-        $jwt = $module->getToken()->getClientCredentials($token);
-        if ($jwt && $jwt->hasClaim('client_id')) {
-            $clientId = $jwt->getClaim('client_id');
-            return static::findOrSetOneById($clientId);
+        $tokenData = $module->getToken()->getAccessTokenData($token);
+        if (isset($tokenData['client_id'])) {
+            return static::findOrSetOneById($tokenData['client_id']);
         }
     }
 

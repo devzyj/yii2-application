@@ -44,12 +44,14 @@ class Client extends \api\models\Client
     
         // 新增数据的场景。
         $scenarios[self::SCENARIO_INSERT] = [
-            'name', 'description', 'status', 'token_expires_in', 'rate_limit_count', 'rate_limit_seconds', 'allowed_ips', 'allowed_apis'
+            'name', 'description', 'status', 'token_expires_in', 'refresh_token_expires_in', 
+            'rate_limit_count', 'rate_limit_seconds', 'allowed_ips', 'allowed_apis'
         ];
     
         // 更新数据的场景。
         $scenarios[self::SCENARIO_UPDATE] = [
-            'name', 'description', 'status', 'token_expires_in', 'rate_limit_count', 'rate_limit_seconds', 'allowed_ips', 'allowed_apis'
+            'name', 'description', 'status', 'token_expires_in', 'refresh_token_expires_in', 
+            'rate_limit_count', 'rate_limit_seconds', 'allowed_ips', 'allowed_apis'
         ];
     
         // 重置ID的场景。

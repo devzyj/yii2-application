@@ -65,9 +65,9 @@ class PermissionRole extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'permission_id' => Yii::t('app', 'Permission ID'),
-            'role_id' => Yii::t('app', 'Role ID'),
-            'create_time' => Yii::t('app', 'Create Time'),
+            'permission_id' => 'Permission ID',
+            'role_id' => 'Role ID',
+            'create_time' => 'Create Time',
         ];
     }
 

@@ -40,12 +40,12 @@ class Operation extends \common\models\rbac\Operation
     
         // 新增数据的场景。
         $scenarios[self::SCENARIO_INSERT] = [
-            'client_id', 'code', 'name', 'description', 'status'
+            'client_id', 'code', 'name', 'description', 'status', 'data'
         ];
     
         // 更新数据的场景。
         $scenarios[self::SCENARIO_UPDATE] = [
-            'code', 'name', 'description', 'status'
+            'code', 'name', 'description', 'status', 'data'
         ];
     
         // 返回修改后的场景列表。

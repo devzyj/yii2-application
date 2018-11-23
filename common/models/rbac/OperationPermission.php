@@ -65,9 +65,9 @@ class OperationPermission extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'operation_id' => Yii::t('app', 'Operation ID'),
-            'permission_id' => Yii::t('app', 'Permission ID'),
-            'create_time' => Yii::t('app', 'Create Time'),
+            'operation_id' => 'Operation ID',
+            'permission_id' => 'Permission ID',
+            'create_time' => 'Create Time',
         ];
     }
 

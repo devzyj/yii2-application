@@ -66,7 +66,7 @@ class OperationSearch extends Operation implements QueryJoinWithBehaviorInterfac
         return [
             // self
             [['id', 'client_id', 'create_time', 'status'], 'integer'],
-            [['code', 'name', 'description'], 'string'],
+            [['code', 'name', 'description', 'data'], 'string'],
             // client
             [['client_create_time'], 'integer'],
             [['client_name', 'client_identifier', 'client_description'], 'string'],
@@ -98,6 +98,7 @@ class OperationSearch extends Operation implements QueryJoinWithBehaviorInterfac
             'description' => static::tableName() . '.description',
             'create_time' => static::tableName() . '.create_time',
             'status' => static::tableName() . '.status',
+            'data' => static::tableName() . '.data',
             // client
             'client_name' => ClientSearch::tableName() . '.name',
             'client_identifier' => ClientSearch::tableName() . '.identifier',

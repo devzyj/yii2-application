@@ -18,6 +18,7 @@ use Yii;
  * @property string $description 操作描述
  * @property int $create_time 创建时间
  * @property int $status 操作状态（0=禁用；1=可用）
+ * @property string $data 额外数据
  *
  * @property Client $client 客户端
  * @property OperationPermission[] $operationPermissions 操作与权限关联
@@ -69,7 +70,7 @@ class Operation extends \yii\db\ActiveRecord
             // 过滤和处理数据。
             [['code', 'name'], 'trim'],
             [['code'], 'filter', 'filter' => 'strtolower'],
-            [['description'], 'default', 'value' => ''],
+            [['description', 'data'], 'default', 'value' => ''],
             [['status'], 'default', 'value' => self::STATUS_DISABLED],
             // 验证规则。
             [['client_id', 'code', 'name'], 'required'],
@@ -77,6 +78,7 @@ class Operation extends \yii\db\ActiveRecord
             [['code'], 'common\validators\rbac\OperationCodeValidator'],
             [['code', 'description'], 'string', 'max' => 255],
             [['name'], 'string', 'max' => 50],
+            [['data'], 'string', 'max' => 5000],
             [['status'], 'boolean'],
             [['code'], 'unique', 'targetAttribute' => ['client_id', 'code']],
             [['name'], 'unique', 'targetAttribute' => ['client_id', 'name']],
@@ -90,13 +92,14 @@ class Operation extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'client_id' => Yii::t('app', 'Client ID'),
-            'code' => Yii::t('app', 'Code'),
-            'name' => Yii::t('app', 'Name'),
-            'description' => Yii::t('app', 'Description'),
-            'create_time' => Yii::t('app', 'Create Time'),
-            'status' => Yii::t('app', 'Status'),
+            'id' => 'ID',
+            'client_id' => 'Client ID',
+            'code' => 'Code',
+            'name' => 'Name',
+            'description' => 'Description',
+            'create_time' => 'Create Time',
+            'status' => 'Status',
+            'data' => 'Data',
         ];
     }
 

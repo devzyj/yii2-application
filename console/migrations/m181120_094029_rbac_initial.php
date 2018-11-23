@@ -185,6 +185,7 @@ class m181120_094029_rbac_initial extends Migration
             'description' => $this->string(255)->notNull()->defaultValue('')->comment('操作描述'),
             'create_time' => $this->integer(10)->unsigned()->notNull()->comment('创建时间'),
             'status' => $this->tinyInteger(1)->unsigned()->notNull()->defaultValue(0)->comment('操作状态（0=禁用；1=可用）'),
+            'data' => $this->text()->notNull()->comment('额外数据'),
         ], "COMMENT='RBAC - 操作表'");
         $this->createIndex('client_id_code', $tables['operation'], ['client_id', 'code'], true);
         $this->createIndex('client_id_name', $tables['operation'], ['client_id', 'name'], true);
@@ -389,6 +390,7 @@ class m181120_094029_rbac_initial extends Migration
                 'description' => $row['description'],
                 'create_time' => time(),
                 'status' => 1,
+                'data' => '',
             ]);
             $id = $this->db->getLastInsertID();
             

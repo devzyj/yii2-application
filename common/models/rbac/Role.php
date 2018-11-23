@@ -88,12 +88,12 @@ class Role extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'client_id' => Yii::t('app', 'Client ID'),
-            'name' => Yii::t('app', 'Name'),
-            'description' => Yii::t('app', 'Description'),
-            'create_time' => Yii::t('app', 'Create Time'),
-            'status' => Yii::t('app', 'Status'),
+            'id' => 'ID',
+            'client_id' => 'Client ID',
+            'name' => 'Name',
+            'description' => 'Description',
+            'create_time' => 'Create Time',
+            'status' => 'Status',
         ];
     }
 

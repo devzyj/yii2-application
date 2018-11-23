@@ -88,12 +88,12 @@ class Client extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'name' => Yii::t('app', 'Name'),
-            'identifier' => Yii::t('app', 'Identifier'),
-            'description' => Yii::t('app', 'Description'),
-            'type' => Yii::t('app', 'Type'),
-            'create_time' => Yii::t('app', 'Create Time'),
+            'id' => 'ID',
+            'name' => 'Name',
+            'identifier' => 'Identifier',
+            'description' => 'Description',
+            'type' => 'Type',
+            'create_time' => 'Create Time',
         ];
     }
 

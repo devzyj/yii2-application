@@ -23,7 +23,8 @@ class DefaultController extends \apiAuthorize\components\Controller
             // 客户端授权。
             'client-credentials' => [
                 'class' => 'apiAuthorize\components\actions\ClientCredentialsAction',
-            ]
+            ],
+            // TODO 刷新令牌。
         ];
     }
     

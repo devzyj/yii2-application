@@ -41,7 +41,7 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
         
         // 设置令牌组件。
         $this->set('token', [
-            'class' => 'apiAuthorize\components\Token',
+            'class' => 'apiAuthorize\components\JsonWebToken',
             'signKey' => Yii::$app->params['authorize.token.signKey'],
         ]);
         
@@ -99,7 +99,7 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
     /**
      * 获取令牌组件。
      * 
-     * @return \apiAuthorize\components\Token
+     * @return \apiAuthorize\components\JsonWebToken
      */
     public function getToken()
     {

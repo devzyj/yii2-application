@@ -11,12 +11,12 @@ use Lcobucci\JWT\Parser;
 use Lcobucci\JWT\ValidationData;
 
 /**
- * Json Web Token
+ * JsonWebTokenTrait 解析并且验证 `token` 的有效性。
  * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
-trait JwtTrait
+trait JsonWebTokenTrait
 {
     /**
      * @var array 加密类型。
@@ -34,7 +34,7 @@ trait JwtTrait
      * @param string $key 令牌的加密 KEY。
      * @return \Lcobucci\JWT\Token|null 令牌模型。
      */
-    protected static function loadJwt($token, $key = null)
+    public static function loadJwt($token, $key = null)
     {
         $token = static::parseJwt($token);
         if (!$token) {

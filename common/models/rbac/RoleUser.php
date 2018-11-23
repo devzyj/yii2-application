@@ -65,9 +65,9 @@ class RoleUser extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'role_id' => Yii::t('app', 'Role ID'),
-            'user_id' => Yii::t('app', 'User ID'),
-            'create_time' => Yii::t('app', 'Create Time'),
+            'role_id' => 'Role ID',
+            'user_id' => 'User ID',
+            'create_time' => 'Create Time',
         ];
     }
 

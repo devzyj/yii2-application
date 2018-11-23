@@ -34,7 +34,8 @@ class m181116_100816_api_client_initial extends Migration
             'description' => $this->string(255)->notNull()->defaultValue('')->comment('客户端描述'),
             'create_time' => $this->integer(10)->unsigned()->notNull()->comment('创建时间'),
             'status' => $this->tinyInteger(1)->unsigned()->notNull()->defaultValue(0)->comment('客户端状态（0=禁用；1=可用）'),
-            'token_expires_in' => $this->integer(10)->unsigned()->notNull()->defaultValue(0)->comment('令牌过期时间（秒）'),
+            'token_expires_in' => $this->integer(10)->unsigned()->notNull()->defaultValue(0)->comment('令牌的过期时间（秒）'),
+            'refresh_token_expires_in' => $this->integer(10)->unsigned()->notNull()->defaultValue(0)->comment('刷新令牌的过期时间（秒）'),
             'rate_limit_count' => $this->integer(10)->unsigned()->notNull()->defaultValue(0)->comment('速率限制次数'),
             'rate_limit_seconds' => $this->integer(10)->unsigned()->notNull()->defaultValue(0)->comment('速率限制秒数'),
             'allowed_ips' => $this->text()->notNull()->defaultValue('')->comment('允许访问的 IPs'),
@@ -50,8 +51,9 @@ class m181116_100816_api_client_initial extends Migration
             'description' => 'Backend Management System',
             'create_time' => time(),
             'status' => 1,
-            'token_expires_in' => 604800,
-            'rate_limit_count' => 9999999,
+            'token_expires_in' => 10800, // 3 hours
+            'refresh_token_expires_in' => 2592000, // 30 days
+            'rate_limit_count' => 999999,
             'rate_limit_seconds' => 1,
             'allowed_ips' => '*',
             'allowed_apis' => '*',
@@ -63,8 +65,9 @@ class m181116_100816_api_client_initial extends Migration
             'description' => 'Frontend Website System',
             'create_time' => time(),
             'status' => 1,
-            'token_expires_in' => 604800,
-            'rate_limit_count' => 9999999,
+            'token_expires_in' => 3600, // 1 hours
+            'refresh_token_expires_in' => 2592000, // 30 days
+            'rate_limit_count' => 999999,
             'rate_limit_seconds' => 1,
             'allowed_ips' => '*',
             'allowed_apis' => '*',
