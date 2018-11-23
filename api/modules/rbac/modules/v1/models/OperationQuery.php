@@ -17,31 +17,37 @@ namespace apiRbacV1\models;
 class OperationQuery extends \yii\db\ActiveQuery
 {
     /**
-     * 添加状态为禁用的条件。
+     * 禁用的操作。
      * 
      * @return $this 查询对象本身
      */
     public function disabled()
     {
-        /* @var $modelClass Operation */
-        $modelClass = $this->modelClass;
         return $this->andWhere([
-            $this->getPrimaryTableName() . '.status' => $modelClass::STATUS_DISABLED,
+            $this->getPrimaryTableName() . '.status' => Operation::STATUS_DISABLED,
         ]);
     }
 
     /**
-     * 添加状态为启用的条件。
+     * 启用的操作。
      * 
      * @return $this 查询对象本身
      */
     public function enabled()
     {
-        /* @var $modelClass Operation */
-        $modelClass = $this->modelClass;
         return $this->andWhere([
-            $this->getPrimaryTableName() . '.status' => $modelClass::STATUS_ENABLED,
+            $this->getPrimaryTableName() . '.status' => Operation::STATUS_ENABLED,
         ]);
+    }
+    
+    /**
+     * 有效的操作。
+     * 
+     * @return $this 查询对象本身。
+     */
+    public function valid()
+    {
+        return $this->enabled();
     }
 
     /**

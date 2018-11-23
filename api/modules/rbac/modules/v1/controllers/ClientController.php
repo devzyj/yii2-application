@@ -47,20 +47,22 @@ class ClientController extends \apiRbacV1\components\ActiveController
      */
     public function actions()
     {
+        /* @var $searchModel \apiRbacV1\models\ClientSearch */
+        $searchModelClass = $this->searchModelClass;
+        $searchModel = $searchModelClass::instance();
+        $searchAttributeFieldMap = $searchModel->searchAttributeFieldMap();
+        
         return ArrayHelper::merge(parent::actions(), [
             'index' => [
                 'dataFilter' => [
                     'class' => 'yii\data\ActiveDataFilter',
-                    'searchModel' => $this->searchModelClass,
-                    'attributeMap' => [
-                        // TODO 指定关联查询属性映射。
-                        
-                    ],
+                    'searchModel' => $searchModelClass,
+                    'attributeMap' => $searchAttributeFieldMap,
                 ],
                 // 通过判断客户端类型，为查询对像添加 `id` 过滤条件的行为。
                 'as queryClientIdBehavior' => [
                     'class' => 'apiRbacV1\components\behaviors\QueryClientIdBehavior',
-                    'attribute' => 'id',
+                    'attribute' => $searchAttributeFieldMap['id'],
                 ],
                 // 通过遍历查询条件中的数据表名，自动使用 [[joinWith()]]。
                 'as queryJoinWithBehavior' => [

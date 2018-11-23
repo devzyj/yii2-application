@@ -21,6 +21,18 @@ use yii\helpers\ArrayHelper;
 class QueryJoinWithBehavior extends \yii\base\Behavior
 {
     /**
+     * @var boolean 是否即时加载，默认为 `false`。
+     * @see \yii\db\ActiveQuery::joinWith()
+     */
+    public $eagerLoading = false;
+    
+    /**
+     * @var string 连接类型，默认为 `LEFT JOIN`。
+     * @see \yii\db\ActiveQuery::joinWith()
+     */
+    public $joinType = 'LEFT JOIN';
+    
+    /**
      * {@inheritdoc}
      */
     public function events()
@@ -43,9 +55,9 @@ class QueryJoinWithBehavior extends \yii\base\Behavior
         if ($model instanceof QueryJoinWithBehaviorInterface) {
             $tables = $this->getQueryTables($query->where);
             if ($tables) {
-                $joinWith = $model->getQueryJoinWithByTables(array_keys($tables));
+                $joinWith = $model->getQueryJoinWithByTables(array_keys($tables), $query);
                 if ($joinWith) {
-                    $query->joinWith($joinWith, false);
+                    $query->joinWith($joinWith, $this->eagerLoading, $this->joinType);
                 }
             }
         }
@@ -63,7 +75,7 @@ class QueryJoinWithBehavior extends \yii\base\Behavior
         if (is_array($where)) {
             foreach ($where as $key => $value) {
                 if (is_array($value)) {
-                    $result = ArrayHelper::merge($result, $this->getQueryFields($value));
+                    $result = ArrayHelper::merge($result, $this->getQueryTables($value));
                     continue;
                 }
                 

@@ -44,21 +44,31 @@ class RoleController extends \apiRbacV1\components\ActiveController
      */
     public function actions()
     {
+        /* @var $searchModel \apiRbacV1\models\RoleSearch */
+        $searchModelClass = $this->searchModelClass;
+        $searchModel = $searchModelClass::instance();
+        $searchAttributeFieldMap = $searchModel->searchAttributeFieldMap();
+        
         return ArrayHelper::merge(parent::actions(), [
             'index' => [
                 'dataFilter' => [
                     'class' => 'yii\data\ActiveDataFilter',
-                    'searchModel' => $this->searchModelClass,
+                    'searchModel' => $searchModelClass,
+                    'attributeMap' => $searchAttributeFieldMap,
                 ],
                 // 通过判断客户端类型，为查询对像添加 `client_id` 过滤条件的行为。
                 'as queryClientIdBehavior' => [
                     'class' => 'apiRbacV1\components\behaviors\QueryClientIdBehavior',
+                    'attribute' => $searchAttributeFieldMap['client_id'],
                 ],
                 // 为查询对像添加 URL 查询参数中的过滤条件的行为。
                 'as queryParamBehavior' => [
                     'class' => 'apiRbacV1\components\behaviors\QueryParamBehavior',
                     'paramMap' => [
-                        'clientid' => 'client_id',
+                        'clientid' => $searchAttributeFieldMap['client_id'],
+                        'permissionid' => $searchAttributeFieldMap['permission_id'],
+                        'userid' => $searchAttributeFieldMap['user_id'],
+                        'operationid' => $searchAttributeFieldMap['operation_id'],
                     ],
                 ],
                 // 通过遍历查询条件中的数据表名，自动使用 [[joinWith()]]。

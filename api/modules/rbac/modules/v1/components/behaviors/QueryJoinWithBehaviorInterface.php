@@ -9,8 +9,6 @@ namespace apiRbacV1\components\behaviors;
 /**
  * QueryJoinWithBehaviorInterface 是可以由查询数据的模型实现的接口，用于自动使用 [[joinWith()]]。
  *
- * 要实现 [[getQueryJoinWithByTables()]] 方法，可以使用 [[QueryJoinWithBehaviorTrait]]。
- * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
@@ -20,7 +18,9 @@ interface QueryJoinWithBehaviorInterface
      * 通过数据表名，返回连接关系。
      * 
      * @param array $names 数据表名列表。
-     * @return array 连接关系。
+     * @param \yii\db\ActiveQuery $query 查询模型。
+     * @return string|array 连接关系。参考 [[ActiveQuery::joinWith()]] 中的 `$with` 参数。
+     * @see \yii\db\ActiveQuery::joinWith()
      */
-    public function getQueryJoinWithByTables($names);
+    public function getQueryJoinWithByTables($names, $query);
 }

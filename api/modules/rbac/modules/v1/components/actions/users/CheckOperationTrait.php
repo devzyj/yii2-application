@@ -25,19 +25,19 @@ trait CheckOperationTrait
     {
         // 查询条件。
         $query->client($model->client_id);
-        $query->enabled();
+        $query->valid();
         
         // 关联查询。
         $query->joinWith([
             'permissions' => function ($query) use ($model) {
                 /* @var $query \apiRbacV1\models\PermissionQuery */
                 $query->client($model->client_id);
-                $query->enabled();
+                $query->valid();
                 $query->joinWith([
                     'roles' => function ($query) use ($model) {
                         /* @var $query \apiRbacV1\models\RoleQuery */
                         $query->client($model->client_id);
-                        $query->enabled();
+                        $query->valid();
                         $query->joinWith([
                             'users' => function ($query) use ($model) {
                                 /* @var $query \apiRbacV1\models\UserQuery */
@@ -45,9 +45,9 @@ trait CheckOperationTrait
                                     $model::tableName() . '.id' => $model->id,
                                 ]);
                             }
-                        ], false);
+                        ]);
                     }
-                ], false);
+                ]);
             },
         ], false);
         

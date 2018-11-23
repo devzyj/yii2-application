@@ -42,7 +42,7 @@ class Client extends \yii\db\ActiveRecord
     const STATUS_DISABLED = 0;
 
     /**
-     * @var integer 状态 - 可用的。
+     * @var integer 状态 - 启用的。
      */
     const STATUS_ENABLED = 1;
 

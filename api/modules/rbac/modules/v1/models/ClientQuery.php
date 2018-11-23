@@ -17,31 +17,37 @@ namespace apiRbacV1\models;
 class ClientQuery extends \yii\db\ActiveQuery
 {
     /**
-     * 添加状态为禁用的条件。
+     * 禁用的客户端。
      * 
      * @return $this 查询对象本身。
      */
     public function disabled()
     {
-        /* @var $modelClass Client */
-        $modelClass = $this->modelClass;
         return $this->andWhere([
-            $this->getPrimaryTableName() . '.status' => $modelClass::STATUS_DISABLED,
+            $this->getPrimaryTableName() . '.status' => Client::STATUS_DISABLED,
         ]);
     }
 
     /**
-     * 添加状态为启用的条件。
+     * 启用的客户端。
      *
      * @return $this 查询对象本身。
      */
     public function enabled()
     {
-        /* @var $modelClass Client */
-        $modelClass = $this->modelClass;
         return $this->andWhere([
-            $this->getPrimaryTableName() . '.status' => $modelClass::STATUS_ENABLED,
+            $this->getPrimaryTableName() . '.status' => Client::STATUS_ENABLED,
         ]);
+    }
+    
+    /**
+     * 有效的客户端。
+     * 
+     * @return $this 查询对象本身。
+     */
+    public function valid()
+    {
+        return $this->enabled();
     }
     
     /**
