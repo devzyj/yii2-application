@@ -7,15 +7,20 @@
 namespace apiRbacV1;
 
 use Yii;
+use api\components\traits\ModuleLogTrait;
 
 /**
  * rbac v1 接口模块。
+ * 
+ * @property \yii\log\Dispatcher $log 日志组件。
  * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
 class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
 {
+    use ModuleLogTrait;
+    
     /**
      * @var string 模块路由规则的配置文件。
      */
@@ -40,33 +45,7 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
         parent::init();
         
         // 设置日志组件。
-        $this->set('log', [
-            'class' => 'yii\log\Dispatcher',
-            'logger' => 'yii\log\Logger',
-            'targets' => [
-                [
-                    'class' => 'yii\log\FileTarget',
-                    'logFile' => "@runtime/logs/modules/{$this->uniqueId}/app.log",
-                    'maxLogFiles' => 50,
-                    'microtime' => true,
-                    'logVars' => [],
-                ],
-            ],
-        ]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function behaviors()
-    {
-        return [
-            // 设置处理动作时记录日志的行为。
-            'actionLogBehavior' => [
-                'class' => 'api\components\behaviors\ActionLogBehavior',
-                'logger' => $this->getLog()->getLogger(),
-            ]
-        ];
+        $this->setLog();
     }
     
     /**
@@ -81,30 +60,10 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
             'enableSession' => false,
             'loginUrl' => null,
         ]);
-        
-        // 设置响应行为。
-        Yii::$app->getResponse()->attachBehaviors([
-            // 设置响应时的日志行为。
-            'responseLogBehavior' => [
-                'class' => 'api\components\behaviors\ResponseLogBehavior',
-                'logger' => $this->getLog()->getLogger(),
-            ],
-            // 设置是否始终使用 `200` 作为 HTTP 状态，并将实际的 HTTP 状态码包含在响应内容中。
-            'suppressResponseCodeBehavior' => [
-                'class' => '\devzyj\rest\behaviors\SuppressResponseCodeBehavior',
-            ],
-        ]);
+
+        // 附加记录响应时日志的行为。
+        $this->attachLogResponseBehavior();
 
         return parent::beforeAction($action);
-    }
-
-    /**
-     * 获取日志组件。
-     *
-     * @return \yii\log\Dispatcher
-     */
-    public function getLog()
-    {
-        return $this->get('log');
     }
 }

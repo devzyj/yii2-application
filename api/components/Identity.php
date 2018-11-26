@@ -78,7 +78,7 @@ class Identity extends \api\models\Client implements IdentityInterface
      */
     public function getId()
     {
-        return $this->primaryKey;
+        return $this->getPrimaryKey();
     }
 
     /**
@@ -86,7 +86,7 @@ class Identity extends \api\models\Client implements IdentityInterface
      */
     public static function findIdentity($id)
     {
-        return static::findOne($id);
+        return static::findOrSetOneById($id);
     }
 
     /**
@@ -94,7 +94,16 @@ class Identity extends \api\models\Client implements IdentityInterface
      */
     public static function findIdentityByAccessToken($token, $type = null)
     {
-        return null;
+        /* @var $module \apiCgiBin\Module */
+        $module = Yii::$app->getModule('cgi-bin');
+        $tokenData = $module->getToken()->getAccessTokenData($token);
+        if (isset($tokenData['client_id'])) {
+            /* @var $model static */
+            $model = static::findIdentity($tokenData['client_id']);
+            if ($model && $model->getClientIsValid()) {
+                return $model;
+            }
+        }
     }
 
     /**

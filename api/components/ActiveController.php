@@ -4,11 +4,10 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace apiCgiBinV1\components;
+namespace api\components;
 
 use Yii;
 use yii\helpers\ArrayHelper;
-use yii\web\ForbiddenHttpException;
 
 /**
  * ActiveController class.
@@ -38,17 +37,6 @@ class ActiveController extends \devzyj\rest\ActiveController
     public function behaviors()
     {
         return ArrayHelper::merge(parent::behaviors(), [
-            // 身份验证。
-            'authenticator' => [
-                'authMethods' => [
-                    'yii\filters\auth\HttpBearerAuth',
-                    'yii\filters\auth\QueryParamAuth',
-                ]
-            ],
-            // 验证客户端状态是否有效。
-            'clientStatusFilter' => [
-                'class' => 'api\components\filters\ClientStatusFilter',
-            ],
             // 验证客户端 IP 是否被允许访问。
             'clientIpFilter' => [
                 'class' => 'api\components\filters\ClientIpFilter',
@@ -78,19 +66,5 @@ class ActiveController extends \devzyj\rest\ActiveController
                 },
             ],
         ]);
-    }
-
-    /**
-     * {@inheritdoc}
-     * 
-     * @throws \yii\web\ForbiddenHttpException 客户端没有登录，或者没有访问权限。
-     */
-    public function checkActionAccess($action, $params = [])
-    {
-        /* @var $identity \api\components\Identity */
-        if (!($user = Yii::$app->getUser()) || !($identity = $user->getIdentity(false)) 
-                || !$identity->checkClientAllowedApi($action->getUniqueId())) {
-            throw new ForbiddenHttpException('Client API limit.');
-        }
     }
 }

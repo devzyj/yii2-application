@@ -12,12 +12,12 @@ use yii\log\Logger;
 use yii\helpers\Json;
 
 /**
- * ResponseLogBehavior 实现了处理响应时记录日志的行为。
+ * LogResponseBehavior 实现了处理响应时记录日志的行为。
  * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
-class ResponseLogBehavior extends \yii\base\Behavior
+class LogResponseBehavior extends \yii\base\Behavior
 {
     /**
      * @var string 成功时记录日志。
@@ -60,17 +60,17 @@ class ResponseLogBehavior extends \yii\base\Behavior
     public function events()
     {
         return [
-            Response::EVENT_AFTER_SEND => 'afterSend',
+            Response::EVENT_BEFORE_SEND => 'beforeSend',
         ];
     }
     
     /**
-     * 在发送响应后记录日志。
+     * 在发送响应前记录日志。
      * 
      * @param \yii\base\Event $event
      * @see \yii\web\Response::send()
      */
-    public function afterSend($event)
+    public function beforeSend($event)
     {
         /* @var $response \yii\web\Response */
         $response = $event->sender;
@@ -146,11 +146,15 @@ class ResponseLogBehavior extends \yii\base\Behavior
     {
         /* @var $response \yii\web\Response */
         $response = $event->sender;
+        $request = Yii::$app->getRequest();
         return [
             'action' => Yii::$app->controller->action->getUniqueId(),
             'statusCode' => $response->statusCode,
             'statusText' => $response->statusText,
             'data' => $response->data,
+            'GET' => $request->getQueryParams(),
+            'POST' => $request->getBodyParams(),
+            'HEADERS' => $request->getHeaders(),
         ];
     }
 }

@@ -67,11 +67,17 @@ class ClientIpFilter extends \yii\base\ActionFilter
     {
         if (($user = Yii::$app->getUser()) && ($identity = $user->getIdentity(false))) {
             if ($identity instanceof ClientIpFilterInterface) {
+                Yii::debug('Check client ip.', __METHOD__);
+                
                 $ip = $this->request->getUserIP();
                 if (!$identity->checkClientIp($ip, $action, $this->request)) {
                     throw new ForbiddenHttpException($this->errorMessage, $this->errorCode);
                 }
+            } else {
+                Yii::info('Skipped: `user` does not implement ClientIpFilterInterface.', __METHOD__);
             }
+        } else {
+            Yii::info('Skipped: user not logged in.', __METHOD__);
         }
         
         return true;

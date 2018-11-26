@@ -4,7 +4,7 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace apiCgiBinV1\components\actions\clients;
+namespace apiV1\components\actions\clients;
 
 use yii\web\ServerErrorHttpException;
 
@@ -39,7 +39,7 @@ class DeleteCacheAction extends \devzyj\rest\DeleteAction
     /**
      * 删除模型缓存。
      * 
-     * @param \apiCgiBinV1\models\Client $model 需要删除缓存的模型实例。
+     * @param \apiV1\models\Client $model 需要删除缓存的模型实例。
      * @return boolean 是否删除成功。
      * @throws \yii\web\ServerErrorHttpException 删除缓存失败并且错误未知。
      */

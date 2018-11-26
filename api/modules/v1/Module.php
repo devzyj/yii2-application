@@ -4,13 +4,13 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace apiCgiBin;
+namespace apiV1;
 
 use Yii;
 use api\components\traits\ModuleLogTrait;
 
 /**
- * cgi-bin 接口模块。
+ * cgi-bin v1 接口模块。
  * 
  * @property \yii\log\Dispatcher $log 日志组件。
  * 
@@ -46,22 +46,6 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
         
         // 设置日志组件。
         $this->setLog();
-
-        // 设置令牌组件。
-        $this->set('token', [
-            'class' => 'apiCgiBin\components\tokens\JsonWebToken',
-            'signKey' => Yii::$app->params['token.signKey'],
-        ]);
-    }
-    
-    /**
-     * 获取令牌组件。
-     * 
-     * @return \apiCgiBin\components\tokens\JsonWebToken
-     */
-    public function getToken()
-    {
-        return $this->get('token');
     }
     
     /**
@@ -72,11 +56,11 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
         // 设置身份认证类。
         Yii::$app->set('user', [
             'class' => 'yii\web\User',
-            'identityClass' => 'apiCgiBin\components\Identity',
+            'identityClass' => 'apiV1\components\Identity',
             'enableSession' => false,
             'loginUrl' => null,
         ]);
-        
+
         // 附加记录响应时日志的行为。
         $this->attachLogResponseBehavior();
         

@@ -4,7 +4,7 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace apiAuthorize\components;
+namespace apiCgiBin\components\tokens;
 
 use Yii;
 use Lcobucci\JWT\Builder;
@@ -45,7 +45,7 @@ class JsonWebToken extends \yii\base\Component
      * 
      * @return \Lcobucci\JWT\Builder 构造器。
      */
-    public function getBuilder()
+    protected function getBuilder()
     {
         if ($this->_builder === null) {
             $this->_builder = Yii::createObject(Builder::class);
@@ -60,7 +60,7 @@ class JsonWebToken extends \yii\base\Component
      * @param \Lcobucci\JWT\Token $token 令牌模型。
      * @return string 类型。
      */
-    public function getUsageType($token)
+    protected function getUsageType($token)
     {
         return $token->getClaim('usage_type', '');
     }
@@ -71,7 +71,7 @@ class JsonWebToken extends \yii\base\Component
      * @param \Lcobucci\JWT\Builder $builder 构造器。
      * @param string $type 类型。
      */
-    public function setUsageType($builder, $type)
+    protected function setUsageType($builder, $type)
     {
         $builder->set('usage_type', $type);
     }
@@ -83,7 +83,7 @@ class JsonWebToken extends \yii\base\Component
      * @param boolean $unsign 生成令牌后，是否移除加密内容。
      * @return \Lcobucci\JWT\Token $token 令牌模型。
      */
-    public function generateToken($builder, $unsign = false)
+    protected function generateToken($builder, $unsign = false)
     {
         $this->signData($builder);
         $token = $builder->getToken();
@@ -99,7 +99,7 @@ class JsonWebToken extends \yii\base\Component
      *
      * @param \Lcobucci\JWT\Builder $builder 构造器。
      */
-    public function signData($builder)
+    protected function signData($builder)
     {
         if ($this->signKey) {
             $signer = new Sha256();
@@ -114,7 +114,7 @@ class JsonWebToken extends \yii\base\Component
      * @param boolean $unsign 生成令牌后，是否移除加密内容。
      * @return \Lcobucci\JWT\Token $token 令牌模型。
      */
-    public function generateAccessToken($builder, $unsign = false)
+    protected function generateAccessToken($builder, $unsign = false)
     {
         $this->setUsageType($builder, self::USAGE_TYPE_ACCESS);
         return $this->generateToken($builder, $unsign);
@@ -127,7 +127,7 @@ class JsonWebToken extends \yii\base\Component
      * @param boolean $unsign 生成令牌后，是否移除加密内容。
      * @return \Lcobucci\JWT\Token $token 令牌模型。
      */
-    public function generateRefreshToken($builder, $unsign = false)
+    protected function generateRefreshToken($builder, $unsign = false)
     {
         $this->setUsageType($builder, self::USAGE_TYPE_REFRESH);
         return $this->generateToken($builder, $unsign);
@@ -157,20 +157,12 @@ class JsonWebToken extends \yii\base\Component
         $builder->setExpiration($issuedAt + $client->token_expires_in);
         
         // 生成访问令牌。
-        $accessToken = $this->generateAccessToken($builder, true);
-
-        // 设置刷新令牌的过期时间。
-        $builder->setExpiration($issuedAt + $client->refresh_token_expires_in);
-        
-        // 生成刷新令牌。
-        $refreshToken = $this->generateRefreshToken($builder);
+        $accessToken = $this->generateAccessToken($builder);
         
         // 返回结果。
         return [
             'access_token' => (string) $accessToken,
             'expires_in' => $client->token_expires_in,
-            'refresh_token' => (string) $refreshToken,
-            'refresh_expires_in' => $client->refresh_token_expires_in,
         ];
     }
 
@@ -180,7 +172,7 @@ class JsonWebToken extends \yii\base\Component
      * @param string $token 令牌。
      * @return \Lcobucci\JWT\Token 令牌模型。
      */
-    public function getToken($token)
+    protected function getToken($token)
     {
         return static::loadJwt($token, $this->signKey);
     }

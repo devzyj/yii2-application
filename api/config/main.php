@@ -9,12 +9,7 @@ $config = [
     'id' => 'app-api',
     'basePath' => dirname(__DIR__),
     'controllerNamespace' => 'api\controllers',
-    'bootstrap' => [
-        'log',
-        'authorize',
-        'cgi-bin/v1',
-        'rbac/v1',
-    ],
+    'bootstrap' => ['log', 'cgi-bin', 'v1', 'rbac/v1'],
     'components' => [
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
@@ -32,6 +27,13 @@ $config = [
                 'application/json' => 'yii\web\JsonParser',
             ],
         ],
+        'response' => [
+            // 设置判断是否始终使用 `200` 作为 HTTP 状态，并将实际的 HTTP 状态码包含在响应内容中。
+            'as suppressResponseCodeBehavior' => [
+                'class' => '\devzyj\rest\behaviors\SuppressResponseCodeBehavior',
+                'suppressResponseCodeParam' => 'suppress_response_code'
+            ],
+        ],
         'urlManager' => [
             'enablePrettyUrl' => true,
             'enableStrictParsing' => true,
@@ -42,16 +44,11 @@ $config = [
         ],
     ],
     'modules' => [
-        'authorize' => [
-            'class' => 'apiAuthorize\Module',
-        ],
         'cgi-bin' => [
             'class' => 'apiCgiBin\Module',
-            'modules' => [
-                'v1' => [
-                    'class' => 'apiCgiBinV1\Module',
-                ],
-            ],
+        ],
+        'v1' => [
+            'class' => 'apiV1\Module',
         ],
         'rbac' => [
             'class' => 'apiRbac\Module',

@@ -6,6 +6,6 @@
  */
 
 return [
-    // 客户端授权，获取 ACCESS_TOKEN。
-    "POST <module:({$this->uniqueId})>/clients" => "<module>/default/client-credentials",
+    // 客户端令牌。
+    "POST <module:({$this->uniqueId})>/token" => "<module>/token/index",
 ];

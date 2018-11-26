@@ -4,11 +4,11 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace apiCgiBinV1\controllers;
+namespace apiV1\controllers;
 
 use yii\helpers\ArrayHelper;
-use apiCgiBinV1\models\Client;
-use apiCgiBinV1\models\ClientSearch;
+use apiV1\models\Client;
+use apiV1\models\ClientSearch;
 
 /**
  * ClientController class.
@@ -16,7 +16,7 @@ use apiCgiBinV1\models\ClientSearch;
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
-class ClientController extends \apiCgiBinV1\components\ActiveController
+class ClientController extends \apiV1\components\ActiveController
 {
     /**
      * {@inheritdoc}
@@ -84,7 +84,7 @@ class ClientController extends \apiCgiBinV1\components\ActiveController
             ],
             // 删除缓存。
             'delete-cache' => [
-                'class' => 'apiCgiBinV1\components\actions\clients\DeleteCacheAction',
+                'class' => 'apiV1\components\actions\clients\DeleteCacheAction',
                 'modelClass' => $this->modelClass,
                 'checkActionAccess' => [$this, 'checkActionAccess'],
                 'checkModelAccess' => [$this, 'checkModelAccess'],
