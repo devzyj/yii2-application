@@ -17,5 +17,5 @@ class OperationCodeValidator extends \yii\validators\RegularExpressionValidator
     /**
      * @var string 正则表达式（必须是以英文，数字，下划线组成的字符串）。
      */
-    public $pattern = '/^\w*$/';
+    public $pattern = '/^[\_A-Za-z0-9]*$/';
 }

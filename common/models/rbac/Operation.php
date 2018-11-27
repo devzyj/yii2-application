@@ -7,6 +7,7 @@
 namespace common\models\rbac;
 
 use Yii;
+use common\validators\rbac\OperationCodeValidator;
 
 /**
  * This is the model class for table "{{%rbac_operation}}".
@@ -75,7 +76,7 @@ class Operation extends \yii\db\ActiveRecord
             // 验证规则。
             [['client_id', 'code', 'name'], 'required'],
             [['client_id'], 'integer', 'integerOnly' => true],
-            [['code'], 'common\validators\rbac\OperationCodeValidator'],
+            [['code'], OperationCodeValidator::class],
             [['code', 'description'], 'string', 'max' => 255],
             [['name'], 'string', 'max' => 50],
             [['data'], 'string', 'max' => 5000],

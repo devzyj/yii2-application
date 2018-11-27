@@ -45,21 +45,19 @@ class m181120_094029_rbac_initial extends Migration
      */
     public function safeDown()
     {
-        $tables = $this->tables;
-
-        $this->dropTable($tables['menuPermission']);
-        $this->dropTable($tables['menu']);
-        $this->dropTable($tables['operationPermission']);
-        $this->dropTable($tables['operation']);
-        $this->dropTable($tables['permissionGroup']);
-        $this->dropTable($tables['permissionRole']);
-        $this->dropTable($tables['permission']);
-        $this->dropTable($tables['groupUser']);
-        $this->dropTable($tables['group']);
-        $this->dropTable($tables['roleUser']);
-        $this->dropTable($tables['role']);
-        $this->dropTable($tables['user']);
-        $this->dropTable($tables['client']);
+        $this->dropTable($this->tables['menuPermission']);
+        $this->dropTable($this->tables['menu']);
+        $this->dropTable($this->tables['operationPermission']);
+        $this->dropTable($this->tables['operation']);
+        $this->dropTable($this->tables['permissionGroup']);
+        $this->dropTable($this->tables['permissionRole']);
+        $this->dropTable($this->tables['permission']);
+        $this->dropTable($this->tables['groupUser']);
+        $this->dropTable($this->tables['group']);
+        $this->dropTable($this->tables['roleUser']);
+        $this->dropTable($this->tables['role']);
+        $this->dropTable($this->tables['user']);
+        $this->dropTable($this->tables['client']);
     }
     
     /**

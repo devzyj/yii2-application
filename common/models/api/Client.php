@@ -25,7 +25,7 @@ use devzyj\behaviors\ActiveCacheBehaviorTrait;
  * @property string $allowed_ips 允许访问的IPs
  * @property string $allowed_apis 允许访问的APIs
  *
- * @property boolean $isValid 客户端是否有效。
+ * @property boolean $isValid 客户端是否有效
  * @property array $rateLimitContents 客户端的速率限制
  * @property array $allowedIPs 允许访问的IPs
  * @property array $allowedAPIs 允许访问的APIs
@@ -106,7 +106,7 @@ class Client extends \yii\db\ActiveRecord
             [['description'], 'string', 'max' => 255],
             [['status'], 'boolean'],
             [['token_expires_in', 'refresh_token_expires_in', 'rate_limit_count', 'rate_limit_seconds'], 'integer', 'integerOnly' => true, 'min' => 0],
-            [['allowed_ips', 'allowed_apis'], 'string'],
+            [['allowed_ips', 'allowed_apis'], 'string', 'max' => 5000],
             [['name'], 'unique'],
         ];
     }
