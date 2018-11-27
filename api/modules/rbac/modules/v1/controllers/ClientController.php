@@ -47,10 +47,8 @@ class ClientController extends \apiRbacV1\components\ActiveController
      */
     public function actions()
     {
-        /* @var $searchModel \apiRbacV1\models\ClientSearch */
         $searchModelClass = $this->searchModelClass;
-        $searchModel = $searchModelClass::instance();
-        $searchAttributeFieldMap = $searchModel->searchAttributeFieldMap();
+        $searchAttributeFieldMap = $searchModelClass::instance()->searchAttributeFieldMap();
         
         return ArrayHelper::merge(parent::actions(), [
             'index' => [

@@ -46,7 +46,10 @@ class OperationSearch extends Operation implements QueryJoinWithBehaviorInterfac
      */
     public function behaviors()
     {
+        // 获取全部查询属性。
         $searchAttributes = array_keys($this->searchAttributeFieldMap());
+        
+        // 移除自身已存在的属性。
         $virtualAttributes = array_diff($searchAttributes, $this->attributes());
         
         return ArrayHelper::merge([

@@ -48,9 +48,12 @@ class PermissionSearch extends Permission implements QueryJoinWithBehaviorInterf
      */
     public function behaviors()
     {
+        // 获取全部查询属性。
         $searchAttributes = array_keys($this->searchAttributeFieldMap());
+        
+        // 移除自身已存在的属性。
         $virtualAttributes = array_diff($searchAttributes, $this->attributes());
-    
+        
         return ArrayHelper::merge([
             // 为模型添加虚拟属性的行为。
             'virtualAttributesBehavior' => [

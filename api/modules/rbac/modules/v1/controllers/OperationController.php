@@ -44,10 +44,8 @@ class OperationController extends \apiRbacV1\components\ActiveController
      */
     public function actions()
     {
-        /* @var $searchModel \apiRbacV1\models\OperationSearch */
         $searchModelClass = $this->searchModelClass;
-        $searchModel = $searchModelClass::instance();
-        $searchAttributeFieldMap = $searchModel->searchAttributeFieldMap();
+        $searchAttributeFieldMap = $searchModelClass::instance()->searchAttributeFieldMap();
         
         return ArrayHelper::merge(parent::actions(), [
             'index' => [

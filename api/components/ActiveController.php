@@ -22,10 +22,9 @@ class ActiveController extends \devzyj\rest\ActiveController
      */
     public function init()
     {
-        // 执行父类程序。
         parent::init();
         
-        // 允许批量操作的个数。
+        // 设置允许批量操作的个数。
         if ($this->allowedCount === null) {
             $this->allowedCount = Yii::$app->params['rest.batch.allowedCount'];
         }

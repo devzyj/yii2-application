@@ -145,8 +145,8 @@ class JsonWebToken extends \yii\base\Component
         $builder = $this->getBuilder();
         
         // 设置令牌参数。
-        $builder->setIssuer(Yii::$app->id)
-            ->setAudience($client->getPrimaryKey())
+        $builder->setIssuer(Yii::$app->getRequest()->getHostInfo())
+            ->setAudience(Yii::$app->getRequest()->getHostInfo())
             ->set('client_id', $client->getPrimaryKey());
         
         // 设置令牌的生成时间。

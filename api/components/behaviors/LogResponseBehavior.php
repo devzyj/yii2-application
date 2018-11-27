@@ -14,6 +14,17 @@ use yii\helpers\Json;
 /**
  * LogResponseBehavior 实现了处理响应时记录日志的行为。
  * 
+ * ```php
+ * public function behaviors()
+ * {
+ *     return [
+ *         'logResponseBehavior' => [
+ *             'class' => 'api\components\behaviors\LogResponseBehavior',
+ *         ],
+ *     ];
+ * }
+ * ```
+ * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
@@ -88,10 +99,6 @@ class LogResponseBehavior extends \yii\base\Behavior
     }
 
     /**
-     * 记录 [[Response::EVENT_AFTER_SEND]]，并且 HTTP 状态为成功时的日志。
-     *
-     * `statusCode >= 200 && statusCode < 300`
-     *
      * @param \yii\base\Event $event
      */
     protected function logSuccessful($event)
@@ -101,10 +108,6 @@ class LogResponseBehavior extends \yii\base\Behavior
     }
 
     /**
-     * 记录 [[Response::EVENT_AFTER_SEND]]，并且 HTTP 状态为客户端错误时的日志。
-     *
-     * `statusCode >= 400 && statusCode < 500`
-     *
      * @param \yii\base\Event $event
      */
     protected function logClientError($event)
@@ -114,10 +117,6 @@ class LogResponseBehavior extends \yii\base\Behavior
     }
 
     /**
-     * 记录 [[Response::EVENT_AFTER_SEND]]，并且 HTTP 状态为服务器端错误时的日志。
-     *
-     * `statusCode >= 500 && statusCode < 600`
-     *
      * @param \yii\base\Event $event
      */
     protected function logServerError($event)
@@ -127,8 +126,6 @@ class LogResponseBehavior extends \yii\base\Behavior
     }
 
     /**
-     * 记录 [[Response::EVENT_AFTER_SEND]]， 并且 `statusCode < 200 || statusCode >= 600` 时的日志。
-     *
      * @param \yii\base\Event $event
      */
     protected function logOther($event)
