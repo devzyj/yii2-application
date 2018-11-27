@@ -8,7 +8,11 @@
 $config = [
     'id' => 'app-backend',
     'basePath' => dirname(__DIR__),
+    //'sourceLanguage' => 'zh-CN',
     'controllerNamespace' => 'backend\controllers',
+    'aliases' => [
+        '@library' => '@backend/library',
+    ],
     'bootstrap' => ['log'],
     'components' => [
         'log' => [
@@ -47,6 +51,34 @@ $config = [
                 'profile' => 'site/profile',
             ],
         ],
+        'errorHandler' => [
+            'errorAction' => 'site/error',
+        ],
+        'view' => [
+            'theme' => [
+                'pathMap' => [
+                    '@app/views' => '@library/adminlte/views'
+                ],
+            ],
+        ],
+        /*'assetManager' => [
+            'bundles' => [
+                'library\adminlte\web\AdminLteAsset' => [
+                    'skin' => 'skin-purple-light',
+                ],
+            ],
+        ],
+        'i18n' => [
+            'translations' => [
+                'adminlte' => [
+                    'class' => 'yii\i18n\PhpMessageSource',
+                    'sourceLanguage' => 'en-US',
+                ],
+            ],
+        ],*/
+    ],
+    'modules' => [
+        
     ],
 ];
 

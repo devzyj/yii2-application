@@ -9,6 +9,7 @@
  * dev configuration.
  */
 $config = [
+    'language' => 'zh-CN',
     'bootstrap'=> ['debug', 'gii'],
     'components' => [
         'log' => [
@@ -31,6 +32,14 @@ $config = [
         'gii' => [
             'class' => 'yii\gii\Module',
             'allowedIPs' => ['127.0.0.1', '::1', '10.111.222.1'],
+            'generators' => [
+                'crud' => [
+                    'class' => 'yii\gii\generators\crud\Generator',
+                    'templates' => [
+                        'adminlte' => '@vendor/dmstr/yii2-adminlte-asset/gii/templates/crud/simple',
+                    ]
+                ]
+            ],
         ]
     ],
 ];

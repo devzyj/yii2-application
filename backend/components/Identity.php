@@ -46,7 +46,7 @@ class Identity extends \yii\base\Model implements IdentityInterface
      */
     public function getAuthKey()
     {
-        return '';
+        return null;
     }
 
     /**

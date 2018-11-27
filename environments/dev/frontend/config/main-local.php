@@ -9,6 +9,7 @@
  * dev configuration.
  */
 $config = [
+    'language' => 'zh-CN',
     'bootstrap'=> ['debug', 'gii'],
     'components' => [
         'log' => [

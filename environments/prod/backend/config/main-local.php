@@ -9,6 +9,7 @@
  * prod configuration.
  */
 return [
+    'language' => 'zh-CN',
     'components' => [
         'request' => [
             'cookieValidationKey' => '',

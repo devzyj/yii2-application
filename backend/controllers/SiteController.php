@@ -14,12 +14,58 @@ use Yii;
 class SiteController extends \yii\web\Controller
 {
     /**
-     * Homepage.
+     * {@inheritdoc}
+     */
+    public function actions()
+    {
+        return [
+            'error' => [
+                //'class' => 'library\adminlte\actions\ErrorAction',
+                'class' => 'yii\web\ErrorAction',
+            ],
+            'captcha' => [
+                'class' => 'yii\captcha\CaptchaAction',
+            ],
+            'login' => [
+                'class' => 'library\adminlte\actions\LoginAction',
+                'modelClass' => 'app\models\User',
+            ],
+            'logout' => [
+                'class' => 'library\adminlte\actions\LogoutAction',
+            ],
+        ];
+    }
+    
+    /**
+     * Displays homepage.
      *
      * @return string
      */
     public function actionIndex()
     {
-        return Yii::$app->id . ' index page.';
+        return $this->render('index');
+    }
+    
+    /**
+     * Displays profile page.
+     *
+     * @return string
+     */
+    public function actionProfile()
+    {
+        throw new \yii\web\NotFoundHttpException('没有找到页面。');
+        //throw new \yii\web\ForbiddenHttpException('禁止的操作。');
+        //throw new \yii\base\InvalidConfigException('无效的配置内容。');
+        return $this->render('profile');
+    }
+    
+    /**
+     * Displays about page.
+     *
+     * @return string
+     */
+    public function actionAbout()
+    {
+        return $this->render('about');
     }
 }
