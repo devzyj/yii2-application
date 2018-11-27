@@ -2,13 +2,14 @@
 /**
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  */
-namespace cgi\helpers;
+namespace backup\helpers;
 
 /**
  * 令牌帮助类。
  * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
+ * @deprecated
  */
 class TokenHelper
 {

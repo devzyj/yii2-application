@@ -2,7 +2,7 @@
 /**
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  */
-namespace library\rest;
+namespace backup\rest;
 
 use Yii;
 use yii\web\Response;
@@ -118,6 +118,7 @@ use yii\web\Response;
  * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
+ * @deprecated
  */
 class FormatterBehavior extends \yii\base\Behavior
 {

@@ -2,7 +2,7 @@
 /**
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  */
-namespace v1\components;
+namespace backup\components;
 
 use yii\helpers\ArrayHelper;
 
@@ -11,6 +11,7 @@ use yii\helpers\ArrayHelper;
  * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
+ * @deprecated
  */
 class ActiveDataFilter extends \yii\data\ActiveDataFilter
 {

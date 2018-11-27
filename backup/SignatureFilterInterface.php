@@ -4,14 +4,14 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace api\components\filters;
+namespace backup\components\filters;
 
 /**
  * SignatureFilterInterface 由登录用户标识对像实现，用于验证签名。
  *
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
- * @deprecated 暂不使用。
+ * @deprecated
  */
 interface SignatureFilterInterface
 {

@@ -4,7 +4,7 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace api\components\filters;
+namespace backup\components\filters;
 
 use Yii;
 use yii\web\BadRequestHttpException;
@@ -27,7 +27,7 @@ use yii\web\BadRequestHttpException;
  *
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
- * @deprecated 暂不使用。
+ * @deprecated
  */
 class TimestampRangeLimiter extends \yii\base\ActionFilter
 {
