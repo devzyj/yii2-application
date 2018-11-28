@@ -69,13 +69,11 @@ class Operation extends \yii\db\ActiveRecord
     {
         return [
             // 过滤和处理数据。
-            [['code', 'name'], 'trim'],
             [['code'], 'filter', 'filter' => 'strtolower'],
-            [['description', 'data'], 'default', 'value' => ''],
-            [['status'], 'default', 'value' => self::STATUS_DISABLED],
+            [['data'], 'default', 'value' => ''],
             // 验证规则。
             [['client_id', 'code', 'name'], 'required'],
-            [['client_id'], 'integer', 'integerOnly' => true],
+            [['client_id'], 'integer'],
             [['code'], OperationCodeValidator::class],
             [['code', 'description'], 'string', 'max' => 255],
             [['name'], 'string', 'max' => 50],

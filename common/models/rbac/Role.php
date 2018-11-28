@@ -67,13 +67,8 @@ class Role extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            // 过滤和处理数据。
-            [['name'], 'trim'],
-            [['description'], 'default', 'value' => ''],
-            [['status'], 'default', 'value' => self::STATUS_DISABLED],
-            // 验证规则。
             [['client_id', 'name'], 'required'],
-            [['client_id'], 'integer', 'integerOnly' => true],
+            [['client_id'], 'integer'],
             [['name'], 'string', 'max' => 50],
             [['description'], 'string', 'max' => 255],
             [['status'], 'boolean'],

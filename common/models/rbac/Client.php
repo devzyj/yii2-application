@@ -69,8 +69,7 @@ class Client extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            // 过滤和处理数据。
-            [['description'], 'default', 'value' => ''],
+            // 设置默认值。
             [['type'], 'default', 'value' => self::TYPE_NORMAL],
             // 验证规则。
             [['name', 'identifier', 'type'], 'required'],

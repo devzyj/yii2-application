@@ -54,11 +54,8 @@ class User extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            // 过滤和处理数据。
-            [['description'], 'default', 'value' => ''],
-            // 验证规则。
             [['client_id', 'account'], 'required'],
-            [['client_id'], 'integer', 'integerOnly' => true],
+            [['client_id'], 'integer'],
             [['account'], 'string', 'max' => 100],
             [['description'], 'string', 'max' => 255],
             [['account'], 'unique', 'targetAttribute' => ['client_id', 'account']],

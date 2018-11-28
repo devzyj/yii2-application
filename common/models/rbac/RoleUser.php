@@ -52,7 +52,7 @@ class RoleUser extends \yii\db\ActiveRecord
     {
         return [
             [['role_id', 'user_id'], 'required'],
-            [['role_id', 'user_id'], 'integer', 'integerOnly' => true],
+            [['role_id', 'user_id'], 'integer'],
             [['role_id', 'user_id'], 'unique', 'targetAttribute' => ['role_id', 'user_id']],
             [['role_id'], 'exist', 'skipOnError' => true, 'targetClass' => Role::class, 'targetAttribute' => ['role_id' => 'id']],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['User' => 'id']],

@@ -71,12 +71,12 @@ class Client extends \yii\db\ActiveRecord
                 'preserveNonEmptyValues' => true,
                 'attributes' => [
                     'id' => [
-                        self::EVENT_BEFORE_INSERT => [static::class, 'generateId'],
-                        self::EVENT_BEFORE_UPDATE => [static::class, 'generateId'],
+                        self::EVENT_BEFORE_INSERT => $fn = [static::class, 'generateId'],
+                        self::EVENT_BEFORE_UPDATE => $fn,
                     ],
                     'secret' => [
-                        self::EVENT_BEFORE_INSERT => [static::class, 'generateSecret'],
-                        self::EVENT_BEFORE_UPDATE => [static::class, 'generateSecret'],
+                        self::EVENT_BEFORE_INSERT => $fn = [static::class, 'generateSecret'],
+                        self::EVENT_BEFORE_UPDATE => $fn,
                     ],
                 ]
             ],
@@ -95,11 +95,8 @@ class Client extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            // 过滤和处理数据。
-            [['name'], 'trim'],
-            [['description', 'allowed_ips', 'allowed_apis'], 'default', 'value' => ''],
-            [['status'], 'default', 'value' => self::STATUS_DISABLED],
-            [['token_expires_in', 'refresh_token_expires_in', 'rate_limit_count', 'rate_limit_seconds'], 'default', 'value' => 0],
+            // 设置字段类型为 `TEXT` 的默认值。
+            [['allowed_ips', 'allowed_apis'], 'default', 'value' => ''],
             // 验证规则。
             [['name'], 'required'],
             [['name'], 'string', 'max' => 50],

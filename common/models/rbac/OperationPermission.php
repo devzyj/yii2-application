@@ -52,7 +52,7 @@ class OperationPermission extends \yii\db\ActiveRecord
     {
         return [
             [['operation_id', 'permission_id'], 'required'],
-            [['operation_id', 'permission_id'], 'integer', 'integerOnly' => true],
+            [['operation_id', 'permission_id'], 'integer'],
             [['operation_id', 'permission_id'], 'unique', 'targetAttribute' => ['operation_id', 'permission_id']],
             [['operation_id'], 'exist', 'skipOnError' => true, 'targetClass' => Operation::class, 'targetAttribute' => ['operation_id' => 'id']],
             [['permission_id'], 'exist', 'skipOnError' => true, 'targetClass' => Permission::class, 'targetAttribute' => ['permission_id' => 'id']],

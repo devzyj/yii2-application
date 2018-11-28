@@ -81,9 +81,7 @@ class Admin extends \yii\db\ActiveRecord
     {
         return [
             // 过滤和处理数据。
-            [['username', 'nickname'], 'trim'],
             [['username'], 'filter', 'filter' => 'strtolower'],
-            [['status'], 'default', 'value' => self::STATUS_DISABLED],
             [['avatar', 'allowed_ips'], 'default', 'value' => ''],
             // 验证规则。
             [['username', 'nickname'], 'required'],

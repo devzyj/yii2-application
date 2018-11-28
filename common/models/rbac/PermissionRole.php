@@ -52,7 +52,7 @@ class PermissionRole extends \yii\db\ActiveRecord
     {
         return [
             [['permission_id', 'role_id'], 'required'],
-            [['permission_id', 'role_id'], 'integer', 'integerOnly' => true],
+            [['permission_id', 'role_id'], 'integer'],
             [['permission_id', 'role_id'], 'unique', 'targetAttribute' => ['permission_id', 'role_id']],
             [['permission_id'], 'exist', 'skipOnError' => true, 'targetClass' => Permission::class, 'targetAttribute' => ['permission_id' => 'id']],
             [['role_id'], 'exist', 'skipOnError' => true, 'targetClass' => Role::class, 'targetAttribute' => ['role_id' => 'id']],
