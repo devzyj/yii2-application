@@ -10,7 +10,7 @@ use yii\db\Migration;
 /**
  * Class m181120_094029_rbac_initial
  */
-class m181120_094029_rbac_initial extends Migration
+abstract class m181120_094029_rbac_initial extends Migration
 {
     /**
      * @var array 全部数据表名。

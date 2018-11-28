@@ -6,8 +6,13 @@
  */
 
 Yii::setAlias('@application', dirname(dirname(__DIR__)));
+
 Yii::setAlias('@common', '@application/common');
+
 Yii::setAlias('@console', '@application/console');
+
 Yii::setAlias('@backend', '@application/backend');
+Yii::setAlias('@backendApi', '@application/backend-api');
+
 Yii::setAlias('@frontend', '@application/frontend');
 Yii::setAlias('@api', '@application/api');
