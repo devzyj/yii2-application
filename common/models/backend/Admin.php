@@ -28,6 +28,7 @@ use common\validators\MobileValidator;
  * @property string $allowed_ips 允许登录的 IPs
  *
  * @property AdminLoginLog[] $adminLoginLogs 管理员登录日志
+ * @property OauthClient[] $oauthClients 创建的授权客户端
  * 
  * @property string $password 设置的密码
  * @property boolean $isValid 管理员是否有效
@@ -77,9 +78,9 @@ class Admin extends \yii\db\ActiveRecord
     {
         return [
             [['username', 'nickname'], 'required'],
+            [['status'], 'boolean'],
             [['username', 'nickname', 'mobile'], 'string', 'max' => 20],
             [['email', 'avatar', 'allowed_ips'], 'string', 'max' => 255],
-            [['status'], 'boolean'],
             [['email'], 'email'],
             [['username'], UsernameValidator::class],
             [['password'], PasswordValidator::class],
@@ -111,21 +112,44 @@ class Admin extends \yii\db\ActiveRecord
     }
 
     /**
+     * 获取管理员登录日志。
+     * 
      * @return \yii\db\ActiveQuery
      */
     public function getAdminLoginLogs()
     {
         return $this->hasMany(AdminLoginLog::class, ['admin_id' => 'id']);
     }
+
+    /**
+     * 获取创建的授权客户端。
+     * 
+     * @return \yii\db\ActiveQuery
+     */
+    public function getOauthClients()
+    {
+        return $this->hasMany(OauthClient::class, ['admin_id' => 'id']);
+    }
     
     /**
-     * 生成 hash 附加值。
+     * 通过用户名，查询并返回一个管理员模型。
      * 
-     * @return string 生成的 hash 附加值。
+     * @param string $username 用户名。
+     * @return static|null 管理员模型实例，如果没有匹配到，则为 `null`。
      */
-    public static function generateHashCode()
+    public static function findOneByUsername($username)
     {
-        return (string) rand(100000, 999999);
+        return static::findOne(['username' => $username]);
+    }
+    
+    /**
+     * 获取管理员是否有效。
+     * 
+     * @return boolean
+     */
+    public function getIsValid()
+    {
+        return $this->status === self::STATUS_ENABLED;
     }
     
     /**
@@ -181,13 +205,13 @@ class Admin extends \yii\db\ActiveRecord
     }
     
     /**
-     * 获取管理员是否有效。
+     * 生成 hash 附加值。
      * 
-     * @return boolean
+     * @return string 生成的 hash 附加值。
      */
-    public function getIsValid()
+    public static function generateHashCode()
     {
-        return $this->status === self::STATUS_ENABLED;
+        return (string) rand(100000, 999999);
     }
     
     /**
@@ -220,16 +244,5 @@ class Admin extends \yii\db\ActiveRecord
         }
         
         return false;
-    }
-    
-    /**
-     * 通过用户名，查询并返回一个管理员模型。
-     * 
-     * @param string $username 用户名。
-     * @return static|null 管理员模型实例，如果没有匹配到，则为 `null`。
-     */
-    public static function findOneByUsername($username)
-    {
-        return static::findOne(['username' => $username]);
     }
 }

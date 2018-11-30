@@ -4,11 +4,11 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace backendApiAuth\components;
+namespace backendApiOauth\components;
 
 use Yii;
 use yii\helpers\ArrayHelper;
-use backendApiAuth\components\Identity;
+use backendApiOauth\components\Identity;
 
 /**
  * ApiController class.
@@ -30,7 +30,7 @@ class ApiController extends \backendApi\components\ApiController
                         'class' => 'yii\filters\auth\HttpBasicAuth',
                         'auth' => function ($username, $password) {
                             /* @var $model Identity */
-                            $model = Identity::findIdentity($username);
+                            $model = Identity::findOneByIdentifier($username);
                             if ($model->secret === $password && $model->getClientIsValid()) {
                                 return $model;
                             }

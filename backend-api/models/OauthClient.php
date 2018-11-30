@@ -7,12 +7,12 @@
 namespace backendApi\models;
 
 /**
- * This is the model class for table "{{%backend_client}}".
+ * This is the model class for table "{{%backend_oauth_client}}".
  *
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
-class Client extends \common\models\backend\Client
+class OauthClient extends \common\models\backend\OauthClient
 {
     
 }

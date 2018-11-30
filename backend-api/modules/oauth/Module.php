@@ -4,7 +4,7 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace backendApiAuth;
+namespace backendApiOauth;
 
 use Yii;
 use backendApi\components\traits\ModuleLogTrait;
@@ -49,15 +49,15 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
 
         // 设置令牌组件。
         $this->set('token', [
-            'class' => 'backendApiAuth\components\JsonWebToken',
-            'signKey' => Yii::$app->params['auth.token.signKey'],
+            'class' => 'backendApiOauth\components\JsonWebToken',
+            'signKey' => Yii::$app->params['oauth.token.signKey'],
         ]);
     }
     
     /**
      * 获取令牌组件。
      * 
-     * @return \backendApiAuth\components\JsonWebToken
+     * @return \backendApiOauth\components\JsonWebToken
      */
     public function getToken()
     {
@@ -72,7 +72,7 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
         // 设置身份认证类。
         Yii::$app->set('user', [
             'class' => 'yii\web\User',
-            'identityClass' => 'backendApiAuth\components\Identity',
+            'identityClass' => 'backendApiOauth\components\Identity',
             'enableSession' => false,
             'loginUrl' => null,
         ]);

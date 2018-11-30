@@ -9,29 +9,34 @@ namespace common\models\backend;
 use Yii;
 
 /**
- * This is the model class for table "{{%backend_client}}".
+ * This is the model class for table "{{%backend_oauth_client}}".
  *
- * @property string $id ID
+ * @property int $id ID
  * @property string $name 名称
- * @property string $secret 密钥
  * @property string $description 描述
+ * @property int $admin_id 创建者 ID
+ * @property string $allowed_ips 允许访问的 IPs
  * @property int $create_time 创建时间
  * @property int $status 状态（0=禁用；1=可用）
- * @property string $allowed_ips 允许访问的 IPs
- * @property string $allowed_apis 允许访问的 APIs
+ * @property string $identifier 标识
+ * @property string $secret 密钥
+ * @property string $grant_types 支持的授权类型
  * @property int $access_token_duration 访问令牌的持续时间
  * @property int $refresh_token_duration 刷新令牌的持续时间
  *
+ * @property Admin $admin 创建者
  * @property AdminLoginLog[] $adminLoginLogs 管理员登录日志
+ * @property OauthClientScope[] $clientScopes 客户端与权限范围的关联数据
+ * @property OauthScope[] $scopes 权限范围
  * 
  * @property boolean $isValid 客户端是否有效
  * @property array $allowedIPs 允许访问的 IPs
- * @property array $allowedAPIs 允许访问的 APIs
+ * @property array $grantTypes 客户端支持的授权类型
  *
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
-class Client extends \yii\db\ActiveRecord
+class OauthClient extends \yii\db\ActiveRecord
 {
     /**
      * @var integer 状态 - 禁用的。
@@ -48,7 +53,7 @@ class Client extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return '{{%backend_client}}';
+        return '{{%backend_oauth_client}}';
     }
 
     /**
@@ -67,7 +72,7 @@ class Client extends \yii\db\ActiveRecord
                 'preserveNonEmptyValues' => true,
                 'attributes' => [
                     'id' => [
-                        self::EVENT_BEFORE_INSERT => $fn = [static::class, 'generateId'],
+                        self::EVENT_BEFORE_INSERT => $fn = [static::class, 'generateIdentifier'],
                         self::EVENT_BEFORE_UPDATE => $fn,
                     ],
                     'secret' => [
@@ -85,12 +90,14 @@ class Client extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name'], 'required'],
+            [['name', 'admin_id'], 'required'],
+            [['admin_id', 'access_token_duration', 'refresh_token_duration'], 'integer'],
             [['status'], 'boolean'],
             [['name'], 'string', 'max' => 50],
-            [['description', 'allowed_ips', 'allowed_apis'], 'string', 'max' => 255],
-            [['access_token_duration', 'refresh_token_duration'], 'integer'],
+            [['description', 'allowed_ips'], 'string', 'max' => 255],
+            [['grant_types'], 'string', 'max' => 100],
             [['name'], 'unique'],
+            [['admin_id'], 'exist', 'skipOnError' => true, 'targetClass' => Admin::class, 'targetAttribute' => ['admin_id' => 'id']],
         ];
     }
 
@@ -102,31 +109,89 @@ class Client extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'name' => 'Name',
-            'secret' => 'Secret',
             'description' => 'Description',
+            'admin_id' => 'Admin ID',
+            'allowed_ips' => 'Allowed Ips',
             'create_time' => 'Create Time',
             'status' => 'Status',
-            'allowed_ips' => 'Allowed Ips',
-            'allowed_apis' => 'Allowed Apis',
+            'identifier' => 'Identifier',
+            'secret' => 'Secret',
+            'grant_types' => 'Grant Types',
             'access_token_duration' => 'Access Token Duration',
             'refresh_token_duration' => 'Refresh Token Duration',
         ];
     }
 
     /**
+     * 获取管理员。
+     * 
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAdmin()
+    {
+        return $this->hasOne(Admin::class, ['id' => 'admin_id']);
+    }
+    
+    /**
+     * 获取管理员登录日志。
+     * 
      * @return \yii\db\ActiveQuery
      */
     public function getAdminLoginLogs()
     {
         return $this->hasMany(AdminLoginLog::class, ['client_id' => 'id']);
     }
+
+    /**
+     * 获取客户端与权限范围的关联数据。
+     * 
+     * @return \yii\db\ActiveQuery
+     */
+    public function getClientScopes()
+    {
+        return $this->hasMany(OauthClientScope::class, ['client_id' => 'id']);
+    }
+
+    /**
+     * 获取权限范围。
+     * 
+     * @return \yii\db\ActiveQuery
+     */
+    public function getScopes()
+    {
+        return $this->hasMany(OauthScope::class, ['id' => 'scope_id'])->viaTable(OauthClientScope::tableName(), ['client_id' => 'id']);
+    }
+
+    /**
+     * 获取默认的权限范围。
+     *
+     * @return \yii\db\ActiveQuery
+     * @deprecated
+     */
+    public function getDefaultScopes()
+    {
+        return $this->hasMany(OauthScope::class, ['id' => 'scope_id'])->viaTable(OauthClientScope::tableName(), ['client_id' => 'id'], function ($query) {
+            $query->andWhere(['is_default' => OauthClientScope::IS_DEFAULT_YES]);
+        });
+    }
     
     /**
-     * 生成客户端 ID。
+     * 通过客户端标识，查询并返回一个客户端模型。
+     * 
+     * @param string $identifier 客户端标识。
+     * @return static|null 客户端模型实例，如果没有匹配到，则为 `null`。
+     */
+    public static function findOneByIdentifier($identifier)
+    {
+        return static::findOne(['identifier' => $identifier]);
+    }
+    
+    /**
+     * 生成客户端标识。
      * 
      * @return string
      */
-    public static function generateId()
+    public static function generateIdentifier()
     {
         return substr(md5(microtime().rand(1000, 9999)), 8, 16);
     }
@@ -172,7 +237,7 @@ class Client extends \yii\db\ActiveRecord
      * @param string $ip 需要检查的 IP 地址。
      * @return boolean
      */
-    public function checkAllowedIp($ip)
+    public function checkAllowedIP($ip)
     {
         foreach ($this->getAllowedIPs() as $allowed) {
             if ($allowed === '*' || $allowed === $ip || (($pos = strpos($allowed, '*')) !== false && !strncmp($ip, $allowed, $pos))) {
@@ -184,9 +249,28 @@ class Client extends \yii\db\ActiveRecord
     }
     
     /**
+     * 获取客户端支持的授权类型。
+     * 
+     * @return array
+     */
+    public function getGrantTypes()
+    {
+        $grantTypes = trim($this->grant_types, ',');
+        if ($grantTypes) {
+            return explode(',', $grantTypes);
+        }
+        
+        return [];
+    }
+    
+    
+    
+    
+    /**
      * 获取客户端允许访问的 APIs。
      * 
      * @return array
+     * @deprecated
      */
     public function getAllowedAPIs()
     {
@@ -215,6 +299,7 @@ class Client extends \yii\db\ActiveRecord
      * 
      * @param array $list API 列表。
      * @return array 
+     * @deprecated
      */
     public function ensureAllowedAPIs($list)
     {
@@ -240,8 +325,9 @@ class Client extends \yii\db\ActiveRecord
      * 
      * @param string $api 需要检查的 API。
      * @return boolean
+     * @deprecated
      */
-    public function checkAllowedApi($api)
+    public function checkAllowedAPI($api)
     {
         $api = '/' . trim($api, '/') . '/';
         $list = $this->ensureAllowedAPIs($this->getAllowedAPIs());

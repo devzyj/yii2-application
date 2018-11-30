@@ -9,7 +9,7 @@ $config = [
     'id' => 'app-backend-api',
     'basePath' => dirname(__DIR__),
     'controllerNamespace' => 'backendApi\controllers',
-    'bootstrap' => ['log', 'auth', 'v1'],
+    'bootstrap' => ['log', 'oauth', 'v1'],
     'components' => [
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
@@ -44,8 +44,8 @@ $config = [
         ],
     ],
     'modules' => [
-        'auth' => [
-            'class' => 'backendApiAuth\Module',
+        'oauth' => [
+            'class' => 'backendApiOauth\Module',
         ],
         'v1' => [
             'class' => 'backendApiV1\Module',

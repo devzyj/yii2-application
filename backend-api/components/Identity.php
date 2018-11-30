@@ -18,7 +18,7 @@ use yii\web\IdentityInterface;
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
-class Identity extends \backendApi\models\Client implements IdentityInterface
+class Identity extends \backendApi\models\OauthClient implements IdentityInterface
 {
     /**
      * 是否为超级客户端。
@@ -62,6 +62,7 @@ class Identity extends \backendApi\models\Client implements IdentityInterface
      * 检查 API 是否被允许。
      *
      * @return boolean 是否允许，超级客户端始终允许。
+     * @deprecated
      */
     public function checkClientAllowedApi($api)
     {
@@ -86,7 +87,7 @@ class Identity extends \backendApi\models\Client implements IdentityInterface
      */
     public static function findIdentity($id)
     {
-        return static::findOne($id);
+        return null;
     }
 
     /**
@@ -94,12 +95,12 @@ class Identity extends \backendApi\models\Client implements IdentityInterface
      */
     public static function findIdentityByAccessToken($token, $type = null)
     {
-        /* @var $module \backendApiAuth\Module */
-        $module = Yii::$app->getModule('auth');
+        /* @var $module \backendApiOauth\Module */
+        $module = Yii::$app->getModule('oauth');
         $tokenData = $module->getToken()->getAccessTokenData($token);
         if (isset($tokenData['client_id'])) {
             /* @var $model static */
-            $model = static::findIdentity($tokenData['client_id']);
+            $model = static::findOneByIdentifier($tokenData['client_id']);
             if ($model && $model->getClientIsValid()) {
                 return $model;
             }

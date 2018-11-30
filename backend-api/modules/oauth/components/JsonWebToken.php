@@ -4,7 +4,7 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace backendApiAuth\components;
+namespace backendApiOauth\components;
 
 use Yii;
 use Lcobucci\JWT\Builder;
@@ -107,6 +107,7 @@ class JsonWebToken extends \yii\base\Component
         $token = [
             'access_token' => (string) $accessToken,
             'expires_in' => $expiresIn,
+            'scope' => $scope,
         ];
         
         if ($refreshExpiresIn !== null) {

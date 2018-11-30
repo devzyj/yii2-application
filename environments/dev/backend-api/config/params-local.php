@@ -10,5 +10,5 @@
  */
 return [
     // 授权令牌的加密 KEY。
-    'auth.token.signKey' => '123456789',
+    'oauth.token.signKey' => '123456789',
 ];

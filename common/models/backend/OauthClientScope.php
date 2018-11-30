@@ -9,28 +9,36 @@ namespace common\models\backend;
 use Yii;
 
 /**
- * This is the model class for table "{{%backend_admin_login_log}}".
+ * This is the model class for table "{{%backend_oauth_client_scope}}".
  *
- * @property string $id ID
  * @property int $client_id 客户端 ID
- * @property int $admin_id 管理员 ID
- * @property string $ip 登录 IP
- * @property int $time 登录时间
+ * @property int $scope_id 权限范围 ID
+ * @property int $create_time 创建时间
  *
- * @property Admin $admin 管理员
+ * @property OauthScope $scope 权限范围
  * @property OauthClient $client 客户端
- * 
+ *
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
-class AdminLoginLog extends \yii\db\ActiveRecord
+class OauthClientScope extends \yii\db\ActiveRecord
 {
+    /**
+     * @var integer 不是默认。
+     */
+    const IS_DEFAULT_NO = 0;
+    
+    /**
+     * @var integer 是默认。
+     */
+    const IS_DEFAULT_YES = 1;
+    
     /**
      * {@inheritdoc}
      */
     public static function tableName()
     {
-        return '{{%backend_admin_login_log}}';
+        return '{{%backend_oauth_client_scope}}';
     }
 
     /**
@@ -41,7 +49,7 @@ class AdminLoginLog extends \yii\db\ActiveRecord
         return [
             'timestampBehavior' => [
                 'class' => 'yii\behaviors\TimestampBehavior',
-                'createdAtAttribute' => 'time',
+                'createdAtAttribute' => 'create_time',
                 'updatedAtAttribute' => null,
             ],
         ];
@@ -53,10 +61,10 @@ class AdminLoginLog extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['client_id', 'admin_id', 'ip'], 'required'],
-            [['client_id', 'admin_id'], 'integer'],
-            [['ip'], 'string', 'max' => 50],
-            [['admin_id'], 'exist', 'skipOnError' => true, 'targetClass' => Admin::class, 'targetAttribute' => ['admin_id' => 'id']],
+            [['client_id', 'scope_id'], 'required'],
+            [['client_id', 'scope_id'], 'integer'],
+            [['client_id', 'scope_id'], 'unique', 'targetAttribute' => ['client_id', 'scope_id']],
+            [['scope_id'], 'exist', 'skipOnError' => true, 'targetClass' => OauthScope::class, 'targetAttribute' => ['scope_id' => 'id']],
             [['client_id'], 'exist', 'skipOnError' => true, 'targetClass' => OauthClient::class, 'targetAttribute' => ['client_id' => 'id']],
         ];
     }
@@ -67,22 +75,20 @@ class AdminLoginLog extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
             'client_id' => 'Client ID',
-            'admin_id' => 'Admin ID',
-            'ip' => 'Ip',
-            'time' => 'Time',
+            'scope_id' => 'Scope ID',
+            'create_time' => 'Create Time',
         ];
     }
 
     /**
-     * 获取管理员。
+     * 获取权限范围。
      * 
      * @return \yii\db\ActiveQuery
      */
-    public function getAdmin()
+    public function getScope()
     {
-        return $this->hasOne(Admin::class, ['id' => 'admin_id']);
+        return $this->hasOne(OauthScope::class, ['id' => 'scope_id']);
     }
 
     /**
