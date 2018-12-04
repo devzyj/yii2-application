@@ -54,6 +54,9 @@ class TokenController extends \yii\web\Controller
             // Grant Type: client_credentials
             'client-credentials' => [
                 'class' => 'common\oauth2\server\actions\ClientCredentialsAction',
+                'clientRepositoryClass' => $this->module->repositoryClassMap['ClientRepository'],
+                'scopeRepositoryClass' => $this->module->repositoryClassMap['ScopeRepository'],
+                'accessTokenRepositoryClass' => $this->module->repositoryClassMap['AccessTokenRepository'],
             ],
             // Grant Type: password
             /*'user-credentials' => [

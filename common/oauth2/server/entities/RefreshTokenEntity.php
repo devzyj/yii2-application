@@ -6,10 +6,6 @@
  */
 namespace common\oauth2\server\entities;
 
-use League\OAuth2\Server\Entities\RefreshTokenEntityInterface;
-use League\OAuth2\Server\Entities\Traits\EntityTrait;
-use League\OAuth2\Server\Entities\Traits\RefreshTokenTrait;
-
 /**
  * RefreshTokenEntity class.
  * 
@@ -18,5 +14,5 @@ use League\OAuth2\Server\Entities\Traits\RefreshTokenTrait;
  */
 class RefreshTokenEntity implements RefreshTokenEntityInterface
 {
-    use RefreshTokenTrait, EntityTrait;
+    
 }

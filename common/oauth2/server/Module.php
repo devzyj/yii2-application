@@ -6,6 +6,8 @@
  */
 namespace common\oauth2\server;
 
+use Yii;
+
 /**
  * OAuth2 Server Module.
  * 
@@ -25,7 +27,7 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
 {
     /**
      * @var array
-     */
+     
     public $entityClassMap = [
         'AccessTokenEntity' => 'common\oauth2\server\entities\AccessTokenEntity',
         'AuthCodeEntity' => 'common\oauth2\server\entities\AuthCodeEntity',
@@ -33,7 +35,7 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
         'RefreshTokenEntity' => 'common\oauth2\server\entities\RefreshTokenEntity',
         'ScopeEntity' => 'common\oauth2\server\entities\ScopeEntity',
         'UserEntity' => 'common\oauth2\server\entities\UserEntity',
-    ];
+    ];*/
 
     /**
      * @var array
@@ -59,5 +61,16 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
                 "<module:({$this->uniqueId})>/resource" => "<module>/resource/index",
             ], false);
         }
+        
+        // set definitions
+        /*foreach ($this->entityClassMap as $class => $definition) {
+            $class = __NAMESPACE__ . '\\entities\\' . $class;
+            Yii::$container->set($class, $definition);
+        }
+
+        foreach ($this->repositoryClassMap as $class => $definition) {
+            $class = __NAMESPACE__ . '\\repositories\\' . $class;
+            Yii::$container->set($class, $definition);
+        }*/
     }
 }

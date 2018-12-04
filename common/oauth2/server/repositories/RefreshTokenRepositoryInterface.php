@@ -7,12 +7,12 @@
 namespace common\oauth2\server\repositories;
 
 /**
- * RefreshTokenRepository class.
+ * 更新令牌存储接口。
  * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
-class RefreshTokenRepository implements RefreshTokenRepositoryInterface
+interface RefreshTokenRepositoryInterface
 {
     
 }

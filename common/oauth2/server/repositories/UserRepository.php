@@ -6,10 +6,6 @@
  */
 namespace common\oauth2\server\repositories;
 
-use League\OAuth2\Server\Entities\ClientEntityInterface;
-use League\OAuth2\Server\Repositories\UserRepositoryInterface;
-use common\oauth2\server\entities\UserEntity;
-
 /**
  * UserRepository class.
  * 
@@ -18,18 +14,5 @@ use common\oauth2\server\entities\UserEntity;
  */
 class UserRepository implements UserRepositoryInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getUserEntityByUserCredentials(
-        $username,
-        $password,
-        $grantType,
-        ClientEntityInterface $clientEntity
-    ) {
-        if ($username === 'alex' && $password === 'whisky') {
-            return new UserEntity();
-        }
-        return;
-    }
+    
 }
