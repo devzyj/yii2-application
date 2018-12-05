@@ -52,6 +52,9 @@ $config = [
         ],
         'oauth2' => [
             'class' => 'common\oauth2\server\Module',
+            'tokenSignKey' => '123a',
+            'tokenPrivateKeyPath' => '@common/oauth2/server/private.key',
+            'tokenPublicKeyPath' => '@common/oauth2/server/public.key',
         ],
     ]
 ];

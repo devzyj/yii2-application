@@ -41,7 +41,7 @@ class m181203_032806_oauth2_server_initial extends Migration
      */
     public function safeDown()
     {
-        $this->dropTable($this->tables['oauth_scope']);
+        //$this->dropTable($this->tables['oauth_scope']);
         $this->dropTable($this->tables['oauth_client']);
     }
     
