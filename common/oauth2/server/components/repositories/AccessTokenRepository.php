@@ -24,7 +24,7 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
      * 
      * @return AccessTokenEntity 新的访问令牌实例。
      */
-    public function createEntity()
+    public function createAccessTokenEntity()
     {
         return Yii::createObject(AccessTokenEntity::class);
     }
@@ -32,18 +32,18 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function save(AccessTokenEntityInterface $token)
+    public function saveAccessToken(AccessTokenEntityInterface $token)
     {}
     
     /**
      * {@inheritdoc}
      */
-    public function revoke($identifier)
+    public function revokeAccessToken($identifier)
     {}
 
     /**
      * {@inheritdoc}
      */
-    public function isRevoked($identifier)
+    public function isAccessTokenRevoked($identifier)
     {}
 }

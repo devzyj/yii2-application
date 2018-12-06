@@ -31,30 +31,6 @@ use common\oauth2\server\components\JwtSignKey;
 class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
 {
     /**
-     * @var array
-     */
-    public $entityClassMap = [
-        'AccessTokenEntity' => 'common\oauth2\server\components\entities\AccessTokenEntity',
-        'AuthCodeEntity' => 'common\oauth2\server\components\entities\AuthCodeEntity',
-        'ClientEntity' => 'common\oauth2\server\components\entities\ClientEntity',
-        'RefreshTokenEntity' => 'common\oauth2\server\components\entities\RefreshTokenEntity',
-        'ScopeEntity' => 'common\oauth2\server\components\entities\ScopeEntity',
-        'UserEntity' => 'common\oauth2\server\components\entities\UserEntity',
-    ];
-
-    /**
-     * @var array
-     */
-    public $repositoryClassMap = [
-        'AccessTokenRepository' => 'common\oauth2\server\components\repositories\AccessTokenRepository',
-        'AuthCodeRepository' => 'common\oauth2\server\components\repositories\AuthCodeRepository',
-        'ClientRepository' => 'common\oauth2\server\components\repositories\ClientRepository',
-        'RefreshTokenRepository' => 'common\oauth2\server\components\repositories\RefreshTokenRepository',
-        'ScopeRepository' => 'common\oauth2\server\components\repositories\ScopeRepository',
-        'UserRepository' => 'common\oauth2\server\components\repositories\UserRepository',
-    ];
-    
-    /**
      * @var string 生成令牌的私钥路径。
      */
     public $tokenPrivateKeyPath;
@@ -73,6 +49,30 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
      * @var string 生成和验证令牌的签名密钥。优先级低于私钥和公钥。
      */
     public $tokenSignKey;
+
+    /**
+     * @var array
+     */
+    public $entityClassMap = [
+        'AccessTokenEntity' => 'common\oauth2\server\components\entities\AccessTokenEntity',
+        'AuthCodeEntity' => 'common\oauth2\server\components\entities\AuthCodeEntity',
+        'ClientEntity' => 'common\oauth2\server\components\entities\ClientEntity',
+        'RefreshTokenEntity' => 'common\oauth2\server\components\entities\RefreshTokenEntity',
+        'ScopeEntity' => 'common\oauth2\server\components\entities\ScopeEntity',
+        'UserEntity' => 'common\oauth2\server\components\entities\UserEntity',
+    ];
+    
+    /**
+     * @var array
+     */
+    public $repositoryClassMap = [
+        'AccessTokenRepository' => 'common\oauth2\server\components\repositories\AccessTokenRepository',
+        'AuthCodeRepository' => 'common\oauth2\server\components\repositories\AuthCodeRepository',
+        'ClientRepository' => 'common\oauth2\server\components\repositories\ClientRepository',
+        'RefreshTokenRepository' => 'common\oauth2\server\components\repositories\RefreshTokenRepository',
+        'ScopeRepository' => 'common\oauth2\server\components\repositories\ScopeRepository',
+        'UserRepository' => 'common\oauth2\server\components\repositories\UserRepository',
+    ];
     
     /**
      * {@inheritdoc}

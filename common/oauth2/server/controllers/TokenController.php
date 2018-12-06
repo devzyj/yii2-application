@@ -50,20 +50,29 @@ class TokenController extends \yii\web\Controller
      */
     public function actions()
     {
+        /* @var $module \common\oauth2\server\Module */
+        $module = $this->module;
+        
         return [
             // Grant Type: client_credentials
             'client-credentials' => [
-                'class' => 'common\oauth2\server\components\actions\ClientCredentialsAction',
-                'accessTokenRepository' => $this->module->repositoryClassMap['AccessTokenRepository'],
-                'clientRepository' => $this->module->repositoryClassMap['ClientRepository'],
-                'scopeRepository' => $this->module->repositoryClassMap['ScopeRepository'],
-                'tokenPrivateKey' => $this->module->getTokenPrivateKey(),
+                'class' => 'common\oauth2\server\components\actions\ClientCredentialsGrantAction',
+                'tokenPrivateKey' => $module->getTokenPrivateKey(),
+                'accessTokenRepository' => $module->repositoryClassMap['AccessTokenRepository'],
+                'clientRepository' => $module->repositoryClassMap['ClientRepository'],
+                'scopeRepository' => $module->repositoryClassMap['ScopeRepository'],
             ],
             // Grant Type: password
-            /*'user-credentials' => [
-                'class' => 'common\oauth2\server\actions\UserCredentialsAction',
+            'user-credentials' => [
+                'class' => 'common\oauth2\server\components\actions\PasswordGrantAction',
+                'tokenPrivateKey' => $module->getTokenPrivateKey(),
+                'accessTokenRepository' => $module->repositoryClassMap['AccessTokenRepository'],
+                'clientRepository' => $module->repositoryClassMap['ClientRepository'],
+                'refreshTokenRepository' => $module->repositoryClassMap['RefreshTokenRepository'],
+                'scopeRepository' => $module->repositoryClassMap['ScopeRepository'],
+                'userRepository' => $module->repositoryClassMap['UserRepository'],
             ],
-            // Grant Type: authorization_code
+            /*// Grant Type: authorization_code
             'code-credentials' => [
                 'class' => 'common\oauth2\server\actions\CodeCredentialsAction',
             ],

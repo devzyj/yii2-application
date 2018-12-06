@@ -22,13 +22,6 @@ interface ClientEntityInterface
     public function getIdentifier();
     
     /**
-     * 获取客户端密钥。
-     * 
-     * @return string
-     */
-    public function getSecret();
-    
-    /**
      * 获取客户端授权类型。
      * 
      * @return string[]
@@ -67,6 +60,6 @@ interface ClientEntityInterface
      * 获取加密键。
      * 
      * @return string
-     
-    public function getEncryptionKey();*/
+     */
+    public function getEncryptionKey();
 }

@@ -21,7 +21,7 @@ interface AccessTokenRepositoryInterface
      * 
      * @return AccessTokenEntityInterface 新的访问令牌实例。
      */
-    public function createEntity();
+    public function createAccessTokenEntity();
     
     /**
      * 保存令牌。
@@ -29,7 +29,7 @@ interface AccessTokenRepositoryInterface
      * @param AccessTokenEntityInterface $token 令牌。
      * @throws UniqueTokenIdentifierException 令牌标识重复。
      */
-    public function save(AccessTokenEntityInterface $token);
+    public function saveAccessToken(AccessTokenEntityInterface $token);
     
     /**
      * 撤销令牌。
@@ -37,7 +37,7 @@ interface AccessTokenRepositoryInterface
      * @param string $identifier 令牌标识。
      * @return boolean 撤销是否成功。
      */
-    public function revoke($identifier);
+    public function revokeAccessToken($identifier);
 
     /**
      * 令牌是否已撤销。
@@ -45,5 +45,5 @@ interface AccessTokenRepositoryInterface
      * @param string $identifier 令牌标识。
      * @return boolean 是否已撤销。
      */
-    public function isRevoked($identifier);
+    public function isAccessTokenRevoked($identifier);
 }

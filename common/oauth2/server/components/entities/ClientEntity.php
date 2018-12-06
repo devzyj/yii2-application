@@ -40,14 +40,6 @@ class ClientEntity extends OauthClient implements ClientEntityInterface
     /**
      * {@inheritdoc}
      */
-    public function getSecret()
-    {
-        return $this->secret;
-    }
-    
-    /**
-     * {@inheritdoc}
-     */
     public function getGrantTypes()
     {
         return parent::getGrantTypes();
@@ -75,6 +67,14 @@ class ClientEntity extends OauthClient implements ClientEntityInterface
     public function getRefreshTokenDuration()
     {
         return $this->refresh_token_duration;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getEncryptionKey()
+    {
+        return '';
     }
 
     /**

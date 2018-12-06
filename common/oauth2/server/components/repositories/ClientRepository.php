@@ -22,8 +22,12 @@ class ClientRepository implements ClientRepositoryInterface
      * 
      * @return ClientEntity 客户端实例。
      */
-    public function getEntity($identifier)
+    public function getClientEntityByCredentials($identifier, $secret)
     {
-        return ClientEntity::findOneByIdentifier($identifier);
+        /* @var $client ClientEntity */
+        $client = ClientEntity::findOneByIdentifier($identifier);
+        if ($client->secret === $secret) {
+            return $client;
+        }
     }
 }

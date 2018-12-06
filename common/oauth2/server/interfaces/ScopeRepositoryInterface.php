@@ -20,7 +20,7 @@ interface ScopeRepositoryInterface
      * @param string $identifier 权限标识。
      * @return ScopeEntityInterface 权限实例。
      */
-    public function getEntity($identifier);
+    public function getScopeEntity($identifier);
     
     /**
      * 根据请求的权限列表、授权类型、客户端、用户，确定最终授权的权限列表。

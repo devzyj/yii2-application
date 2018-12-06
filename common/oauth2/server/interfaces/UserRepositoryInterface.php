@@ -15,10 +15,11 @@ namespace common\oauth2\server\interfaces;
 interface UserRepositoryInterface
 {
     /**
-     * 获取用户。
+     * 使用用户认证信息，获取用户实例。
      * 
-     * @param string $identifier 用户标识。
+     * @param string $username 用户名。
+     * @param string $password 用户密码。
      * @return UserEntityInterface 用户实例。
      */
-    public function getEntity($identifier);
+    public function getUserEntityByCredentials($username, $password);
 }
