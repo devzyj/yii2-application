@@ -4,7 +4,7 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace common\oauth2\server\components\actions;
+namespace common\oauth2\server\actions;
 
 use Yii;
 use yii\base\InvalidConfigException;
@@ -18,17 +18,17 @@ use common\oauth2\server\interfaces\UserRepositoryInterface;
 /**
  * Action class.
  * 
- * @property AccessTokenRepositoryInterface $accessTokenRepository 访问令牌存储。
- * @property AuthCodeRepositoryInterface $authCodeRepository 授权码存储。
- * @property ClientRepositoryInterface $clientRepository 客户端存储。
- * @property RefreshTokenRepositoryInterface $refreshTokenRepository 更新令牌存储。
- * @property ScopeRepositoryInterface $scopeRepository 权限存储。
- * @property UserRepositoryInterface $userRepository 用户存储。
+ * @property AccessTokenRepositoryInterface $accessTokenRepository 访问令牌存储库。
+ * @property AuthCodeRepositoryInterface $authCodeRepository 授权码存储库。
+ * @property ClientRepositoryInterface $clientRepository 客户端存储库。
+ * @property RefreshTokenRepositoryInterface $refreshTokenRepository 更新令牌存储库。
+ * @property ScopeRepositoryInterface $scopeRepository 权限存储库。
+ * @property UserRepositoryInterface $userRepository 用户存储库。
  * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
-abstract class Action extends \yii\base\Action
+class Action extends \yii\base\Action
 {
     /**
      * @var \yii\web\Request 当前的请求。如果没有设置，将使用 `Yii::$app->getRequest()`。
@@ -41,32 +41,32 @@ abstract class Action extends \yii\base\Action
     public $response;
     
     /**
-     * @var AccessTokenRepositoryInterface 访问令牌存储。
+     * @var AccessTokenRepositoryInterface 访问令牌存储库。
      */
     private $_accessTokenRepository;
 
     /**
-     * @var AuthCodeRepositoryInterface 授权码存储。
+     * @var AuthCodeRepositoryInterface 授权码存储库。
      */
     private $_authCodeRepository;
     
     /**
-     * @var ClientRepositoryInterface 客户端存储。
+     * @var ClientRepositoryInterface 客户端存储库。
      */
     private $_clientRepository;
 
     /**
-     * @var RefreshTokenRepositoryInterface 更新令牌存储。
+     * @var RefreshTokenRepositoryInterface 更新令牌存储库。
      */
     private $_refreshTokenRepository;
     
     /**
-     * @var ScopeRepositoryInterface 权限存储。
+     * @var ScopeRepositoryInterface 权限存储库。
      */
     private $_scopeRepository;
 
     /**
-     * @var UserRepositoryInterface 用户存储。
+     * @var UserRepositoryInterface 用户存储库。
      */
     private $_userRepository;
     
@@ -87,7 +87,7 @@ abstract class Action extends \yii\base\Action
     }
     
     /**
-     * 获取访问令牌存储。
+     * 获取访问令牌存储库。
      *
      * @return AccessTokenRepositoryInterface
      */
@@ -97,7 +97,7 @@ abstract class Action extends \yii\base\Action
     }
     
     /**
-     * 设置访问令牌存储。
+     * 设置访问令牌存储库。
      *
      * @param AccessTokenRepositoryInterface|string|array $value
      */
@@ -115,7 +115,7 @@ abstract class Action extends \yii\base\Action
     }
 
     /**
-     * 获取授权码存储。
+     * 获取授权码存储库。
      *
      * @return AuthCodeRepositoryInterface
      */
@@ -125,7 +125,7 @@ abstract class Action extends \yii\base\Action
     }
     
     /**
-     * 设置授权码存储。
+     * 设置授权码存储库。
      *
      * @param AuthCodeRepositoryInterface|string|array $value
      */
@@ -143,7 +143,7 @@ abstract class Action extends \yii\base\Action
     }
     
     /**
-     * 获取客户端存储。
+     * 获取客户端存储库。
      * 
      * @return ClientRepositoryInterface
      */
@@ -153,7 +153,7 @@ abstract class Action extends \yii\base\Action
     }
     
     /**
-     * 设置客户端存储。
+     * 设置客户端存储库。
      * 
      * @param ClientRepositoryInterface|string|array $value
      */
@@ -171,7 +171,7 @@ abstract class Action extends \yii\base\Action
     }
 
     /**
-     * 获取更新令牌存储。
+     * 获取更新令牌存储库。
      *
      * @return RefreshTokenRepositoryInterface
      */
@@ -181,7 +181,7 @@ abstract class Action extends \yii\base\Action
     }
     
     /**
-     * 设置更新令牌存储。
+     * 设置更新令牌存储库。
      *
      * @param RefreshTokenRepositoryInterface|string|array $value
      */
@@ -199,7 +199,7 @@ abstract class Action extends \yii\base\Action
     }
     
     /**
-     * 获取权限存储。
+     * 获取权限存储库。
      *
      * @return ScopeRepositoryInterface
      */
@@ -209,7 +209,7 @@ abstract class Action extends \yii\base\Action
     }
     
     /**
-     * 设置权限存储。
+     * 设置权限存储库。
      *
      * @param ScopeRepositoryInterface|string|array $value
      */
@@ -227,7 +227,7 @@ abstract class Action extends \yii\base\Action
     }
     
     /**
-     * 获取用户存储。
+     * 获取用户存储库。
      *
      * @return UserRepositoryInterface
      */
@@ -237,7 +237,7 @@ abstract class Action extends \yii\base\Action
     }
     
     /**
-     * 设置用户存储。
+     * 设置用户存储库。
      *
      * @param UserRepositoryInterface|string|array $value
      */

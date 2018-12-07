@@ -7,7 +7,7 @@
 namespace common\oauth2\server\interfaces;
 
 /**
- * 授权码存储接口。
+ * 授权码存储库接口。
  * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0

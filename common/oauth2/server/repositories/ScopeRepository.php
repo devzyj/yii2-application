@@ -4,13 +4,14 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace common\oauth2\server\components\repositories;
+namespace common\oauth2\server\repositories;
 
-use common\oauth2\server\interfaces\ScopeRepositoryInterface;
-use common\oauth2\server\components\entities\ScopeEntity;
-use common\oauth2\server\interfaces\ClientEntityInterface;
-use common\oauth2\server\interfaces\UserEntityInterface;
 use yii\helpers\ArrayHelper;
+use common\oauth2\server\interfaces\ScopeRepositoryInterface;
+use common\oauth2\server\interfaces\ClientEntityInterface;
+use common\oauth2\server\interfaces\ScopeEntityInterface;
+use common\oauth2\server\interfaces\UserEntityInterface;
+use common\oauth2\server\entities\ScopeEntity;
 
 /**
  * ScopeRepository class.
@@ -55,33 +56,7 @@ class ScopeRepository implements ScopeRepositoryInterface
      */
     protected function ensureClientCredentials(array $scopes, ClientEntityInterface $client)
     {
-        if (empty($scopes)) {
-            // 如果没有请求权限，默认使用客户端的全部权限。
-            return $client->getScopes();
-        }
-        
-        // 使用标识索引权限数组。
-        $scopes = ArrayHelper::index($scopes, function ($element) {
-            /* @var $element ScopeEntityInterface */
-            return $element->getIdentifier();
-        });
-        
-        // 获取使用标识索引的客户端权限数组。
-        $clientScopes = ArrayHelper::index($client->getScopes(), function ($element) {
-            /* @var $element ScopeEntityInterface */
-            return $element->getIdentifier();
-        });
-        
-        // 检查权限是否有效。
-        $result = [];
-        foreach ($scopes as $identifier => $scope) {
-            if (isset($clientScopes[$identifier])) {
-                $result[] = $scope;
-            }
-        }
-        
-        // 返回有效的权限。
-        return $result;
+        return $this->ensureScopes($scopes, $client);
     }
     
     /**
@@ -94,7 +69,44 @@ class ScopeRepository implements ScopeRepositoryInterface
      */
     protected function ensureUserCredentials(array $scopes, ClientEntityInterface $client, UserEntityInterface $user)
     {
-        // TODO 具体实现可以继承后实现该方法。
-        return $scopes;
+        return $this->ensureScopes($scopes, $user);
+    }
+
+    /**
+     * 确认客户端或者用户的有效权限。
+     *
+     * @param ScopeEntityInterface[] $scopes 请求的权限列表。
+     * @param ClientEntityInterface|UserEntityInterface $entity 客户端或者用户。
+     * @return ScopeEntityInterface[] 有效的权限列表。
+     */
+    protected function ensureScopes(array $scopes, $entity)
+    {
+        if (empty($scopes)) {
+            // 如果没有请求权限，使用默认权限。
+            return $entity->getDefaultScopes();
+        }
+        
+        // 使用标识索引权限数组。
+        $scopes = ArrayHelper::index($scopes, function ($element) {
+            /* @var $element ScopeEntityInterface */
+            return $element->getIdentifier();
+        });
+        
+        // 获取使用标识索引的全部权限的数组。
+        $entityScopes = ArrayHelper::index($entity->getScopes(), function ($element) {
+            /* @var $element ScopeEntityInterface */
+            return $element->getIdentifier();
+        });
+        
+        // 检查权限是否有效。
+        $result = [];
+        foreach ($scopes as $identifier => $scope) {
+            if (isset($entityScopes[$identifier])) {
+                $result[] = $scope;
+            }
+        }
+        
+        // 返回有效的权限。
+        return $result;
     }
 }

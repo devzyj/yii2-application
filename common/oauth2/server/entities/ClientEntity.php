@@ -4,7 +4,7 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace common\oauth2\server\components\entities;
+namespace common\oauth2\server\entities;
 
 use common\oauth2\server\interfaces\ClientEntityInterface;
 use common\oauth2\server\models\OauthClient;
@@ -71,10 +71,12 @@ class ClientEntity extends OauthClient implements ClientEntityInterface
 
     /**
      * {@inheritdoc}
+     * 
+     * @return ScopeEntity[]
      */
-    public function getEncryptionKey()
+    public function getScopes()
     {
-        return '';
+        return $this->oauthScopes;
     }
 
     /**
@@ -82,7 +84,7 @@ class ClientEntity extends OauthClient implements ClientEntityInterface
      * 
      * @return ScopeEntity[]
      */
-    public function getScopes()
+    public function getDefaultScopes()
     {
         return $this->oauthScopes;
     }

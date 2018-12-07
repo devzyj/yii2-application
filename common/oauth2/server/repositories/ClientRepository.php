@@ -4,10 +4,10 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace common\oauth2\server\components\repositories;
+namespace common\oauth2\server\repositories;
 
 use common\oauth2\server\interfaces\ClientRepositoryInterface;
-use common\oauth2\server\components\entities\ClientEntity;
+use common\oauth2\server\entities\ClientEntity;
 
 /**
  * ClientRepository class.
@@ -21,11 +21,21 @@ class ClientRepository implements ClientRepositoryInterface
      * {@inheritdoc}
      * 
      * @return ClientEntity 客户端实例。
+     * @deprecated 可能不需要。最终完成时如果没有使用，会移除方法。
+     */
+    public function getClientEntity($identifier)
+    {
+        return ClientEntity::findOneByIdentifier($identifier);
+    }
+    
+    /**
+     * {@inheritdoc}
+     * 
+     * @return ClientEntity 客户端实例。
      */
     public function getClientEntityByCredentials($identifier, $secret)
     {
-        /* @var $client ClientEntity */
-        $client = ClientEntity::findOneByIdentifier($identifier);
+        $client = $this->getClientEntity($identifier);
         if ($client->secret === $secret) {
             return $client;
         }

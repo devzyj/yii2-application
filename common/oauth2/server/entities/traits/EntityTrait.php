@@ -4,7 +4,7 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace common\oauth2\server\components\entities\traits;
+namespace common\oauth2\server\entities\traits;
 
 /**
  * EntityTrait
@@ -15,7 +15,7 @@ namespace common\oauth2\server\components\entities\traits;
 trait EntityTrait
 {
     /**
-     * @var string
+     * @var string 标识符。
      */
     private $_identifier;
     

@@ -4,10 +4,10 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace common\oauth2\server\components\repositories;
+namespace common\oauth2\server\repositories;
 
 use common\oauth2\server\interfaces\UserRepositoryInterface;
-use common\oauth2\server\components\entities\UserEntity;
+use common\oauth2\server\entities\UserEntity;
 
 /**
  * UserRepository class.
@@ -22,10 +22,28 @@ class UserRepository implements UserRepositoryInterface
      * 
      * @return UserEntity 用户实例。
      */
+    public function getUserEntity($identifier)
+    {
+        if ($identifier == 1) {
+            $user = new UserEntity();
+            $user->id = 1;
+            $user->username = 'jerry';
+            return $user;
+        }
+    }
+    
+    /**
+     * {@inheritdoc}
+     * 
+     * @return UserEntity 用户实例。
+     */
     public function getUserEntityByCredentials($username, $password)
     {
         if ($username == 'jerry' && $password == '123456') {
-            return new UserEntity();
+            $user = new UserEntity();
+            $user->id = 1;
+            $user->username = $username;
+            return $user;
         }
     }
 }

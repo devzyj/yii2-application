@@ -4,12 +4,12 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace common\oauth2\server\components\repositories;
+namespace common\oauth2\server\repositories;
 
 use Yii;
 use common\oauth2\server\interfaces\RefreshTokenRepositoryInterface;
 use common\oauth2\server\interfaces\RefreshTokenEntityInterface;
-use common\oauth2\server\components\entities\RefreshTokenEntity;
+use common\oauth2\server\entities\RefreshTokenEntity;
 
 /**
  * RefreshTokenRepository class.

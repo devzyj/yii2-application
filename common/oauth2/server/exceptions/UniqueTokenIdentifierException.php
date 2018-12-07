@@ -4,7 +4,7 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace common\oauth2\server\components;
+namespace common\oauth2\server\exceptions;
 
 /**
  * UniqueTokenIdentifierException 保存令牌时，唯一标识重复的异常。

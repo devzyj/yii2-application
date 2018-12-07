@@ -4,7 +4,7 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace common\oauth2\server\components\entities;
+namespace common\oauth2\server\entities;
 
 use common\oauth2\server\interfaces\UserEntityInterface;
 
@@ -16,11 +16,31 @@ use common\oauth2\server\interfaces\UserEntityInterface;
  */
 class UserEntity implements UserEntityInterface
 {
+    public $id;
+    
+    public $username;
+    
     /**
      * {@inheritdoc}
      */
     public function getIdentifier()
     {
-        return 1;
+        return $this->id;
+    }
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function getScopes()
+    {
+        return [];
+    }
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function getDefaultScopes()
+    {
+        return [];
     }
 }

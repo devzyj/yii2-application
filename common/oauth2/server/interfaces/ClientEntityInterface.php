@@ -20,7 +20,7 @@ interface ClientEntityInterface
      * @return string
      */
     public function getIdentifier();
-    
+
     /**
      * 获取客户端授权类型。
      * 
@@ -34,13 +34,6 @@ interface ClientEntityInterface
      * @return string|string[]
      */
     public function getRedirectUri();
-    
-    /**
-     * 获取客户端权限。
-     *
-     * @return ScopeEntityInterface[]
-     */
-    public function getScopes();
 
     /**
      * 获取访问令牌的持续时间（秒）。
@@ -55,11 +48,18 @@ interface ClientEntityInterface
      * @return integer
      */
     public function getRefreshTokenDuration();
-
+    
     /**
-     * 获取加密键。
-     * 
-     * @return string
+     * 获取客户端全部权限。
+     *
+     * @return ScopeEntityInterface[]
      */
-    public function getEncryptionKey();
+    public function getScopes();
+    
+    /**
+     * 获取客户端默认权限。
+     *
+     * @return ScopeEntityInterface[]
+     */
+    public function getDefaultScopes();
 }

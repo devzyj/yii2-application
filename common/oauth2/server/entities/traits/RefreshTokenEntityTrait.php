@@ -4,7 +4,7 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace common\oauth2\server\components\entities\traits;
+namespace common\oauth2\server\entities\traits;
 
 use common\oauth2\server\interfaces\AccessTokenEntityInterface;
 
@@ -19,27 +19,27 @@ trait RefreshTokenEntityTrait
     use TokenEntityTrait;
     
     /**
-     * @var AccessTokenEntityInterface
+     * @var AccessTokenEntityInterface 与更新令牌关联的访问令牌。
      */
     private $_accessToken;
 
     /**
      * 获取与更新令牌关联的访问令牌。
      *
-     * @return AccessTokenEntityInterface
+     * @return AccessTokenEntityInterface 访问令牌实例。
      */
     public function getAccessToken()
     {
         return $this->_accessToken;
     }
-    
+
     /**
      * 设置与更新令牌关联的访问令牌。
      *
-     * @param AccessTokenEntityInterface $token
-    */
-    public function setAccessToken(AccessTokenEntityInterface $token)
+     * @param AccessTokenEntityInterface $accessToken 访问令牌实例。
+     */
+    public function setAccessToken(AccessTokenEntityInterface $accessToken)
     {
-        $this->_accessToken = $token;
+        $this->_accessToken = $accessToken;
     }
 }

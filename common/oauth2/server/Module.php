@@ -8,7 +8,6 @@ namespace common\oauth2\server;
 
 use Yii;
 use yii\base\InvalidConfigException;
-use common\oauth2\server\components\JwtSignKey;
 
 /**
  * OAuth2 Server Module.
@@ -22,8 +21,9 @@ use common\oauth2\server\components\JwtSignKey;
  * ]
  * ```
  * 
- * @property JwtSignKey $tokenPrivateKey 生成令牌的私钥
- * @property JwtSignKey $tokenPublicKey 验证令牌的公钥
+ * @property CryptKey $tokenPrivateKey 生成访问令牌的私钥
+ * @property CryptKey $tokenPublicKey 验证访问令牌的公钥
+ * @property CryptKey $encryptionKey 加密密钥
  * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
@@ -31,47 +31,64 @@ use common\oauth2\server\components\JwtSignKey;
 class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
 {
     /**
-     * @var string 生成令牌的私钥路径。
+     * @var string 生成访问令牌的私钥路径。
      */
     public $tokenPrivateKeyPath;
     
     /**
-     * @var string 生成令牌的私钥密码。
+     * @var string 生成访问令牌的私钥密码。
      */
     public $tokenPrivateKeyPassphrase;
     
     /**
-     * @var string 验证令牌的公钥路径。
+     * @var string 验证访问令牌的公钥路径。
      */
     public $tokenPublicKeyPath;
 
     /**
-     * @var string 生成和验证令牌的签名密钥。优先级低于私钥和公钥。
+     * @var string 生成和验证访问令牌的密钥。优先级低于 [[$tokenPrivateKeyPath]] 和 [[$tokenPublicKeyPath]]。
      */
-    public $tokenSignKey;
+    public $tokenSecretKey;
 
+    /**
+     * @var string 加密密钥的文件路径。
+     * 
+     * 运行如下脚本：
+     * ```
+     * $ composer require defuse/php-encryption
+     * $ vendor/bin/generate-defuse-key
+     * ```
+     * 将输出保存到文件中，并且设置参数为文件路径。
+     */
+    public $encryptionKeyPath;
+
+    /**
+     * @var string 加密密码。优先级低于 [[$encryptionKeyPath]]。
+     */
+    public $encryptionPassword;
+    
     /**
      * @var array
      */
     public $entityClassMap = [
-        'AccessTokenEntity' => 'common\oauth2\server\components\entities\AccessTokenEntity',
-        'AuthCodeEntity' => 'common\oauth2\server\components\entities\AuthCodeEntity',
-        'ClientEntity' => 'common\oauth2\server\components\entities\ClientEntity',
-        'RefreshTokenEntity' => 'common\oauth2\server\components\entities\RefreshTokenEntity',
-        'ScopeEntity' => 'common\oauth2\server\components\entities\ScopeEntity',
-        'UserEntity' => 'common\oauth2\server\components\entities\UserEntity',
+        'AccessTokenEntity' => 'common\oauth2\server\entities\AccessTokenEntity',
+        'AuthCodeEntity' => 'common\oauth2\server\entities\AuthCodeEntity',
+        'ClientEntity' => 'common\oauth2\server\entities\ClientEntity',
+        'RefreshTokenEntity' => 'common\oauth2\server\entities\RefreshTokenEntity',
+        'ScopeEntity' => 'common\oauth2\server\entities\ScopeEntity',
+        'UserEntity' => 'common\oauth2\server\entities\UserEntity',
     ];
     
     /**
      * @var array
      */
     public $repositoryClassMap = [
-        'AccessTokenRepository' => 'common\oauth2\server\components\repositories\AccessTokenRepository',
-        'AuthCodeRepository' => 'common\oauth2\server\components\repositories\AuthCodeRepository',
-        'ClientRepository' => 'common\oauth2\server\components\repositories\ClientRepository',
-        'RefreshTokenRepository' => 'common\oauth2\server\components\repositories\RefreshTokenRepository',
-        'ScopeRepository' => 'common\oauth2\server\components\repositories\ScopeRepository',
-        'UserRepository' => 'common\oauth2\server\components\repositories\UserRepository',
+        'AccessTokenRepository' => 'common\oauth2\server\repositories\AccessTokenRepository',
+        'AuthCodeRepository' => 'common\oauth2\server\repositories\AuthCodeRepository',
+        'ClientRepository' => 'common\oauth2\server\repositories\ClientRepository',
+        'RefreshTokenRepository' => 'common\oauth2\server\repositories\RefreshTokenRepository',
+        'ScopeRepository' => 'common\oauth2\server\repositories\ScopeRepository',
+        'UserRepository' => 'common\oauth2\server\repositories\UserRepository',
     ];
     
     /**
@@ -81,8 +98,10 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
     {
         parent::init();
         
-        if ($this->tokenSignKey === null && ($this->tokenPrivateKeyPath === null || $this->tokenPublicKeyPath === null)) {
-            throw new InvalidConfigException('The "tokenPrivateKeyPath" and "tokenPublicKeyPath", or "tokenSignKey" property must be set.');
+        if ($this->tokenSecretKey === null && ($this->tokenPrivateKeyPath === null || $this->tokenPublicKeyPath === null)) {
+            throw new InvalidConfigException('The "tokenPrivateKeyPath" and "tokenPublicKeyPath", or "tokenSecretKey" property must be set.');
+        } elseif ($this->encryptionKeyPath === null || $this->encryptionPassword) {
+            throw new InvalidConfigException('The "encryptionKeyPath" or "encryptionPassword" property must be set.');
         }
     }
     
@@ -112,42 +131,62 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
     }
     
     /**
-     * 获取生成令牌时的私钥。
+     * 获取生成访问令牌时的私钥。
      * 
-     * @return JwtSignKey
+     * @return CryptKey
      */
     public function getTokenPrivateKey()
     {
         if ($this->tokenPrivateKeyPath !== null) {
-            return Yii::createObject(JwtSignKey::className(), [
-                JwtSignKey::KEY_TYPE_PRIVATE,
-                Yii::getAlias($this->tokenPrivateKeyPath),
+            return Yii::createObject(CryptKey::className(), [
+                CryptKey::KEY_TYPE_PRIVATE,
+                $this->tokenPrivateKeyPath,
                 $this->tokenPrivateKeyPassphrase,
             ]);
-        } elseif ($this->tokenSignKey !== null) {
-            return Yii::createObject(JwtSignKey::className(), [
-                JwtSignKey::KEY_TYPE_SECRET,
-                $this->tokenSignKey,
+        } elseif ($this->tokenSecretKey !== null) {
+            return Yii::createObject(CryptKey::className(), [
+                CryptKey::KEY_TYPE_SECRET,
+                $this->tokenSecretKey,
             ]);
         }
     }
     
     /**
-     * 获取验证令牌时的公钥。
+     * 获取验证访问令牌时的公钥。
      * 
-     * @return JwtSignKey
+     * @return CryptKey
      */
     public function getTokenPublicKey()
     {
         if ($this->tokenPublicKeyPath !== null) {
-            return Yii::createObject(JwtSignKey::className(), [
-                JwtSignKey::KEY_TYPE_PRIVATE,
-                Yii::getAlias($this->tokenPublicKeyPath),
+            return Yii::createObject(CryptKey::className(), [
+                CryptKey::KEY_TYPE_PRIVATE,
+                $this->tokenPublicKeyPath,
             ]);
-        } elseif ($this->tokenSignKey !== null) {
-            return Yii::createObject(JwtSignKey::className(), [
-                JwtSignKey::KEY_TYPE_SECRET,
-                $this->tokenSignKey,
+        } elseif ($this->tokenSecretKey !== null) {
+            return Yii::createObject(CryptKey::className(), [
+                CryptKey::KEY_TYPE_SECRET,
+                $this->tokenSecretKey,
+            ]);
+        }
+    }
+    
+    /**
+     * 获取加密密钥。
+     * 
+     * @return CryptKey
+     */
+    public function getEncryptionKey()
+    {
+        if ($this->encryptionKeyPath !== null) {
+            return Yii::createObject(CryptKey::className(), [
+                CryptKey::KEY_TYPE_PRIVATE,
+                $this->encryptionKeyPath,
+            ]);
+        } elseif ($this->encryptionPassword !== null) {
+            return Yii::createObject(CryptKey::className(), [
+                CryptKey::KEY_TYPE_SECRET,
+                $this->encryptionPassword,
             ]);
         }
     }

@@ -4,7 +4,7 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace common\oauth2\server\components\actions;
+namespace common\oauth2\server\actions;
 
 use Yii;
 use yii\base\InvalidConfigException;
@@ -18,8 +18,10 @@ use common\oauth2\server\interfaces\ClientEntityInterface;
 use common\oauth2\server\interfaces\RefreshTokenEntityInterface;
 use common\oauth2\server\interfaces\ScopeEntityInterface;
 use common\oauth2\server\interfaces\UserEntityInterface;
-use common\oauth2\server\components\JwtSignKey;
-use common\oauth2\server\components\UniqueTokenIdentifierException;
+use common\oauth2\server\CryptKey;
+use common\oauth2\server\exceptions\UniqueTokenIdentifierException;
+use common\oauth2\server\CryptTrait;
+use yii\helpers\Json;
 
 /**
  * GrantAction class.
@@ -29,6 +31,8 @@ use common\oauth2\server\components\UniqueTokenIdentifierException;
  */
 abstract class GrantAction extends Action
 {
+    use CryptTrait;
+    
     /**
      * @var string 授权码模式。
      */
@@ -60,7 +64,7 @@ abstract class GrantAction extends Action
     const GENERATE_IDENDIFIER_MAX = 10;
 
     /**
-     * @var JwtSignKey 生成令牌的私钥。
+     * @var CryptKey 生成令牌的私钥。
      */
     public $tokenPrivateKey;
     
@@ -341,7 +345,8 @@ abstract class GrantAction extends Action
             
             // TODO 加密数据。
             $key = $client->getEncryptionKey();
-            $result['refresh_token'] = $refreshTokenData;
+            $this->setEncryptionKey($key);
+            $result['refresh_token'] = $this->encrypt(Json::encode($refreshTokenData));
             $result['refresh_expires_in'] = $refreshToken->getExpires() - time();
         }
         

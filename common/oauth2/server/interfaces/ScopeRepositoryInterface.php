@@ -7,7 +7,7 @@
 namespace common\oauth2\server\interfaces;
 
 /**
- * 权限范围存储接口。
+ * 权限范围存储库接口。
  * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
@@ -15,7 +15,7 @@ namespace common\oauth2\server\interfaces;
 interface ScopeRepositoryInterface
 {
     /**
-     * 获取权限。
+     * 获取权限实例。
      * 
      * @param string $identifier 权限标识。
      * @return ScopeEntityInterface 权限实例。

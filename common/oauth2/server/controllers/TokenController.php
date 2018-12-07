@@ -56,7 +56,7 @@ class TokenController extends \yii\web\Controller
         return [
             // Grant Type: client_credentials
             'client-credentials' => [
-                'class' => 'common\oauth2\server\components\actions\ClientCredentialsGrantAction',
+                'class' => 'common\oauth2\server\actions\ClientCredentialsGrantAction',
                 'tokenPrivateKey' => $module->getTokenPrivateKey(),
                 'accessTokenRepository' => $module->repositoryClassMap['AccessTokenRepository'],
                 'clientRepository' => $module->repositoryClassMap['ClientRepository'],
@@ -64,8 +64,19 @@ class TokenController extends \yii\web\Controller
             ],
             // Grant Type: password
             'user-credentials' => [
-                'class' => 'common\oauth2\server\components\actions\PasswordGrantAction',
+                'class' => 'common\oauth2\server\actions\PasswordGrantAction',
                 'tokenPrivateKey' => $module->getTokenPrivateKey(),
+                'accessTokenRepository' => $module->repositoryClassMap['AccessTokenRepository'],
+                'clientRepository' => $module->repositoryClassMap['ClientRepository'],
+                'refreshTokenRepository' => $module->repositoryClassMap['RefreshTokenRepository'],
+                'scopeRepository' => $module->repositoryClassMap['ScopeRepository'],
+                'userRepository' => $module->repositoryClassMap['UserRepository'],
+            ],
+            // Grant Type: refresh_token
+            'refresh-credentials' => [
+                'class' => 'common\oauth2\server\actions\RefreshTokenGrantAction',
+                'tokenPrivateKey' => $module->getTokenPrivateKey(),
+                'encryptionKey' => $module->getEncryptionKey(),
                 'accessTokenRepository' => $module->repositoryClassMap['AccessTokenRepository'],
                 'clientRepository' => $module->repositoryClassMap['ClientRepository'],
                 'refreshTokenRepository' => $module->repositoryClassMap['RefreshTokenRepository'],
@@ -75,10 +86,6 @@ class TokenController extends \yii\web\Controller
             /*// Grant Type: authorization_code
             'code-credentials' => [
                 'class' => 'common\oauth2\server\actions\CodeCredentialsAction',
-            ],
-            // Grant Type: refresh_token
-            'refresh-credentials' => [
-                'class' => 'common\oauth2\server\actions\RefreshCredentialsAction',
             ],*/
         ];
     }
