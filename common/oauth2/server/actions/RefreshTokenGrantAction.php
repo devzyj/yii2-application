@@ -12,6 +12,8 @@ use yii\web\BadRequestHttpException;
 use yii\web\UnauthorizedHttpException;
 use common\oauth2\server\interfaces\UserEntityInterface;
 use common\oauth2\server\interfaces\RefreshTokenEntityInterface;
+use common\oauth2\server\interfaces\ClientEntityInterface;
+use yii\web\yii\web;
 
 /**
  * RefreshTokenGrantAction class.
@@ -21,11 +23,6 @@ use common\oauth2\server\interfaces\RefreshTokenEntityInterface;
  */
 class RefreshTokenGrantAction extends GrantAction
 {
-    /**
-     * @var CryptKey 加密更新令牌的密钥。
-     */
-    public $encryptionKey;
-    
     /**
      * {@inheritdoc}
      */
@@ -37,8 +34,6 @@ class RefreshTokenGrantAction extends GrantAction
             throw new InvalidConfigException('The "userRepository" property must be set.');
         } elseif ($this->refreshTokenRepository === null) {
             throw new InvalidConfigException('The "refreshTokenRepository" property must be set.');
-        } elseif ($this->encryptionKey === null) {
-            throw new InvalidConfigException('The "encryptionKey" property must be set.');
         }
     }
 
@@ -49,39 +44,32 @@ class RefreshTokenGrantAction extends GrantAction
      */
     public function run()
     {
-        // 获取客户端认证信息。
-        list ($identifier, $secret) = $this->getClientAuthCredentials();
-        
-        // 获取客户端实例。
-        $client = $this->getClientByCredentials($identifier, $secret);
-        
-        // 验证客户端是否允许使用当前的授权类型。
-        $this->validateClientGrantType($client);
+        // 获取正在请求授权的客户端。
+        $client = $this->getAuthorizeClient();
         
         // 获取请求的更新令牌。
         $requestedRefreshToken = $this->getRequestedRefreshToken();
         
-        // 解密更新令牌。
-        $requestedRefreshToken = $this->decryptRefreshToken();
-        
         // 验证请求的更新令牌。
-        $this->validateRequestedRefreshToken($requestedRefreshToken);
-        
-        
-        
-        
-        
-        // 获取用户实例。
-        $user = $this->getUserByCredentials($username, $password);
+        $this->validateRefreshToken($requestedRefreshToken, $client);
         
         // 获取请求中的权限。
-        $requestedScopes = $this->getRequestedScopes();
+        $refreshTokenScopeIdentifiers = $requestedRefreshToken->getScopeIdentifiers();
+        $requestedScopes = $this->getRequestedScopes(implode(self::SCOPE_SEPARATOR, $refreshTokenScopeIdentifiers));
+        foreach ($requestedScopes as $scope) {
+            if (in_array($scope->getIdentifier(), $refreshTokenScopeIdentifiers, true) === false) {
+                throw new UnauthorizedHttpException('The requested scope is invalid.');
+            }
+        }
         
-        // 确定最终授权的权限列表。
-        $finalizedScopes = $this->getScopeRepository()->finalize($requestedScopes, $this->getGrantType(), $client, $user);
+        // TODO 撤销与更新令牌关联的访问令牌。
+        $this->getAccessTokenRepository()->revokeAccessTokenEntity();
         
-        // 创建访问令牌。
-        $accessToken = $this->generateAccessToken($finalizedScopes, $client, $user);
+        // 撤销更新令牌。
+        $this->getRefreshTokenRepository()->revokeRefreshTokenEntity($requestedRefreshToken->getIdentifier());
+        
+        // TODO 创建访问令牌。
+        $accessToken = $this->generateAccessToken($requestedScopes, $client, $requestedRefreshToken->getUserIdentifier());
         
         // 创建更新令牌。
         $refreshToken = $this->generateRefreshToken($accessToken);
@@ -95,7 +83,6 @@ class RefreshTokenGrantAction extends GrantAction
      *
      * @return RefreshTokenEntityInterface 更新令牌。
      * @throws \yii\web\BadRequestHttpException 缺少参数。
-     * @throws \yii\web\UnauthorizedHttpException 更新令牌不能解密。
      */
     protected function getRequestedRefreshToken()
     {
@@ -104,42 +91,25 @@ class RefreshTokenGrantAction extends GrantAction
             throw new BadRequestHttpException('Missing parameters: "refresh_token" required.');
         }
         
-        try {
-            $refreshToken = $this->decrypt($refreshToken);
-        } catch (\Exception $e) {
-            throw new UnauthorizedHttpException('Invalid refresh token.', 0, $e);
-        }
-    
-        return $refreshToken;
+        return $this->getRefreshTokenRepository()->unserializeRefreshTokenEntity($refreshToken, $this->refreshTokenCryptKey);
     }
     
     /**
      * 验证请求的更新令牌。
      * 
-     * @param RefreshTokenEntityInterface $requestedRefreshToken
+     * @param RefreshTokenEntityInterface $refreshToken
+     * @param ClientEntityInterface $client
+     * @throws UnauthorizedHttpException 令牌没有关联到当前客户端，或者令牌过期，或者令牌已撤销。
      */
-    protected function validateRequestedRefreshToken(RefreshTokenEntityInterface $requestedRefreshToken)
+    protected function validateRefreshToken(RefreshTokenEntityInterface $refreshToken, ClientEntityInterface $client)
     {
-        
-    }
-
-    /**
-     * 使用用户认证信息，获取用户实例。
-     *
-     * @param string $username 用户名。
-     * @param string $password 用户密码。
-     * @return UserEntityInterface 用户实例。
-     */
-    protected function getUserByCredentials($username, $password)
-    {
-        $user = $this->getUserRepository()->getUserEntityByCredentials($username, $password);
-        if (empty($user)) {
-            throw new UnauthorizedHttpException('User authentication failed.');
-        } elseif (!$user instanceof UserEntityInterface) {
-            throw new InvalidConfigException(get_class($user) . ' does not implement UserEntityInterface.');
+        if ($refreshToken->getClientIdentifier() != $client->getIdentifier()) {
+            throw new UnauthorizedHttpException('Token is not linked to client.');
+        } elseif ($refreshToken->getExpires() < time()) {
+            throw new UnauthorizedHttpException('Token has expired.');
+        } elseif ($this->getRefreshTokenRepository()->isRefreshTokenEntityRevoked($refreshToken->getIdentifier())) {
+            throw new UnauthorizedHttpException('Token has been revoked.');
         }
-        
-        return $user;
     }
     
     /**
@@ -147,6 +117,6 @@ class RefreshTokenGrantAction extends GrantAction
      */
     public function getGrantType()
     {
-        return self::GRANT_TYPE_PASSWORD;
+        return self::GRANT_TYPE_REFRESH_TOKEN;
     }
 }

@@ -19,8 +19,7 @@ class UserRepository implements UserRepositoryInterface
 {
     /**
      * {@inheritdoc}
-     * 
-     * @return UserEntity 用户实例。
+     * @deprecated 可能不会使用。
      */
     public function getUserEntity($identifier)
     {
@@ -34,8 +33,6 @@ class UserRepository implements UserRepositoryInterface
     
     /**
      * {@inheritdoc}
-     * 
-     * @return UserEntity 用户实例。
      */
     public function getUserEntityByCredentials($username, $password)
     {

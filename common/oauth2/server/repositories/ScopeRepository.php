@@ -23,8 +23,6 @@ class ScopeRepository implements ScopeRepositoryInterface
 {
     /**
      * {@inheritdoc}
-     * 
-     * @return ScopeEntity 权限实例。
      */
     public function getScopeEntity($identifier)
     {
@@ -34,7 +32,7 @@ class ScopeRepository implements ScopeRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function finalize(array $scopes, $grantType, ClientEntityInterface $client, UserEntityInterface $user = null)
+    public function finalizeEntities(array $scopes, $grantType, ClientEntityInterface $client, UserEntityInterface $user = null)
     {
         if ($grantType === 'client_credentials') {
             // 客户端授权模式，确认客户端的权限。
@@ -83,7 +81,7 @@ class ScopeRepository implements ScopeRepositoryInterface
     {
         if (empty($scopes)) {
             // 如果没有请求权限，使用默认权限。
-            return $entity->getDefaultScopes();
+            return $entity->getDefaultScopeEntities();
         }
         
         // 使用标识索引权限数组。
@@ -93,7 +91,7 @@ class ScopeRepository implements ScopeRepositoryInterface
         });
         
         // 获取使用标识索引的全部权限的数组。
-        $entityScopes = ArrayHelper::index($entity->getScopes(), function ($element) {
+        $scopeEntities = ArrayHelper::index($entity->getScopeEntities(), function ($element) {
             /* @var $element ScopeEntityInterface */
             return $element->getIdentifier();
         });
@@ -101,7 +99,7 @@ class ScopeRepository implements ScopeRepositoryInterface
         // 检查权限是否有效。
         $result = [];
         foreach ($scopes as $identifier => $scope) {
-            if (isset($entityScopes[$identifier])) {
+            if (isset($scopeEntities[$identifier])) {
                 $result[] = $scope;
             }
         }

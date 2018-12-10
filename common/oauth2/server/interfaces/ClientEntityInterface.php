@@ -54,12 +54,12 @@ interface ClientEntityInterface
      *
      * @return ScopeEntityInterface[]
      */
-    public function getScopes();
+    public function getScopeEntities();
     
     /**
      * 获取客户端默认权限。
      *
      * @return ScopeEntityInterface[]
      */
-    public function getDefaultScopes();
+    public function getDefaultScopeEntities();
 }

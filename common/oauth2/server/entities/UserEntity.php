@@ -31,16 +31,16 @@ class UserEntity implements UserEntityInterface
     /**
      * {@inheritdoc}
      */
-    public function getScopes()
+    public function getScopeEntities()
     {
-        return [];
+        return ScopeEntity::findAll([1 ,2, 3]);
     }
     
     /**
      * {@inheritdoc}
      */
-    public function getDefaultScopes()
+    public function getDefaultScopeEntities()
     {
-        return [];
+        return ScopeEntity::findAll([1, 3]);
     }
 }

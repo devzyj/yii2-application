@@ -20,7 +20,6 @@ class ClientRepository implements ClientRepositoryInterface
     /**
      * {@inheritdoc}
      * 
-     * @return ClientEntity 客户端实例。
      * @deprecated 可能不需要。最终完成时如果没有使用，会移除方法。
      */
     public function getClientEntity($identifier)
@@ -30,8 +29,6 @@ class ClientRepository implements ClientRepositoryInterface
     
     /**
      * {@inheritdoc}
-     * 
-     * @return ClientEntity 客户端实例。
      */
     public function getClientEntityByCredentials($identifier, $secret)
     {

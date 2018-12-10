@@ -52,9 +52,17 @@ $config = [
         ],
         'oauth2' => [
             'class' => 'common\oauth2\server\Module',
-            'tokenSignKey' => "test",
-            //'tokenPrivateKeyPath' => '@common/oauth2/server/private.key',
-            //'tokenPublicKeyPath' => '@common/oauth2/server/public.key',
+            'accessTokenCryptKey' => 'test', // 字符串签名加密。
+            /*'accessTokenCryptKey' => [ // 私钥文件加密。
+                'privateKey' => '@common/oauth2/server/private.key',
+                'passphrase' => '',
+                'publicKey' => '@common/oauth2/server/public.key',
+            ],*/
+            'refreshTokenCryptKey' => [
+                //'ascii' => 'def000008f058ff223434851b1d087e64bc0ac984be363bf9bb719c9cc8962fe53b2b0e61728e0d121df64493bd9a3089d5be0785fb3383d561aa44312bb97f211987368',
+                //'path' => '@common/oauth2/server/refresh-token.txt',
+                'password' => 'test',
+            ],
         ],
     ]
 ];

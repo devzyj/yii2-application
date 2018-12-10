@@ -6,7 +6,7 @@
  */
 namespace common\oauth2\server\interfaces;
 
-use common\oauth2\server\CryptKey;
+use yii\web\UnauthorizedHttpException;
 use common\oauth2\server\exceptions\UniqueTokenIdentifierException;
 
 /**
@@ -27,10 +27,10 @@ interface AccessTokenRepositoryInterface
     /**
      * 保存访问令牌。
      * 
-     * @param AccessTokenEntityInterface $accessToken 访问令牌。
+     * @param AccessTokenEntityInterface $accessTokenEntity 访问令牌。
      * @throws UniqueTokenIdentifierException 访问令牌标识重复。
      */
-    public function saveAccessToken(AccessTokenEntityInterface $accessToken);
+    public function saveAccessTokenEntity(AccessTokenEntityInterface $accessTokenEntity);
     
     /**
      * 撤销访问令牌。
@@ -38,7 +38,7 @@ interface AccessTokenRepositoryInterface
      * @param string $identifier 访问令牌标识。
      * @return boolean 撤销是否成功。
      */
-    public function revokeAccessToken($identifier);
+    public function revokeAccessTokenEntity($identifier);
 
     /**
      * 访问令牌是否已撤销。
@@ -46,21 +46,24 @@ interface AccessTokenRepositoryInterface
      * @param string $identifier 访问令牌标识。
      * @return boolean 是否已撤销。
      */
-    public function isAccessTokenRevoked($identifier);
+    public function isAccessTokenEntityRevoked($identifier);
 
     /**
      * 序列化访问令牌，用于最终的响应结果。
      *
-     * @param AccessTokenEntityInterface $accessToken 访问令牌。
-     * @return string
+     * @param AccessTokenEntityInterface $accessTokenEntity 访问令牌。
+     * @param mixed $cryptKey 访问令牌密钥。
+     * @return string 序列化的访问令牌。
      */
-    public function serializeAccessToken(AccessTokenEntityInterface $accessToken);
+    public function serializeAccessTokenEntity(AccessTokenEntityInterface $accessTokenEntity, $cryptKey);
     
     /**
      * 反序列化访问令牌，用于从请求中接收到的访问令牌。
      *
      * @param string $serializedAccessToken 已序列化的访问令牌。
+     * @param mixed $cryptKey 访问令牌密钥。
      * @return AccessTokenEntityInterface 访问令牌实例。
-    */
-    public function unserializeAccessToken($serializedAccessToken);
+     * @throws UnauthorizedHttpException 无效的访问令牌。
+     */
+    public function unserializeAccessTokenEntity($serializedAccessToken, $cryptKey);
 }

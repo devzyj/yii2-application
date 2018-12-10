@@ -34,5 +34,5 @@ interface ScopeRepositoryInterface
      * @param UserEntityInterface $user 用户。
      * @return ScopeEntityInterface[] 最终授权的权限列表。
      */
-    public function finalize(array $scopes, $grantType, ClientEntityInterface $client, UserEntityInterface $user = null);
+    public function finalizeEntities(array $scopes, $grantType, ClientEntityInterface $client, UserEntityInterface $user = null);
 }

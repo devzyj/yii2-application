@@ -18,10 +18,7 @@ use common\oauth2\server\interfaces\ClientEntityInterface;
 use common\oauth2\server\interfaces\RefreshTokenEntityInterface;
 use common\oauth2\server\interfaces\ScopeEntityInterface;
 use common\oauth2\server\interfaces\UserEntityInterface;
-use common\oauth2\server\CryptKey;
 use common\oauth2\server\exceptions\UniqueTokenIdentifierException;
-use common\oauth2\server\CryptTrait;
-use yii\helpers\Json;
 
 /**
  * GrantAction class.
@@ -31,8 +28,6 @@ use yii\helpers\Json;
  */
 abstract class GrantAction extends Action
 {
-    use CryptTrait;
-    
     /**
      * @var string 授权码模式。
      */
@@ -62,11 +57,16 @@ abstract class GrantAction extends Action
      * @var integer 生成标识的最大次数。
      */
     const GENERATE_IDENDIFIER_MAX = 10;
+    
+    /**
+     * @var mixed 访问令牌密钥。
+     */
+    public $accessTokenCryptKey;
 
     /**
-     * @var CryptKey 生成令牌的私钥。
+     * @var mixed 更新令牌密钥。
      */
-    public $tokenPrivateKey;
+    public $refreshTokenCryptKey;
     
     /**
      * @var ScopeEntityInterface[] 客户端请求的权限。
@@ -80,9 +80,7 @@ abstract class GrantAction extends Action
     {
         parent::init();
 
-        if ($this->tokenPrivateKey === null) {
-            throw new InvalidConfigException('The "tokenPrivateKey" property must be set.');
-        } elseif ($this->accessTokenRepository === null) {
+        if ($this->accessTokenRepository === null) {
             throw new InvalidConfigException('The "accessTokenRepository" property must be set.');
         } elseif ($this->clientRepository === null) {
             throw new InvalidConfigException('The "clientRepository" property must be set.');
@@ -97,6 +95,26 @@ abstract class GrantAction extends Action
      * @return string
      */
     abstract public function getGrantType();
+    
+    /**
+     * 获取正在请求授权的客户端。
+     * 
+     * @return ClientEntityInterface 客户端。
+     */
+    protected function getAuthorizeClient()
+    {
+        // 获取客户端认证信息。
+        list ($identifier, $secret) = $this->getClientAuthCredentials();
+        
+        // 获取客户端实例。
+        $client = $this->getClientByCredentials($identifier, $secret);
+        
+        // 验证客户端是否允许使用当前的授权类型。
+        $this->validateClientGrantType($client);
+        
+        // 返回正在授权的客户端实例。
+        return $client;
+    }
     
     /**
      * 从请求的头部，或者内容中获取客户端的认证信息。
@@ -154,43 +172,51 @@ abstract class GrantAction extends Action
     }
 
     /**
-     * 获取请求中的权限。
-     *
+     * 获取请求的权限。
+     * 
+     * @param string $default 默认权限。多个权限使用 [[SELF::SCOPE_SEPARATOR]] 分隔。
      * @return ScopeEntityInterface[] 权限列表。
      */
-    protected function getRequestedScopes()
+    protected function getRequestedScopes($default = null)
     {
         if ($this->_requestedScopes === null) {
-            $this->_requestedScopes = [];
-            $strScope = $this->request->getBodyParam('scope');
-            if ($strScope !== null && $strScope !== '') {
-                // 转换成数组，并且过滤为空的权限。
-                $scopes = array_filter(explode(self::SCOPE_SEPARATOR, $strScope), function ($scope) {
-                    return $scope !== '';
-                });
-                
-                // 循环验证权限是否有效。
-                $validScopes = [];
-                foreach ($scopes as $scope) {
-                    if (!isset($validScopes[$scope])) {
-                        $scopeEntity = $this->getScopeRepository()->getScopeEntity($scope);
-                        if (empty($scopeEntity)) {
-                            throw new BadRequestHttpException('The requested scope is invalid.');
-                        } elseif (!$scopeEntity instanceof ScopeEntityInterface) {
-                            throw new InvalidConfigException(get_class($scopeEntity) . ' does not implement ScopeEntityInterface.');
-                        }
-            
-                        $validScopes[$scope] = $scopeEntity;
-                    }
-                }
-                
-                $this->_requestedScopes = array_values($validScopes);
-            }
+            $this->_requestedScopes = $this->validateScopes($this->request->getBodyParam('scope', $default));
         }
         
         return $this->_requestedScopes;
     }
     
+    /**
+     * 验证权限。
+     * 
+     * @param string|string[] $scopes 需要验证的权限标识。
+     * @return ScopeEntityInterface[] 验证有效的权限。
+     */
+    protected function validateScopes($scopes)
+    {
+        if (!is_array($scopes)) {
+            $scopes = array_filter(explode(self::SCOPE_SEPARATOR, trim($scopes)), function ($scope) {
+                return $scope !== '';
+            });
+        }
+        
+        $validScopes = [];
+        foreach ($scopes as $scope) {
+            if (!isset($validScopes[$scope])) {
+                $scopeEntity = $this->getScopeRepository()->getScopeEntity($scope);
+                if (empty($scopeEntity)) {
+                    throw new BadRequestHttpException('The requested scope is invalid.');
+                } elseif (!$scopeEntity instanceof ScopeEntityInterface) {
+                    throw new InvalidConfigException(get_class($scopeEntity) . ' does not implement ScopeEntityInterface.');
+                }
+        
+                $validScopes[$scope] = $scopeEntity;
+            }
+        }
+        
+        return array_values($validScopes);
+    }
+
     /**
      * 生成并且保存访问令牌。
      * 
@@ -202,39 +228,39 @@ abstract class GrantAction extends Action
      */
     protected function generateAccessToken(array $scopes, ClientEntityInterface $client, UserEntityInterface $user = null)
     {
-        $token = $this->getAccessTokenRepository()->createAccessTokenEntity();
-        if (!$token instanceof AccessTokenEntityInterface) {
-            throw new InvalidConfigException(get_class($token) . ' does not implement AccessTokenEntityInterface.');
+        $accessToken = $this->getAccessTokenRepository()->createAccessTokenEntity();
+        if (!$accessToken instanceof AccessTokenEntityInterface) {
+            throw new InvalidConfigException(get_class($accessToken) . ' does not implement AccessTokenEntityInterface.');
         }
-        
+
         // 添加权限。
         foreach ($scopes as $scope) {
-            $token->addScope($scope);
+            $accessToken->addScopeEntity($scope);
         }
-        
-        // 设置客户端。
-        $token->setClient($client);
 
+        // 设置客户端。
+        $accessToken->setClientEntity($client);
+        
         // 设置用户。
         if ($user) {
-            $token->setUser($user);
+            $accessToken->setUserEntity($user);
         }
 
         // 设置过期时间。
-        $token->setExpires(time() + $client->getAccessTokenDuration());
+        $accessToken->setExpires(time() + $client->getAccessTokenDuration());
         
         // 生成唯一标识，并保存令牌。
         $count = self::GENERATE_IDENDIFIER_MAX;
         while ($count-- > 0) {
             // 生成并设置唯一标识。
-            $token->setIdentifier($this->generateUniqueIdentifier());
+            $accessToken->setIdentifier($this->generateUniqueIdentifier());
             
             try {
                 // 保存令牌。
-                $this->getAccessTokenRepository()->saveAccessToken($token);
+                $this->getAccessTokenRepository()->saveAccessTokenEntity($accessToken);
                 
                 // 返回保存成功的令牌。
-                return $token;
+                return $accessToken;
             } catch (UniqueTokenIdentifierException $e) {
                 if ($count === 0) {
                     throw $e;
@@ -252,30 +278,45 @@ abstract class GrantAction extends Action
      */
     protected function generateRefreshToken(AccessTokenEntityInterface $accessToken)
     {
-        $token = $this->getRefreshTokenRepository()->createRefreshTokenEntity();
-        if (!$token instanceof RefreshTokenEntityInterface ) {
-            throw new InvalidConfigException(get_class($token) . ' does not implement RefreshTokenEntityInterface .');
+        $refreshToken = $this->getRefreshTokenRepository()->createRefreshTokenEntity();
+        if (!$refreshToken instanceof RefreshTokenEntityInterface ) {
+            throw new InvalidConfigException(get_class($refreshToken) . ' does not implement RefreshTokenEntityInterface.');
         }
         
         // 设置关联的访问令牌。
-        $token->setAccessToken($accessToken);
+        $refreshToken->setAccessTokenEntity($accessToken);
+
+        // 设置客户端。
+        $client = $accessToken->getClientEntity();
+        $refreshToken->setClientIdentifier($client->getIdentifier());
+
+        // 设置用户。
+        $user = $accessToken->getUserEntity();
+        if ($user) {
+            $refreshToken->setUserIdentifier($user->getIdentifier());
+        }
+
+        // 添加权限。
+        $scopes = $accessToken->getScopeEntities();
+        foreach ($scopes as $scope) {
+            $refreshToken->addScopeIdentifier($scope->getIdentifier());
+        }
         
         // 设置过期时间。
-        $client = $accessToken->getClient();
-        $token->setExpires(time() + $client->getRefreshTokenDuration());
+        $refreshToken->setExpires(time() + $client->getRefreshTokenDuration());
 
         // 生成唯一标识，并保存令牌。
         $count = self::GENERATE_IDENDIFIER_MAX;
         while ($count-- > 0) {
             // 生成并设置唯一标识。
-            $token->setIdentifier($this->generateUniqueIdentifier());
+            $refreshToken->setIdentifier($this->generateUniqueIdentifier());
         
             try {
                 // 保存令牌。
-                $this->getRefreshTokenRepository()->saveRefreshToken($token);
+                $this->getRefreshTokenRepository()->saveRefreshTokenEntity($refreshToken);
         
                 // 返回保存成功的令牌。
-                return $token;
+                return $refreshToken;
             } catch (UniqueTokenIdentifierException $e) {
                 if ($count === 0) {
                     throw $e;
@@ -312,9 +353,6 @@ abstract class GrantAction extends Action
      */
     protected function generateCredentials(AccessTokenEntityInterface $accessToken, RefreshTokenEntityInterface $refreshToken = null)
     {
-        // 把访问令牌转换成 JWT。
-        $accessJwt = $accessToken->convertToJWT($this->tokenPrivateKey);
-
         // 确认认证信息中要展示的权限。
         $scopes = $this->ensureCredentialsScopes($accessToken);
         if ($scopes) {
@@ -322,35 +360,20 @@ abstract class GrantAction extends Action
         }
         
         // 访问令牌的信息。
-        $result = [
+        $credentials = [
             'token_type' => 'Bearer',
-            'access_token' => (string) $accessJwt,
+            'access_token' => $this->getAccessTokenRepository()->serializeAccessTokenEntity($accessToken, $this->accessTokenCryptKey),
             'expires_in' => $accessToken->getExpires() - time(),
             'scope' => $scopes ? $scopes : null,
         ];
         
         // 更新令牌。
         if ($refreshToken) {
-            $client = $accessToken->getClient();
-            $user = $accessToken->getUser();
-            $scopes = $this->getIdentifierColumn($accessToken->getScopes());
-            $refreshTokenData = [
-                'refresh_token_id' => $refreshToken->getIdentifier(),
-                'access_token_id' => $accessToken->getIdentifier(),
-                'client_id' => $client->getIdentifier(),
-                'user_id' => $user ? $user->getIdentifier() : null,
-                'scopes' => $scopes,
-                'expires' => $refreshToken->getExpires(),
-            ];
-            
-            // TODO 加密数据。
-            $key = $client->getEncryptionKey();
-            $this->setEncryptionKey($key);
-            $result['refresh_token'] = $this->encrypt(Json::encode($refreshTokenData));
-            $result['refresh_expires_in'] = $refreshToken->getExpires() - time();
+            $credentials['refresh_token'] = $this->getRefreshTokenRepository()->serializeRefreshTokenEntity($refreshToken, $this->refreshTokenCryptKey);
+            $credentials['refresh_expires_in'] = $refreshToken->getExpires() - time();
         }
         
-        return $result;
+        return $credentials;
     }
     
     /**
@@ -361,10 +384,10 @@ abstract class GrantAction extends Action
      */
     protected function ensureCredentialsScopes($accessToken)
     {
-        // 确认认证信息中要展示的权限。
+        // 根据请求的权限，确认认证信息中要展示的权限。
         $requestedScopes = $this->getRequestedScopes();
         if ($requestedScopes) {
-            $tokenScopes = $accessToken->getScopes();
+            $tokenScopes = $accessToken->getScopeEntities();
             if (count($requestedScopes) != count($tokenScopes)) {
                 // 令牌中的权限和请求的权限数量不同时，在认证信息中显示令牌中的权限。
                 return $tokenScopes;

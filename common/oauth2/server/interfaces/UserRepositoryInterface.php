@@ -18,6 +18,7 @@ interface UserRepositoryInterface
      * 获取用户实例。
      * 
      * @param string $identifier 用户标识。
+     * @deprecated 可能不会使用。
      */
     public function getUserEntity($identifier);
     

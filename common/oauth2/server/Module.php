@@ -7,7 +7,6 @@
 namespace common\oauth2\server;
 
 use Yii;
-use yii\base\InvalidConfigException;
 
 /**
  * OAuth2 Server Module.
@@ -21,51 +20,31 @@ use yii\base\InvalidConfigException;
  * ]
  * ```
  * 
- * @property CryptKey $tokenPrivateKey 生成访问令牌的私钥
- * @property CryptKey $tokenPublicKey 验证访问令牌的公钥
- * @property CryptKey $encryptionKey 加密密钥
- * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
 class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
 {
     /**
-     * @var string 生成访问令牌的私钥路径。
+     * @var mixed 授权码密钥。
+     * @see \common\oauth2\server\interfaces\AuthCodeRepositoryInterface::serializeAuthCode()
+     * @see \common\oauth2\server\interfaces\AuthCodeRepositoryInterface::unserializeAuthCode()
      */
-    public $tokenPrivateKeyPath;
+    public $authCodeCryptKey;
     
     /**
-     * @var string 生成访问令牌的私钥密码。
+     * @var mixed 访问令牌密钥。
+     * @see \common\oauth2\server\interfaces\AccessTokenRepositoryInterface::serializeAccessToken()
+     * @see \common\oauth2\server\interfaces\AccessTokenRepositoryInterface::unserializeAccessToken()
      */
-    public $tokenPrivateKeyPassphrase;
-    
-    /**
-     * @var string 验证访问令牌的公钥路径。
-     */
-    public $tokenPublicKeyPath;
+    public $accessTokenCryptKey;
 
     /**
-     * @var string 生成和验证访问令牌的密钥。优先级低于 [[$tokenPrivateKeyPath]] 和 [[$tokenPublicKeyPath]]。
+     * @var mixed 更新令牌密钥。
+     * @see \common\oauth2\server\interfaces\RefreshTokenRepositoryInterface::serializeRefreshToken()
+     * @see \common\oauth2\server\interfaces\RefreshTokenRepositoryInterface::unserializeRefreshToken()
      */
-    public $tokenSecretKey;
-
-    /**
-     * @var string 加密密钥的文件路径。
-     * 
-     * 运行如下脚本：
-     * ```
-     * $ composer require defuse/php-encryption
-     * $ vendor/bin/generate-defuse-key
-     * ```
-     * 将输出保存到文件中，并且设置参数为文件路径。
-     */
-    public $encryptionKeyPath;
-
-    /**
-     * @var string 加密密码。优先级低于 [[$encryptionKeyPath]]。
-     */
-    public $encryptionPassword;
+    public $refreshTokenCryptKey;
     
     /**
      * @var array
@@ -94,20 +73,6 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
     /**
      * {@inheritdoc}
      */
-    public function init()
-    {
-        parent::init();
-        
-        if ($this->tokenSecretKey === null && ($this->tokenPrivateKeyPath === null || $this->tokenPublicKeyPath === null)) {
-            throw new InvalidConfigException('The "tokenPrivateKeyPath" and "tokenPublicKeyPath", or "tokenSecretKey" property must be set.');
-        } elseif ($this->encryptionKeyPath === null || $this->encryptionPassword) {
-            throw new InvalidConfigException('The "encryptionKeyPath" or "encryptionPassword" property must be set.');
-        }
-    }
-    
-    /**
-     * {@inheritdoc}
-     */
     public function bootstrap($app)
     {
         if ($app instanceof \yii\web\Application) {
@@ -128,66 +93,5 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
             $class = __NAMESPACE__ . '\\repositories\\' . $class;
             Yii::$container->set($class, $definition);
         }*/
-    }
-    
-    /**
-     * 获取生成访问令牌时的私钥。
-     * 
-     * @return CryptKey
-     */
-    public function getTokenPrivateKey()
-    {
-        if ($this->tokenPrivateKeyPath !== null) {
-            return Yii::createObject(CryptKey::className(), [
-                CryptKey::KEY_TYPE_PRIVATE,
-                $this->tokenPrivateKeyPath,
-                $this->tokenPrivateKeyPassphrase,
-            ]);
-        } elseif ($this->tokenSecretKey !== null) {
-            return Yii::createObject(CryptKey::className(), [
-                CryptKey::KEY_TYPE_SECRET,
-                $this->tokenSecretKey,
-            ]);
-        }
-    }
-    
-    /**
-     * 获取验证访问令牌时的公钥。
-     * 
-     * @return CryptKey
-     */
-    public function getTokenPublicKey()
-    {
-        if ($this->tokenPublicKeyPath !== null) {
-            return Yii::createObject(CryptKey::className(), [
-                CryptKey::KEY_TYPE_PRIVATE,
-                $this->tokenPublicKeyPath,
-            ]);
-        } elseif ($this->tokenSecretKey !== null) {
-            return Yii::createObject(CryptKey::className(), [
-                CryptKey::KEY_TYPE_SECRET,
-                $this->tokenSecretKey,
-            ]);
-        }
-    }
-    
-    /**
-     * 获取加密密钥。
-     * 
-     * @return CryptKey
-     */
-    public function getEncryptionKey()
-    {
-        if ($this->encryptionKeyPath !== null) {
-            return Yii::createObject(CryptKey::className(), [
-                CryptKey::KEY_TYPE_PRIVATE,
-                $this->encryptionKeyPath,
-            ]);
-        } elseif ($this->encryptionPassword !== null) {
-            return Yii::createObject(CryptKey::className(), [
-                CryptKey::KEY_TYPE_SECRET,
-                $this->encryptionPassword,
-            ]);
-        }
     }
 }

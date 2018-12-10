@@ -104,7 +104,7 @@ class m181203_032806_oauth2_server_initial extends Migration
             'name' => '测试授权客户端',
             'identifier' => 'f4c22926e400ebca',
             'secret' => '692569f364854bc130687297c770c2c0',
-            'grant_types' => 'client_credentials password',
+            'grant_types' => 'client_credentials password refresh_token',
             'redirect_uri' => '',
             'access_token_duration' => 10800, // 3 hours
             'refresh_token_duration' => 2592000, // 30 days

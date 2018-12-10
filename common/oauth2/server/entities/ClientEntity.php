@@ -71,20 +71,16 @@ class ClientEntity extends OauthClient implements ClientEntityInterface
 
     /**
      * {@inheritdoc}
-     * 
-     * @return ScopeEntity[]
      */
-    public function getScopes()
+    public function getScopeEntities()
     {
         return $this->oauthScopes;
     }
 
     /**
      * {@inheritdoc}
-     * 
-     * @return ScopeEntity[]
      */
-    public function getDefaultScopes()
+    public function getDefaultScopeEntities()
     {
         return $this->oauthScopes;
     }

@@ -17,7 +17,7 @@ interface UserEntityInterface
     /**
      * 获取用户的标识符。
      *
-     * @return string 用户的标识符。
+     * @return string
      */
     public function getIdentifier();
     
@@ -26,12 +26,12 @@ interface UserEntityInterface
      *
      * @return ScopeEntityInterface[]
      */
-    public function getScopes();
+    public function getScopeEntities();
     
     /**
      * 获取用户的默认权限。
      *
      * @return ScopeEntityInterface[]
      */
-    public function getDefaultScopes();
+    public function getDefaultScopeEntities();
 }

@@ -6,13 +6,9 @@
  */
 namespace common\oauth2\server\entities\traits;
 
-use Yii;
-use yii\helpers\ArrayHelper;
-use Lcobucci\JWT\Builder;
-use Lcobucci\JWT\Signer\Hmac\Sha256 as HmacSha256;
-use Lcobucci\JWT\Signer\Rsa\Sha256 as RsaSha256;
-use Lcobucci\JWT\Signer\Key;
-use common\oauth2\server\CryptKey;
+use common\oauth2\server\interfaces\ClientEntityInterface;
+use common\oauth2\server\interfaces\UserEntityInterface;
+use common\oauth2\server\interfaces\ScopeEntityInterface;
 
 /**
  * AccessTokenEntityTrait
@@ -22,37 +18,105 @@ use common\oauth2\server\CryptKey;
  */
 trait AccessTokenEntityTrait
 {
-    use TokenEntityTrait;
-    
+    use EntityTrait;
+
     /**
-     * 转换成 JWT。
+     * @var integer
+     */
+    private $_expires;
+
+    /**
+     * @var ClientEntityInterface
+     */
+    private $_clientEntity;
+
+    /**
+     * @var UserEntityInterface
+     */
+    private $_userEntity;
+
+    /**
+     * @var ScopeEntityInterface[]
+     */
+    private $_scopeEntities = [];
+
+    /**
+     * 获取访问令牌的过期时间。
      *
-     * @param CryptKey $key
-     * @return string
-     
-    public function convertToJWT(CryptKey $key)
+     * @return integer 过期的时间戳。
+     */
+    public function getExpires()
     {
-        $scopes = ArrayHelper::getColumn($this->getScopes(), function ($element) {
-            return $element->getIdentifier();
-        });
-        
-        $builder = new Builder();
-        $builder->setId($this->getIdentifier())
-            ->setAudience($this->getClient()->getIdentifier())
-            ->setSubject($this->getUser() ? $this->getUser()->getIdentifier() : null)
-            ->setIssuedAt(time())
-            ->setNotBefore(time())
-            ->setExpiration($this->getExpires())
-            ->set('scopes', $scopes);
-        
-        if ($key) {
-            if ($key->isSecretKey()) {
-                $builder->sign(new HmacSha256(), $key->getKey());
-            } elseif ($key->isPrivateKey()) {
-                $builder->sign(new RsaSha256(), new Key('file://' . $key->getKey(), $key->getPassphrase()));
-            }
-        }
-        
-        return $builder->getToken();
-    }*/
+        return $this->_expires;
+    }
+
+    /**
+     * 设置访问令牌的过期时间。
+     *
+     * @param integer $expires 过期时间的时间戳。
+     */
+    public function setExpires($expires)
+    {
+        $this->_expires = $expires;
+    }
+
+    /**
+     * 获取与访问令牌关联的客户端。
+     *
+     * @return ClientEntityInterface 客户端实例。
+     */
+    public function getClientEntity()
+    {
+        return $this->_clientEntity;
+    }
+
+    /**
+     * 设置与访问令牌关联的客户端。
+     *
+     * @param ClientEntityInterface $clientEntity 客户端实例。
+     */
+    public function setClientEntity(ClientEntityInterface $clientEntity)
+    {
+        $this->_clientEntity = $clientEntity;
+    }
+
+    /**
+     * 获取与访问令牌关联的用户。
+     *
+     * @return UserEntityInterface 用户实例。
+     */
+    public function getUserEntity()
+    {
+        return $this->_userEntity;
+    }
+
+    /**
+     * 设置与访问令牌关联的用户。
+     *
+     * @param UserEntityInterface $userEntity 用户实例。
+     */
+    public function setUserEntity(UserEntityInterface $userEntity)
+    {
+        $this->_userEntity = $userEntity;
+    }
+
+    /**
+     * 获取与访问令牌关联的权限。
+     *
+     * @return ScopeEntityInterface[] 权限实例列表。
+     */
+    public function getScopeEntities()
+    {
+        return array_values($this->_scopeEntities);
+    }
+
+    /**
+     * 添加与访问令牌关联的权限。
+     * 
+     * @param ScopeEntityInterface $scopeEntity 权限实例。
+     */
+    public function addScopeEntity(ScopeEntityInterface $scopeEntity)
+    {
+        $this->_scopeEntities[$scopeEntity->getIdentifier()] = $scopeEntity;
+    }
 }

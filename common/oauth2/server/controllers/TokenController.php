@@ -57,31 +57,32 @@ class TokenController extends \yii\web\Controller
             // Grant Type: client_credentials
             'client-credentials' => [
                 'class' => 'common\oauth2\server\actions\ClientCredentialsGrantAction',
-                'tokenPrivateKey' => $module->getTokenPrivateKey(),
                 'accessTokenRepository' => $module->repositoryClassMap['AccessTokenRepository'],
                 'clientRepository' => $module->repositoryClassMap['ClientRepository'],
                 'scopeRepository' => $module->repositoryClassMap['ScopeRepository'],
+                'accessTokenCryptKey' => $module->accessTokenCryptKey,
             ],
             // Grant Type: password
             'user-credentials' => [
                 'class' => 'common\oauth2\server\actions\PasswordGrantAction',
-                'tokenPrivateKey' => $module->getTokenPrivateKey(),
                 'accessTokenRepository' => $module->repositoryClassMap['AccessTokenRepository'],
                 'clientRepository' => $module->repositoryClassMap['ClientRepository'],
                 'refreshTokenRepository' => $module->repositoryClassMap['RefreshTokenRepository'],
                 'scopeRepository' => $module->repositoryClassMap['ScopeRepository'],
                 'userRepository' => $module->repositoryClassMap['UserRepository'],
+                'accessTokenCryptKey' => $module->accessTokenCryptKey,
+                'refreshTokenCryptKey' => $module->refreshTokenCryptKey,
             ],
             // Grant Type: refresh_token
             'refresh-credentials' => [
                 'class' => 'common\oauth2\server\actions\RefreshTokenGrantAction',
-                'tokenPrivateKey' => $module->getTokenPrivateKey(),
-                'encryptionKey' => $module->getEncryptionKey(),
                 'accessTokenRepository' => $module->repositoryClassMap['AccessTokenRepository'],
                 'clientRepository' => $module->repositoryClassMap['ClientRepository'],
                 'refreshTokenRepository' => $module->repositoryClassMap['RefreshTokenRepository'],
                 'scopeRepository' => $module->repositoryClassMap['ScopeRepository'],
                 'userRepository' => $module->repositoryClassMap['UserRepository'],
+                'accessTokenCryptKey' => $module->accessTokenCryptKey,
+                'refreshTokenCryptKey' => $module->refreshTokenCryptKey,
             ],
             /*// Grant Type: authorization_code
             'code-credentials' => [

@@ -12,19 +12,89 @@ namespace common\oauth2\server\interfaces;
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
-interface RefreshTokenEntityInterface extends BasicTokenEntityInterface
+interface RefreshTokenEntityInterface
 {
+    /**
+     * 获取更新令牌的标识符。
+     *
+     * @return string 更新令牌的标识符。
+     */
+    public function getIdentifier();
+    
+    /**
+     * 设置更新令牌的标识符。
+     *
+     * @param string $identifier 更新令牌的标识符。
+     */
+    public function setIdentifier($identifier);
+
+    /**
+     * 获取更新令牌的过期时间。
+     *
+     * @return integer 过期的时间戳。
+     */
+    public function getExpires();
+    
+    /**
+     * 设置更新令牌的过期时间。
+     * 
+     * @param integer $expires 过期时间的时间戳。
+     */
+    public function setExpires($expires);
+
+    /**
+     * 获取与更新令牌关联的客户端标识。
+     *
+     * @return string 客户端标识。
+     */
+    public function getClientIdentifier();
+    
+    /**
+     * 设置与更新令牌关联的客户端标识。
+     *
+     * @param string $clientIdentifier 客户端标识。
+     */
+    public function setClientIdentifier($clientIdentifier);
+    
+    /**
+     * 获取与更新令牌关联的用户标识。
+     *
+     * @return string 用户标识。
+     */
+    public function getUserIdentifier();
+    
+    /**
+     * 设置与更新令牌关联的用户标识。
+     *
+     * @param string $userIdentifier 用户标识。
+     */
+    public function setUserIdentifier($userIdentifier);
+    
+    /**
+     * 获取与更新令牌关联的权限标识符。
+     *
+     * @return string[] 权限标识符列表。
+     */
+    public function getScopeIdentifiers();
+    
+    /**
+     * 添加与更新令牌关联的权限标识符。
+     *
+     * @param string $scopeIdentifier 权限标识符。
+     */
+    public function addScopeIdentifier($scopeIdentifier);
+    
     /**
      * 获取与更新令牌关联的访问令牌。
      *
      * @return AccessTokenEntityInterface 访问令牌实例。
      */
-    public function getAccessToken();
+    public function getAccessTokenEntity();
     
     /**
      * 设置与更新令牌关联的访问令牌。
      * 
-     * @param AccessTokenEntityInterface $accessToken 访问令牌实例。
+     * @param AccessTokenEntityInterface $accessTokenEntity 访问令牌实例。
      */
-    public function setAccessToken(AccessTokenEntityInterface $accessToken);
+    public function setAccessTokenEntity(AccessTokenEntityInterface $accessTokenEntity);
 }
