@@ -6,8 +6,6 @@
  */
 namespace common\oauth2\server\actions;
 
-use Yii;
-
 /**
  * ClientCredentialsGrantAction class.
  *

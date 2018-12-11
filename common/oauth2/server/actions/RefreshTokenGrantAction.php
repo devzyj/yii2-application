@@ -7,13 +7,10 @@
 namespace common\oauth2\server\actions;
 
 use Yii;
-use yii\base\InvalidConfigException;
 use yii\web\BadRequestHttpException;
 use yii\web\UnauthorizedHttpException;
-use common\oauth2\server\interfaces\UserEntityInterface;
 use common\oauth2\server\interfaces\RefreshTokenEntityInterface;
 use common\oauth2\server\interfaces\ClientEntityInterface;
-use yii\web\yii\web;
 
 /**
  * RefreshTokenGrantAction class.
@@ -24,21 +21,7 @@ use yii\web\yii\web;
 class RefreshTokenGrantAction extends GrantAction
 {
     /**
-     * {@inheritdoc}
-     */
-    public function init()
-    {
-        parent::init();
-    
-        if ($this->userRepository === null) {
-            throw new InvalidConfigException('The "userRepository" property must be set.');
-        } elseif ($this->refreshTokenRepository === null) {
-            throw new InvalidConfigException('The "refreshTokenRepository" property must be set.');
-        }
-    }
-
-    /**
-     * Generate user credentials.
+     * Generate credentials.
      * 
      * @return array
      */
@@ -55,43 +38,54 @@ class RefreshTokenGrantAction extends GrantAction
         
         // 获取请求中的权限。
         $refreshTokenScopeIdentifiers = $requestedRefreshToken->getScopeIdentifiers();
-        $requestedScopes = $this->getRequestedScopes(implode(self::SCOPE_SEPARATOR, $refreshTokenScopeIdentifiers));
+        $requestedScopes = $this->getRequestedScopes($refreshTokenScopeIdentifiers);
         foreach ($requestedScopes as $scope) {
             if (in_array($scope->getIdentifier(), $refreshTokenScopeIdentifiers, true) === false) {
                 throw new UnauthorizedHttpException('The requested scope is invalid.');
             }
         }
         
-        // TODO 撤销与更新令牌关联的访问令牌。
-        $this->getAccessTokenRepository()->revokeAccessTokenEntity();
-        
-        // 撤销更新令牌。
-        $this->getRefreshTokenRepository()->revokeRefreshTokenEntity($requestedRefreshToken->getIdentifier());
-        
-        // TODO 创建访问令牌。
-        $accessToken = $this->generateAccessToken($requestedScopes, $client, $requestedRefreshToken->getUserIdentifier());
+        // 获取与更新令牌关联的用户。
+        $user = $this->getUserRepository()->getUserEntity($requestedRefreshToken->getUserIdentifier());
+
+        // 创建访问令牌。
+        $accessToken = $this->generateAccessToken($requestedScopes, $client, $user);
         
         // 创建更新令牌。
         $refreshToken = $this->generateRefreshToken($accessToken);
         
-        // 生成并返回认证信息。
-        return $this->generateCredentials($accessToken, $refreshToken);
+        // 生成认证信息。
+        $credentials = $this->generateCredentials($accessToken, $refreshToken);
+        
+        // 撤销与更新令牌关联的访问令牌。
+        $this->getAccessTokenRepository()->revokeAccessTokenEntity($requestedRefreshToken->getAccessTokenIdentifier());
+        
+        // 撤销更新令牌。
+        $this->getRefreshTokenRepository()->revokeRefreshTokenEntity($requestedRefreshToken->getIdentifier());
+        
+        // 返回认证信息。
+        return $credentials;
     }
 
     /**
      * 获取请求的更新令牌。
      *
      * @return RefreshTokenEntityInterface 更新令牌。
-     * @throws \yii\web\BadRequestHttpException 缺少参数。
+     * @throws BadRequestHttpException 缺少参数。
      */
     protected function getRequestedRefreshToken()
     {
-        $refreshToken = $this->request->getBodyParam('refresh_token');
-        if ($refreshToken === null) {
+        $requestedRefreshToken = $this->request->getBodyParam('refresh_token');
+        if ($requestedRefreshToken === null) {
             throw new BadRequestHttpException('Missing parameters: "refresh_token" required.');
         }
         
-        return $this->getRefreshTokenRepository()->unserializeRefreshTokenEntity($refreshToken, $this->refreshTokenCryptKey);
+        $refreshToken = $this->getRefreshTokenRepository()->unserializeRefreshTokenEntity($requestedRefreshToken, $this->refreshTokenCryptKey);
+        if (!$refreshToken instanceof RefreshTokenEntityInterface) {
+            throw new UnauthorizedHttpException('Refresh token is invalid.');
+        }
+        
+        return $refreshToken;
     }
     
     /**
@@ -104,11 +98,11 @@ class RefreshTokenGrantAction extends GrantAction
     protected function validateRefreshToken(RefreshTokenEntityInterface $refreshToken, ClientEntityInterface $client)
     {
         if ($refreshToken->getClientIdentifier() != $client->getIdentifier()) {
-            throw new UnauthorizedHttpException('Token is not linked to client.');
+            throw new UnauthorizedHttpException('Refresh token is not linked to client.');
         } elseif ($refreshToken->getExpires() < time()) {
-            throw new UnauthorizedHttpException('Token has expired.');
+            throw new UnauthorizedHttpException('Refresh token has expired.');
         } elseif ($this->getRefreshTokenRepository()->isRefreshTokenEntityRevoked($refreshToken->getIdentifier())) {
-            throw new UnauthorizedHttpException('Token has been revoked.');
+            throw new UnauthorizedHttpException('Refresh token has been revoked.');
         }
     }
     

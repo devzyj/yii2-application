@@ -14,6 +14,12 @@ use common\oauth2\server\interfaces\ClientRepositoryInterface;
 use common\oauth2\server\interfaces\RefreshTokenRepositoryInterface;
 use common\oauth2\server\interfaces\ScopeRepositoryInterface;
 use common\oauth2\server\interfaces\UserRepositoryInterface;
+use common\oauth2\server\repositories\AccessTokenRepository;
+use common\oauth2\server\repositories\AuthCodeRepository;
+use common\oauth2\server\repositories\ClientRepository;
+use common\oauth2\server\repositories\RefreshTokenRepository;
+use common\oauth2\server\repositories\ScopeRepository;
+use common\oauth2\server\repositories\UserRepository;
 
 /**
  * Action class.
@@ -93,25 +99,14 @@ class Action extends \yii\base\Action
      */
     public function getAccessTokenRepository()
     {
-        return $this->_accessTokenRepository;
-    }
-    
-    /**
-     * 设置访问令牌存储库。
-     *
-     * @param AccessTokenRepositoryInterface|string|array $value
-     */
-    public function setAccessTokenRepository($value)
-    {
-        if ($value instanceof AccessTokenRepositoryInterface) {
-            $this->_accessTokenRepository = $value;
-        } else {
-            $this->_accessTokenRepository = Yii::createObject($value);
+        if ($this->_accessTokenRepository === null) {
+            $this->_accessTokenRepository = Yii::createObject(AccessTokenRepository::class);
+            if (!$this->_accessTokenRepository instanceof AccessTokenRepositoryInterface) {
+                throw new InvalidConfigException(get_class($this->_accessTokenRepository) . ' does not implement AccessTokenRepositoryInterface.');
+            }
         }
         
-        if (!$this->_accessTokenRepository instanceof AccessTokenRepositoryInterface) {
-            throw new InvalidConfigException(get_class($this->_accessTokenRepository) . ' does not implement AccessTokenRepositoryInterface.');
-        }
+        return $this->_accessTokenRepository;
     }
 
     /**
@@ -121,25 +116,14 @@ class Action extends \yii\base\Action
      */
     public function getAuthCodeRepository()
     {
+        if ($this->_authCodeRepository === null) {
+            $this->_authCodeRepository = Yii::createObject(AuthCodeRepository::class);
+            if (!$this->_authCodeRepository instanceof AuthCodeRepositoryInterface) {
+                throw new InvalidConfigException(get_class($this->_authCodeRepository) . ' does not implement AuthCodeRepositoryInterface.');
+            }
+        }
+        
         return $this->_authCodeRepository;
-    }
-    
-    /**
-     * 设置授权码存储库。
-     *
-     * @param AuthCodeRepositoryInterface|string|array $value
-     */
-    public function setAuthCodeRepository($value)
-    {
-        if ($value instanceof AuthCodeRepositoryInterface) {
-            $this->_authCodeRepository = $value;
-        } else {
-            $this->_authCodeRepository = Yii::createObject($value);
-        }
-    
-        if (!$this->_authCodeRepository instanceof AuthCodeRepositoryInterface) {
-            throw new InvalidConfigException(get_class($this->_authCodeRepository) . ' does not implement AuthCodeRepositoryInterface.');
-        }
     }
     
     /**
@@ -149,25 +133,14 @@ class Action extends \yii\base\Action
      */
     public function getClientRepository()
     {
-        return $this->_clientRepository;
-    }
-    
-    /**
-     * 设置客户端存储库。
-     * 
-     * @param ClientRepositoryInterface|string|array $value
-     */
-    public function setClientRepository($value)
-    {
-        if ($value instanceof ClientRepositoryInterface) {
-            $this->_clientRepository = $value;
-        } else {
-            $this->_clientRepository = Yii::createObject($value);
+        if ($this->_clientRepository === null) {
+            $this->_clientRepository = Yii::createObject(ClientRepository::class);
+            if (!$this->_clientRepository instanceof ClientRepositoryInterface) {
+                throw new InvalidConfigException(get_class($this->_clientRepository) . ' does not implement ClientRepositoryInterface.');
+            }
         }
         
-        if (!$this->_clientRepository instanceof ClientRepositoryInterface) {
-            throw new InvalidConfigException(get_class($this->_clientRepository) . ' does not implement ClientRepositoryInterface.');
-        }
+        return $this->_clientRepository;
     }
 
     /**
@@ -177,25 +150,14 @@ class Action extends \yii\base\Action
      */
     public function getRefreshTokenRepository()
     {
+        if ($this->_refreshTokenRepository === null) {
+            $this->_refreshTokenRepository = Yii::createObject(RefreshTokenRepository::class);
+            if (!$this->_refreshTokenRepository instanceof RefreshTokenRepositoryInterface) {
+                throw new InvalidConfigException(get_class($this->_refreshTokenRepository) . ' does not implement RefreshTokenRepositoryInterface.');
+            }
+        }
+        
         return $this->_refreshTokenRepository;
-    }
-    
-    /**
-     * 设置更新令牌存储库。
-     *
-     * @param RefreshTokenRepositoryInterface|string|array $value
-     */
-    public function setRefreshTokenRepository($value)
-    {
-        if ($value instanceof RefreshTokenRepositoryInterface) {
-            $this->_refreshTokenRepository = $value;
-        } else {
-            $this->_refreshTokenRepository = Yii::createObject($value);
-        }
-    
-        if (!$this->_refreshTokenRepository instanceof RefreshTokenRepositoryInterface) {
-            throw new InvalidConfigException(get_class($this->_refreshTokenRepository) . ' does not implement RefreshTokenRepositoryInterface.');
-        }
     }
     
     /**
@@ -205,25 +167,14 @@ class Action extends \yii\base\Action
      */
     public function getScopeRepository()
     {
-        return $this->_scopeRepository;
-    }
-    
-    /**
-     * 设置权限存储库。
-     *
-     * @param ScopeRepositoryInterface|string|array $value
-     */
-    public function setScopeRepository($value)
-    {
-        if ($value instanceof ScopeRepositoryInterface) {
-            $this->_scopeRepository = $value;
-        } else {
-            $this->_scopeRepository = Yii::createObject($value);
+        if ($this->_scopeRepository === null) {
+            $this->_scopeRepository = Yii::createObject(ScopeRepository::class);
+            if (!$this->_scopeRepository instanceof ScopeRepositoryInterface) {
+                throw new InvalidConfigException(get_class($this->_scopeRepository) . ' does not implement ScopeRepositoryInterface.');
+            }
         }
         
-        if (!$this->_scopeRepository instanceof ScopeRepositoryInterface) {
-            throw new InvalidConfigException(get_class($this->_scopeRepository) . ' does not implement ScopeRepositoryInterface.');
-        }
+        return $this->_scopeRepository;
     }
     
     /**
@@ -233,24 +184,13 @@ class Action extends \yii\base\Action
      */
     public function getUserRepository()
     {
-        return $this->_userRepository;
-    }
-    
-    /**
-     * 设置用户存储库。
-     *
-     * @param UserRepositoryInterface|string|array $value
-     */
-    public function setUserRepository($value)
-    {
-        if ($value instanceof UserRepositoryInterface) {
-            $this->_userRepository = $value;
-        } else {
-            $this->_userRepository = Yii::createObject($value);
+        if ($this->_userRepository === null) {
+            $this->_userRepository = Yii::createObject(UserRepository::class);
+            if (!$this->_userRepository instanceof UserRepositoryInterface) {
+                throw new InvalidConfigException(get_class($this->_userRepository) . ' does not implement UserRepositoryInterface.');
+            }
         }
         
-        if (!$this->_userRepository instanceof UserRepositoryInterface) {
-            throw new InvalidConfigException(get_class($this->_userRepository) . ' does not implement UserRepositoryInterface.');
-        }
+        return $this->_userRepository;
     }
 }

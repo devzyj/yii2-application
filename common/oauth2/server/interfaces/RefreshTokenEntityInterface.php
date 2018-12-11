@@ -83,6 +83,20 @@ interface RefreshTokenEntityInterface
      * @param string $scopeIdentifier 权限标识符。
      */
     public function addScopeIdentifier($scopeIdentifier);
+
+    /**
+     * 获取与更新令牌关联的访问令牌标识。
+     *
+     * @param string 访问令牌标识。
+     */
+    public function getAccessTokenIdentifier();
+    
+    /**
+     * 设置与更新令牌关联的访问令牌标识。
+     * 
+     * @param string $accessTokenIdentifier 访问令牌标识。
+     */
+    public function setAccessTokenIdentifier($accessTokenIdentifier);
     
     /**
      * 获取与更新令牌关联的访问令牌。

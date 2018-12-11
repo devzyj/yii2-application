@@ -57,30 +57,17 @@ class TokenController extends \yii\web\Controller
             // Grant Type: client_credentials
             'client-credentials' => [
                 'class' => 'common\oauth2\server\actions\ClientCredentialsGrantAction',
-                'accessTokenRepository' => $module->repositoryClassMap['AccessTokenRepository'],
-                'clientRepository' => $module->repositoryClassMap['ClientRepository'],
-                'scopeRepository' => $module->repositoryClassMap['ScopeRepository'],
                 'accessTokenCryptKey' => $module->accessTokenCryptKey,
             ],
             // Grant Type: password
             'user-credentials' => [
                 'class' => 'common\oauth2\server\actions\PasswordGrantAction',
-                'accessTokenRepository' => $module->repositoryClassMap['AccessTokenRepository'],
-                'clientRepository' => $module->repositoryClassMap['ClientRepository'],
-                'refreshTokenRepository' => $module->repositoryClassMap['RefreshTokenRepository'],
-                'scopeRepository' => $module->repositoryClassMap['ScopeRepository'],
-                'userRepository' => $module->repositoryClassMap['UserRepository'],
                 'accessTokenCryptKey' => $module->accessTokenCryptKey,
                 'refreshTokenCryptKey' => $module->refreshTokenCryptKey,
             ],
             // Grant Type: refresh_token
             'refresh-credentials' => [
                 'class' => 'common\oauth2\server\actions\RefreshTokenGrantAction',
-                'accessTokenRepository' => $module->repositoryClassMap['AccessTokenRepository'],
-                'clientRepository' => $module->repositoryClassMap['ClientRepository'],
-                'refreshTokenRepository' => $module->repositoryClassMap['RefreshTokenRepository'],
-                'scopeRepository' => $module->repositoryClassMap['ScopeRepository'],
-                'userRepository' => $module->repositoryClassMap['UserRepository'],
                 'accessTokenCryptKey' => $module->accessTokenCryptKey,
                 'refreshTokenCryptKey' => $module->refreshTokenCryptKey,
             ],
@@ -106,11 +93,11 @@ class TokenController extends \yii\web\Controller
             return $this->runAction('client-credentials');
         } elseif ($grantType === 'password') {
             return $this->runAction('user-credentials');
-        } elseif ($grantType === 'authorization_code') {
-            return $this->runAction('code-credentials');
         } elseif ($grantType === 'refresh_token') {
             return $this->runAction('refresh-credentials');
-        }
+        }/* elseif ($grantType === 'authorization_code') {
+            return $this->runAction('code-credentials');
+        }*/
     }
 
     /**
@@ -125,8 +112,8 @@ class TokenController extends \yii\web\Controller
             'index' => ['POST'],
             'client-credentials' => ['POST'],
             'user-credentials' => ['POST'],
-            'code-credentials' => ['POST'],
             'refresh-credentials' => ['POST'],
+            //'code-credentials' => ['POST'],
         ];
     }
 }

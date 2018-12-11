@@ -36,7 +36,6 @@ interface AccessTokenRepositoryInterface
      * 撤销访问令牌。
      * 
      * @param string $identifier 访问令牌标识。
-     * @return boolean 撤销是否成功。
      */
     public function revokeAccessTokenEntity($identifier);
 

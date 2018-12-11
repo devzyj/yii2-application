@@ -37,6 +37,11 @@ trait RefreshTokenEntityTrait
      * @var array
      */
     private $_scopeIdentifiers = [];
+
+    /**
+     * @var string
+     */
+    private $_accessTokenIdentifier;
     
     /**
      * @var AccessTokenEntityInterface
@@ -121,6 +126,26 @@ trait RefreshTokenEntityTrait
     public function addScopeIdentifier($scopeIdentifier)
     {
         $this->_scopeIdentifiers[$scopeIdentifier] = true;
+    }
+
+    /**
+     * 获取与更新令牌关联的访问令牌标识。
+     *
+     * @param string 访问令牌标识。
+     */
+    public function getAccessTokenIdentifier()
+    {
+        return $this->_accessTokenIdentifier;
+    }
+    
+    /**
+     * 设置与更新令牌关联的访问令牌标识。
+     * 
+     * @param string $accessTokenIdentifier 访问令牌标识。
+     */
+    public function setAccessTokenIdentifier($accessTokenIdentifier)
+    {
+        $this->_accessTokenIdentifier = $accessTokenIdentifier;
     }
     
     /**

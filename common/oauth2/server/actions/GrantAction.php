@@ -74,22 +74,6 @@ abstract class GrantAction extends Action
     private $_requestedScopes;
     
     /**
-     * {@inheritdoc}
-     */
-    public function init()
-    {
-        parent::init();
-
-        if ($this->accessTokenRepository === null) {
-            throw new InvalidConfigException('The "accessTokenRepository" property must be set.');
-        } elseif ($this->clientRepository === null) {
-            throw new InvalidConfigException('The "clientRepository" property must be set.');
-        } elseif ($this->scopeRepository === null) {
-            throw new InvalidConfigException('The "scopeRepository" property must be set.');
-        }
-    }
-    
-    /**
      * 获取当前的授权模式。
      * 
      * @return string
@@ -121,7 +105,7 @@ abstract class GrantAction extends Action
      * 优先使用请求内容中的认证信息。
      * 
      * @return array 认证信息。第一个元素为 `client_id`，第二个元素为 `client_secret`。
-     * @throws \yii\web\BadRequestHttpException 缺少参数。
+     * @throws BadRequestHttpException 缺少参数。
      */
     protected function getClientAuthCredentials()
     {
@@ -149,10 +133,8 @@ abstract class GrantAction extends Action
     protected function getClientByCredentials($identifier, $secret)
     {
         $client = $this->getClientRepository()->getClientEntityByCredentials($identifier, $secret);
-        if (empty($client)) {
+        if (!$client instanceof ClientEntityInterface) {
             throw new UnauthorizedHttpException('Client authentication failed.');
-        } elseif (!$client instanceof ClientEntityInterface) {
-            throw new InvalidConfigException(get_class($client) . ' does not implement ClientEntityInterface.');
         }
         
         return $client;
@@ -162,7 +144,7 @@ abstract class GrantAction extends Action
      * 验证客户端是否允许使用当前的授权类型。
      * 
      * @param ClientEntityInterface $client 客户端。
-     * @throws \yii\web\ForbiddenHttpException 禁止的授权类型。
+     * @throws ForbiddenHttpException 禁止的授权类型。
      */
     protected function validateClientGrantType(ClientEntityInterface $client)
     {
@@ -174,40 +156,35 @@ abstract class GrantAction extends Action
     /**
      * 获取请求的权限。
      * 
-     * @param string $default 默认权限。多个权限使用 [[SELF::SCOPE_SEPARATOR]] 分隔。
+     * @param string|string[] $default 默认权限。多个权限可以是数组，也可以是以 [[SELF::SCOPE_SEPARATOR]] 分隔的字符串。
      * @return ScopeEntityInterface[] 权限列表。
      */
     protected function getRequestedScopes($default = null)
     {
-        if ($this->_requestedScopes === null) {
-            $this->_requestedScopes = $this->validateScopes($this->request->getBodyParam('scope', $default));
+        $requestedScopes = $this->request->getBodyParam('scope', $default);
+        if (!is_array($requestedScopes)) {
+            $requestedScopes = array_filter(explode(self::SCOPE_SEPARATOR, trim($requestedScopes)), function ($scope) {
+                return $scope !== '';
+            });
         }
         
-        return $this->_requestedScopes;
+        return $this->validateScopes($requestedScopes);
     }
     
     /**
      * 验证权限。
      * 
-     * @param string|string[] $scopes 需要验证的权限标识。
+     * @param string[] $scopes 需要验证的权限标识。
      * @return ScopeEntityInterface[] 验证有效的权限。
      */
-    protected function validateScopes($scopes)
+    protected function validateScopes(array $scopes)
     {
-        if (!is_array($scopes)) {
-            $scopes = array_filter(explode(self::SCOPE_SEPARATOR, trim($scopes)), function ($scope) {
-                return $scope !== '';
-            });
-        }
-        
         $validScopes = [];
         foreach ($scopes as $scope) {
             if (!isset($validScopes[$scope])) {
                 $scopeEntity = $this->getScopeRepository()->getScopeEntity($scope);
-                if (empty($scopeEntity)) {
-                    throw new BadRequestHttpException('The requested scope is invalid.');
-                } elseif (!$scopeEntity instanceof ScopeEntityInterface) {
-                    throw new InvalidConfigException(get_class($scopeEntity) . ' does not implement ScopeEntityInterface.');
+                if (!$scopeEntity instanceof ScopeEntityInterface) {
+                    throw new BadRequestHttpException('Scope is invalid.');
                 }
         
                 $validScopes[$scope] = $scopeEntity;
@@ -349,77 +326,38 @@ abstract class GrantAction extends Action
      * 
      * @param AccessTokenEntityInterface $accessToken 访问令牌。
      * @param RefreshTokenEntityInterface $refreshToken 更新令牌。
-     * @return array
+     * @return array 认证信息。
      */
     protected function generateCredentials(AccessTokenEntityInterface $accessToken, RefreshTokenEntityInterface $refreshToken = null)
     {
-        // 确认认证信息中要展示的权限。
-        $scopes = $this->ensureCredentialsScopes($accessToken);
-        if ($scopes) {
-            $scopes = implode(self::SCOPE_SEPARATOR, $this->getIdentifierColumn($scopes));
+        // 获取访问令牌中的权限标识列表。
+        $scopeIdentifiers = ArrayHelper::getColumn($accessToken->getScopeEntities(), function ($element) {
+            /* @var $element ScopeEntityInterface */
+            return $element->getIdentifier();
+        });
+
+        // 认证信息中要展示的权限。
+        $scope = null;
+        if ($scopeIdentifiers) {
+            $scope = implode(self::SCOPE_SEPARATOR, $scopeIdentifiers);
         }
         
-        // 访问令牌的信息。
+        // 访问令牌信息。
         $credentials = [
             'token_type' => 'Bearer',
             'access_token' => $this->getAccessTokenRepository()->serializeAccessTokenEntity($accessToken, $this->accessTokenCryptKey),
             'expires_in' => $accessToken->getExpires() - time(),
-            'scope' => $scopes ? $scopes : null,
+            'scope' => $scope,
         ];
         
-        // 更新令牌。
+        // 更新令牌信息。
         if ($refreshToken) {
             $credentials['refresh_token'] = $this->getRefreshTokenRepository()->serializeRefreshTokenEntity($refreshToken, $this->refreshTokenCryptKey);
             $credentials['refresh_expires_in'] = $refreshToken->getExpires() - time();
         }
         
+        // 返回认证信息。
         return $credentials;
-    }
-    
-    /**
-     * 确认认证信息中要展示的权限。
-     * 
-     * @param AccessTokenEntityInterface $accessToken 访问令牌。
-     * @return ScopeEntityInterface[]
-     */
-    protected function ensureCredentialsScopes($accessToken)
-    {
-        // 根据请求的权限，确认认证信息中要展示的权限。
-        $requestedScopes = $this->getRequestedScopes();
-        if ($requestedScopes) {
-            $tokenScopes = $accessToken->getScopeEntities();
-            if (count($requestedScopes) != count($tokenScopes)) {
-                // 令牌中的权限和请求的权限数量不同时，在认证信息中显示令牌中的权限。
-                return $tokenScopes;
-            }
-            
-            // 令牌中的权限和请求的权限数量相同时，判断权限是否一致。
-            // 获取请求的权限标识列表。
-            $requestedScopeIds = $this->getIdentifierColumn($requestedScopes);
-        
-            // 获取令牌中的权限标识列表。
-            $tokenScopeIds = $this->getIdentifierColumn($tokenScopes);
-    
-            // 判断权限是否一致。
-            if (array_diff($requestedScopeIds, $tokenScopeIds)) {
-                // 权限不一致时，在认证信息中显示令牌中的权限。
-                return $tokenScopes;
-            }
-        }
-        
-        return [];
-    }
-    
-    /**
-     * 获取标识符列表。
-     * 
-     * @return array
-     */
-    protected function getIdentifierColumn(array $array)
-    {
-        return ArrayHelper::getColumn($array, function ($element) {
-            return $element->getIdentifier();
-        });
     }
     
     /**
@@ -427,7 +365,7 @@ abstract class GrantAction extends Action
      * 
      * @param ClientEntityInterface $client
      * @param string $redirectUri
-     * @throws \yii\web\BadRequestHttpException
+     * @throws BadRequestHttpException
      
     protected function validateRedirectUri($client, $redirectUri)
     {

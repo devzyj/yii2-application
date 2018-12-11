@@ -7,7 +7,6 @@
 namespace common\oauth2\server\actions;
 
 use Yii;
-use yii\base\InvalidConfigException;
 use yii\web\BadRequestHttpException;
 use yii\web\UnauthorizedHttpException;
 use common\oauth2\server\interfaces\UserEntityInterface;
@@ -20,20 +19,6 @@ use common\oauth2\server\interfaces\UserEntityInterface;
  */
 class PasswordGrantAction extends GrantAction
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function init()
-    {
-        parent::init();
-    
-        if ($this->userRepository === null) {
-            throw new InvalidConfigException('The "userRepository" property must be set.');
-        } elseif ($this->refreshTokenRepository === null) {
-            throw new InvalidConfigException('The "refreshTokenRepository" property must be set.');
-        }
-    }
-
     /**
      * Generate user credentials.
      * 
@@ -81,7 +66,7 @@ class PasswordGrantAction extends GrantAction
      * 获取用户的认证信息。
      *
      * @return array 认证信息。第一个元素为 `username`，第二个元素为 `password`。
-     * @throws \yii\web\BadRequestHttpException 缺少参数。
+     * @throws BadRequestHttpException 缺少参数。
      */
     protected function getUserAuthCredentials()
     {
@@ -104,10 +89,8 @@ class PasswordGrantAction extends GrantAction
     protected function getUserByCredentials($username, $password)
     {
         $user = $this->getUserRepository()->getUserEntityByCredentials($username, $password);
-        if (empty($user)) {
+        if (!$user instanceof UserEntityInterface) {
             throw new UnauthorizedHttpException('User authentication failed.');
-        } elseif (!$user instanceof UserEntityInterface) {
-            throw new InvalidConfigException(get_class($user) . ' does not implement UserEntityInterface.');
         }
         
         return $user;

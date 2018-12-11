@@ -36,7 +36,6 @@ interface RefreshTokenRepositoryInterface
      * 撤销更新令牌。
      * 
      * @param string $identifier 更新令牌标识。
-     * @return boolean 撤销是否成功。
      */
     public function revokeRefreshTokenEntity($identifier);
 

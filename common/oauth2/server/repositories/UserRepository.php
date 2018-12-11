@@ -19,7 +19,6 @@ class UserRepository implements UserRepositoryInterface
 {
     /**
      * {@inheritdoc}
-     * @deprecated 可能不会使用。
      */
     public function getUserEntity($identifier)
     {
