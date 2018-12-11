@@ -24,8 +24,6 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
     
     /**
      * {@inheritdoc}
-     * 
-     * @return AccessTokenEntity 新的访问令牌实例。
      */
     public function createAccessTokenEntity()
     {

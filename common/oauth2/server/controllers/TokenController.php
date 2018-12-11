@@ -54,27 +54,29 @@ class TokenController extends \yii\web\Controller
         $module = $this->module;
         
         return [
-            // Grant Type: client_credentials
-            'client-credentials' => [
-                'class' => 'common\oauth2\server\actions\ClientCredentialsGrantAction',
+            // authorization_code
+            'authorization-code' => [
+                'class' => 'common\oauth2\server\actions\AuthorizationCodeGrantAction',
                 'accessTokenCryptKey' => $module->accessTokenCryptKey,
+                'refreshTokenCryptKey' => $module->refreshTokenCryptKey,
             ],
-            // Grant Type: password
+            // password
             'user-credentials' => [
                 'class' => 'common\oauth2\server\actions\PasswordGrantAction',
                 'accessTokenCryptKey' => $module->accessTokenCryptKey,
                 'refreshTokenCryptKey' => $module->refreshTokenCryptKey,
             ],
-            // Grant Type: refresh_token
-            'refresh-credentials' => [
+            // client_credentials
+            'client-credentials' => [
+                'class' => 'common\oauth2\server\actions\ClientCredentialsGrantAction',
+                'accessTokenCryptKey' => $module->accessTokenCryptKey,
+            ],
+            // refresh_token
+            'refresh-token' => [
                 'class' => 'common\oauth2\server\actions\RefreshTokenGrantAction',
                 'accessTokenCryptKey' => $module->accessTokenCryptKey,
                 'refreshTokenCryptKey' => $module->refreshTokenCryptKey,
             ],
-            /*// Grant Type: authorization_code
-            'code-credentials' => [
-                'class' => 'common\oauth2\server\actions\CodeCredentialsAction',
-            ],*/
         ];
     }
     
@@ -89,15 +91,15 @@ class TokenController extends \yii\web\Controller
         }
         
         // run actions
-        if ($grantType === 'client_credentials') {
-            return $this->runAction('client-credentials');
+        if ($grantType === 'authorization_code') {
+            return $this->runAction('authorization-code');
         } elseif ($grantType === 'password') {
             return $this->runAction('user-credentials');
+        } elseif ($grantType === 'client_credentials') {
+            return $this->runAction('client-credentials');
         } elseif ($grantType === 'refresh_token') {
-            return $this->runAction('refresh-credentials');
-        }/* elseif ($grantType === 'authorization_code') {
-            return $this->runAction('code-credentials');
-        }*/
+            return $this->runAction('refresh-token');
+        }
     }
 
     /**
@@ -110,10 +112,10 @@ class TokenController extends \yii\web\Controller
     {
         return [
             'index' => ['POST'],
-            'client-credentials' => ['POST'],
+            'authorization-code' => ['POST'],
             'user-credentials' => ['POST'],
-            'refresh-credentials' => ['POST'],
-            //'code-credentials' => ['POST'],
+            'client-credentials' => ['POST'],
+            'refresh-token' => ['POST'],
         ];
     }
 }

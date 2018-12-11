@@ -23,6 +23,9 @@ class ClientCredentialsGrantAction extends GrantAction
     {
         // 获取正在请求授权的客户端。
         $client = $this->getAuthorizeClient();
+
+        // 验证客户端是否允许使用当前的授权类型。
+        $this->validateClientGrantType($client);
         
         // 获取请求中的权限。
         $requestedScopes = $this->getRequestedScopes();

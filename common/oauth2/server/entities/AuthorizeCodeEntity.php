@@ -4,15 +4,17 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace common\oauth2\server\interfaces;
+namespace common\oauth2\server\entities;
+
+use common\oauth2\server\interfaces\AuthorizationCodeEntityInterface;
 
 /**
- * 授权码实体接口。
+ * AuthorizationCodeEntity class.
  * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
-interface AuthCodeEntityInterface
+class AuthorizationCodeEntity implements AuthorizationCodeEntityInterface
 {
     
 }

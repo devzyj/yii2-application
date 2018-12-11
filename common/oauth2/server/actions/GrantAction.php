@@ -18,7 +18,7 @@ use common\oauth2\server\interfaces\ClientEntityInterface;
 use common\oauth2\server\interfaces\RefreshTokenEntityInterface;
 use common\oauth2\server\interfaces\ScopeEntityInterface;
 use common\oauth2\server\interfaces\UserEntityInterface;
-use common\oauth2\server\exceptions\UniqueTokenIdentifierException;
+use common\oauth2\server\exceptions\UniqueIdentifierException;
 
 /**
  * GrantAction class.
@@ -90,14 +90,8 @@ abstract class GrantAction extends Action
         // 获取客户端认证信息。
         list ($identifier, $secret) = $this->getClientAuthCredentials();
         
-        // 获取客户端实例。
-        $client = $this->getClientByCredentials($identifier, $secret);
-        
-        // 验证客户端是否允许使用当前的授权类型。
-        $this->validateClientGrantType($client);
-        
-        // 返回正在授权的客户端实例。
-        return $client;
+        // 获取并返回正在授权的客户端实例。
+        return $this->getClientByCredentials($identifier, $secret);
     }
     
     /**
@@ -115,9 +109,8 @@ abstract class GrantAction extends Action
         // 从请求内容中获取。
         $identifier = $this->request->getBodyParam('client_id', $authUser);
         $secret = $this->request->getBodyParam('client_secret', $authPassword);
-        
-        if ($identifier === null || $secret === null) {
-            throw new BadRequestHttpException('Missing parameters: "client_id" and "client_secret" required.');
+        if ($identifier === null) {
+            throw new BadRequestHttpException('Missing parameters: "client_id" required.');
         }
         
         return [$identifier, $secret];
@@ -201,7 +194,7 @@ abstract class GrantAction extends Action
      * @param ClientEntityInterface $client 需要关联的客户端。
      * @param UserEntityInterface $user 需要关联的用户。
      * @return AccessTokenEntityInterface 生成并且保存成功的访问令牌。
-     * @throws UniqueTokenIdentifierException 保存令牌时唯一标识重复。
+     * @throws UniqueIdentifierException 保存令牌时唯一标识重复。
      */
     protected function generateAccessToken(array $scopes, ClientEntityInterface $client, UserEntityInterface $user = null)
     {
@@ -238,7 +231,7 @@ abstract class GrantAction extends Action
                 
                 // 返回保存成功的令牌。
                 return $accessToken;
-            } catch (UniqueTokenIdentifierException $e) {
+            } catch (UniqueIdentifierException $e) {
                 if ($count === 0) {
                     throw $e;
                 }
@@ -251,7 +244,7 @@ abstract class GrantAction extends Action
      *
      * @param AccessTokenEntityInterface $accessToken 访问令牌。
      * @return RefreshTokenEntityInterface 生成并且保存成功的更新令牌。
-     * @throws UniqueTokenIdentifierException 保存令牌时唯一标识重复。
+     * @throws UniqueIdentifierException 保存令牌时唯一标识重复。
      */
     protected function generateRefreshToken(AccessTokenEntityInterface $accessToken)
     {
@@ -294,7 +287,7 @@ abstract class GrantAction extends Action
         
                 // 返回保存成功的令牌。
                 return $refreshToken;
-            } catch (UniqueTokenIdentifierException $e) {
+            } catch (UniqueIdentifierException $e) {
                 if ($count === 0) {
                     throw $e;
                 }

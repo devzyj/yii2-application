@@ -18,10 +18,31 @@ use yii\web\BadRequestHttpException;
 class AuthorizeController extends \yii\web\Controller
 {
     /**
-     * 授权入口。
-     * 
-     * @return array 认证信息。
-     * @todo 
+     * {@inheritdoc}
+     */
+    public function actions()
+    {
+        /* @var $module \common\oauth2\server\Module */
+        $module = $this->module;
+        
+        return [
+            // code
+            'code' => [
+                'class' => 'common\oauth2\server\actions\CodeAuthorizeAction',
+                'accessTokenCryptKey' => $module->accessTokenCryptKey,
+                'refreshTokenCryptKey' => $module->refreshTokenCryptKey,
+            ],
+            // token
+            'token' => [
+                'class' => 'common\oauth2\server\actions\TokenAuthorizeAction',
+                'accessTokenCryptKey' => $module->accessTokenCryptKey,
+                'refreshTokenCryptKey' => $module->refreshTokenCryptKey,
+            ],
+        ];
+    }
+    
+    /**
+     * @return array
      */
     public function actionIndex()
     {
@@ -31,9 +52,9 @@ class AuthorizeController extends \yii\web\Controller
         }
         
         if ($responseType === 'code') {
-            return 'todo authorize code action';
+            return $this->runAction('code');
         } elseif ($responseType === 'token') {
-            return 'todo authorize token action';
+            return $this->runAction('token');
         }
     }
 }

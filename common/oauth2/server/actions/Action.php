@@ -9,13 +9,13 @@ namespace common\oauth2\server\actions;
 use Yii;
 use yii\base\InvalidConfigException;
 use common\oauth2\server\interfaces\AccessTokenRepositoryInterface;
-use common\oauth2\server\interfaces\AuthCodeRepositoryInterface;
+use common\oauth2\server\interfaces\AuthorizationCodeRepositoryInterface;
 use common\oauth2\server\interfaces\ClientRepositoryInterface;
 use common\oauth2\server\interfaces\RefreshTokenRepositoryInterface;
 use common\oauth2\server\interfaces\ScopeRepositoryInterface;
 use common\oauth2\server\interfaces\UserRepositoryInterface;
 use common\oauth2\server\repositories\AccessTokenRepository;
-use common\oauth2\server\repositories\AuthCodeRepository;
+use common\oauth2\server\repositories\AuthorizationCodeRepository;
 use common\oauth2\server\repositories\ClientRepository;
 use common\oauth2\server\repositories\RefreshTokenRepository;
 use common\oauth2\server\repositories\ScopeRepository;
@@ -25,7 +25,7 @@ use common\oauth2\server\repositories\UserRepository;
  * Action class.
  * 
  * @property AccessTokenRepositoryInterface $accessTokenRepository 访问令牌存储库。
- * @property AuthCodeRepositoryInterface $authCodeRepository 授权码存储库。
+ * @property AuthorizationCodeRepositoryInterface $authCodeRepository 授权码存储库。
  * @property ClientRepositoryInterface $clientRepository 客户端存储库。
  * @property RefreshTokenRepositoryInterface $refreshTokenRepository 更新令牌存储库。
  * @property ScopeRepositoryInterface $scopeRepository 权限存储库。
@@ -52,9 +52,9 @@ class Action extends \yii\base\Action
     private $_accessTokenRepository;
 
     /**
-     * @var AuthCodeRepositoryInterface 授权码存储库。
+     * @var AuthorizationCodeRepositoryInterface 授权码存储库。
      */
-    private $_authCodeRepository;
+    private $_authorizationCodeRepository;
     
     /**
      * @var ClientRepositoryInterface 客户端存储库。
@@ -112,18 +112,18 @@ class Action extends \yii\base\Action
     /**
      * 获取授权码存储库。
      *
-     * @return AuthCodeRepositoryInterface
+     * @return AuthorizationCodeRepositoryInterface
      */
-    public function getAuthCodeRepository()
+    public function getAuthorizationCodeRepository()
     {
-        if ($this->_authCodeRepository === null) {
-            $this->_authCodeRepository = Yii::createObject(AuthCodeRepository::class);
-            if (!$this->_authCodeRepository instanceof AuthCodeRepositoryInterface) {
-                throw new InvalidConfigException(get_class($this->_authCodeRepository) . ' does not implement AuthCodeRepositoryInterface.');
+        if ($this->_authorizationCodeRepository === null) {
+            $this->_authorizationCodeRepository = Yii::createObject(AuthorizationCodeRepository::class);
+            if (!$this->_authorizationCodeRepository instanceof AuthorizationCodeRepositoryInterface) {
+                throw new InvalidConfigException(get_class($this->_authorizationCodeRepository) . ' does not implement AuthorizationCodeRepositoryInterface.');
             }
         }
         
-        return $this->_authCodeRepository;
+        return $this->_authorizationCodeRepository;
     }
     
     /**

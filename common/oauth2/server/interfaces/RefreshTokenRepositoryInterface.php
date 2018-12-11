@@ -7,7 +7,7 @@
 namespace common\oauth2\server\interfaces;
 
 use yii\web\UnauthorizedHttpException;
-use common\oauth2\server\exceptions\UniqueTokenIdentifierException;
+use common\oauth2\server\exceptions\UniqueIdentifierException;
 
 /**
  * 更新令牌存储库接口。
@@ -28,7 +28,7 @@ interface RefreshTokenRepositoryInterface
      * 保存更新令牌。
      * 
      * @param RefreshTokenEntityInterface $refreshTokenEntity 更新令牌。
-     * @throws UniqueTokenIdentifierException 令牌标识重复。
+     * @throws UniqueIdentifierException 令牌标识重复。
      */
     public function saveRefreshTokenEntity(RefreshTokenEntityInterface $refreshTokenEntity);
     

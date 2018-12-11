@@ -30,11 +30,15 @@ class ClientRepository implements ClientRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function getClientEntityByCredentials($identifier, $secret)
+    public function getClientEntityByCredentials($identifier, $secret = null)
     {
         $client = $this->getClientEntity($identifier);
-        if ($client->secret === $secret) {
-            return $client;
+        if (empty($client)) {
+            return null;
+        } elseif ($secret !== null && $client->secret !== $secret) {
+            return null;
         }
+        
+        return $client;
     }
 }

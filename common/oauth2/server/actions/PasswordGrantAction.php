@@ -28,6 +28,9 @@ class PasswordGrantAction extends GrantAction
     {
         // 获取正在请求授权的客户端。
         $client = $this->getAuthorizeClient();
+
+        // 验证客户端是否允许使用当前的授权类型。
+        $this->validateClientGrantType($client);
         
         // 获取正在请求授权的用户。
         $user = $this->getAuthorizeUser();
