@@ -22,6 +22,13 @@ interface RefreshTokenRepositoryInterface
      * @return RefreshTokenEntityInterface 新的更新令牌实例。
      */
     public function createRefreshTokenEntity();
+
+    /**
+     * 生成更新令牌唯一标识。
+     *
+     * @return string 更新令牌唯一标识。
+     */
+    public function generateRefreshTokenUniqueIdentifier();
     
     /**
      * 保存更新令牌。

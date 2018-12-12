@@ -20,6 +20,8 @@ use devjerry\yii2\oauth2\server\repositories\RefreshTokenRepository;
 use devjerry\yii2\oauth2\server\repositories\ScopeRepository;
 use devjerry\yii2\oauth2\server\repositories\UserRepository;
 use devjerry\yii2\oauth2\server\ServerRequest;
+use devjerry\oauth2\server\grants\PasswordGrant;
+use devjerry\oauth2\server\grants\RefreshTokenGrant;
 
 /**
  * TokenController class.
@@ -121,15 +123,33 @@ class TokenController extends \yii\web\Controller
         /* @var $clientCredentialsGrant ClientCredentialsGrant */
         $clientCredentialsGrant = Yii::createObject(ClientCredentialsGrant::class);
         $clientCredentialsGrant->setAccessTokenCryptKey($module->accessTokenCryptKey);
-        $clientCredentialsGrant->setRefreshTokenCryptKey($module->refreshTokenCryptKey);
         $clientCredentialsGrant->setAccessTokenRepository($accessTokenRepository);
         //$clientCredentialsGrant->setAuthorizationCodeRepository($authorizationCodeRepository);
         $clientCredentialsGrant->setClientRepository($clientRepository);
-        $clientCredentialsGrant->setRefreshTokenRepository($refreshTokenRepository);
         $clientCredentialsGrant->setScopeRepository($scopeRepository);
-        $clientCredentialsGrant->setUserRepository($userRepository);
-        
         $authorizeServer->addGrantType($clientCredentialsGrant);
+
+        /* @var $passwordGrant PasswordGrant */
+        $passwordGrant = Yii::createObject(PasswordGrant::class);
+        $passwordGrant->setAccessTokenCryptKey($module->accessTokenCryptKey);
+        $passwordGrant->setRefreshTokenCryptKey($module->refreshTokenCryptKey);
+        $passwordGrant->setAccessTokenRepository($accessTokenRepository);
+        $passwordGrant->setClientRepository($clientRepository);
+        $passwordGrant->setRefreshTokenRepository($refreshTokenRepository);
+        $passwordGrant->setScopeRepository($scopeRepository);
+        $passwordGrant->setUserRepository($userRepository);
+        $authorizeServer->addGrantType($passwordGrant);
+
+        /* @var $refreshTokenGrant RefreshTokenGrant */
+        $refreshTokenGrant = Yii::createObject(RefreshTokenGrant::class);
+        $refreshTokenGrant->setAccessTokenCryptKey($module->accessTokenCryptKey);
+        $refreshTokenGrant->setRefreshTokenCryptKey($module->refreshTokenCryptKey);
+        $refreshTokenGrant->setAccessTokenRepository($accessTokenRepository);
+        $refreshTokenGrant->setClientRepository($clientRepository);
+        $refreshTokenGrant->setRefreshTokenRepository($refreshTokenRepository);
+        $refreshTokenGrant->setScopeRepository($scopeRepository);
+        $refreshTokenGrant->setUserRepository($userRepository);
+        $authorizeServer->addGrantType($refreshTokenGrant);
         
         /* @var $serverRequest ServerRequest */
         $serverRequest = Yii::createObject([

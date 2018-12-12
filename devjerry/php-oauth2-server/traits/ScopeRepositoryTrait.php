@@ -1,18 +1,17 @@
 <?php
 /**
- * @link https://github.com/devzyj/yii2-oauth2-server
+ * @link https://github.com/devzyj/php-oauth2-server
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace devjerry\yii2\oauth2\server\repositories\traits;
+namespace devjerry\oauth2\server\traits;
 
-use yii\helpers\ArrayHelper;
 use devjerry\oauth2\server\interfaces\ClientEntityInterface;
 use devjerry\oauth2\server\interfaces\UserEntityInterface;
 use devjerry\oauth2\server\interfaces\ScopeEntityInterface;
 
 /**
- * ScopeRepositoryTrait
+ * ScopeRepositoryTrait 实现了 [[ScopeRepositoryInterface::finalizeEntities()]] 方法。
  *
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
@@ -20,24 +19,25 @@ use devjerry\oauth2\server\interfaces\ScopeEntityInterface;
 trait ScopeRepositoryTrait
 {
     /**
-     * 根据请求的权限列表、授权类型、客户端、用户，确定最终授权的权限列表。
-     * 
-     * 如果请求的权限为空，可以返回默认的权限。
-     * 如果请求的权限不为空，可以判断权限对于客户端和用户的有效性，并增加、删除权限。
+     * 根据请求的权限列表、权限授予类型、客户端、用户，确定最终授予的权限列表。
      * 
      * @param ScopeEntityInterface[] $scopes 请求的权限列表。
-     * @param string $grantType 授权类型。
+     * @param string $grantType 权限授予类型。
      * @param ClientEntityInterface $client 客户端。
      * @param UserEntityInterface $user 用户。
-     * @return ScopeEntityInterface[] 最终授权的权限列表。
+     * @return ScopeEntityInterface[] 最终授予的权限列表。
      */
     public function finalizeEntities(array $scopes, $grantType, ClientEntityInterface $client, UserEntityInterface $user = null)
     {
+        if (empty($scopes)) {
+            return [];
+        }
+        
         if ($grantType === 'client_credentials') {
-            // 客户端授权模式，确认客户端的权限。
+            // 客户端权限授予模式，确认客户端的权限。
             return $this->ensureClientCredentials($scopes, $client);
-        } elseif ($grantType === 'password') {
-            // 用户密码授权模式，确认用户的权限。
+        } elseif ($user !== null) {
+            // 确认用户的权限。
             return $this->ensureUserCredentials($scopes, $client, $user);
         }
         
@@ -53,7 +53,12 @@ trait ScopeRepositoryTrait
      */
     protected function ensureClientCredentials(array $scopes, ClientEntityInterface $client)
     {
-        return $this->ensureScopes($scopes, $client);
+        $clientScopes = $client->getScopeEntities();
+        if ($clientScopes === null) {
+            return $scopes;
+        }
+        
+        return $this->ensureScopes($scopes, $clientScopes);
     }
     
     /**
@@ -66,39 +71,38 @@ trait ScopeRepositoryTrait
      */
     protected function ensureUserCredentials(array $scopes, ClientEntityInterface $client, UserEntityInterface $user)
     {
-        return $this->ensureScopes($scopes, $user);
+        $userScopes = $user->getScopeEntities();
+        if ($userScopes === null) {
+            return $scopes;
+        }
+        
+        return $this->ensureScopes($scopes, $userScopes);
     }
 
     /**
      * 确认客户端或者用户的有效权限。
      *
      * @param ScopeEntityInterface[] $scopes 请求的权限列表。
-     * @param ClientEntityInterface|UserEntityInterface $entity 客户端或者用户。
+     * @param ScopeEntityInterface[] $entityScopes 客户端或者用户的全部权限列表。
      * @return ScopeEntityInterface[] 有效的权限列表。
      */
-    protected function ensureScopes(array $scopes, $entity)
+    protected function ensureScopes(array $scopes, array $entityScopes)
     {
-        if (empty($scopes)) {
-            // 如果没有请求权限，使用默认权限。
-            return $entity->getDefaultScopeEntities();
+        $indexScopes = [];
+        foreach ($scopes as $scope) {
+            $indexScopes[$scope->getIdentifier()] = $scope;
         }
         
-        // 使用标识索引权限数组。
-        $scopes = ArrayHelper::index($scopes, function ($element) {
-            /* @var $element ScopeEntityInterface */
-            return $element->getIdentifier();
-        });
-        
-        // 获取使用标识索引的全部权限的数组。
-        $scopeEntities = ArrayHelper::index($entity->getScopeEntities(), function ($element) {
-            /* @var $element ScopeEntityInterface */
-            return $element->getIdentifier();
-        });
+        $indexEntityScopes = [];
+        foreach ($entityScopes as $entityScope) {
+            $indexEntityScopes[$entityScope->getIdentifier()] = $entityScope;
+        }
         
         // 检查权限是否有效。
         $result = [];
-        foreach ($scopes as $identifier => $scope) {
-            if (isset($scopeEntities[$identifier])) {
+        /* @var $scope ScopeEntityInterface */
+        foreach ($indexScopes as $identifier => $scope) {
+            if (isset($indexEntityScopes[$identifier])) {
                 $result[] = $scope;
             }
         }

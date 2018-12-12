@@ -7,7 +7,7 @@
 namespace devjerry\yii2\oauth2\server\entities;
 
 use devjerry\oauth2\server\interfaces\AccessTokenEntityInterface;
-use devjerry\yii2\oauth2\server\entities\traits\AccessTokenEntityTrait;
+use devjerry\oauth2\server\traits\AccessTokenEntityTrait;
 
 /**
  * AccessTokenEntity class.

@@ -7,8 +7,8 @@
 namespace devjerry\yii2\oauth2\server\repositories;
 
 use devjerry\oauth2\server\interfaces\ScopeRepositoryInterface;
+use devjerry\oauth2\server\traits\ScopeRepositoryTrait;
 use devjerry\yii2\oauth2\server\entities\ScopeEntity;
-use devjerry\yii2\oauth2\server\repositories\traits\ScopeRepositoryTrait;
 
 /**
  * ScopeRepository class.

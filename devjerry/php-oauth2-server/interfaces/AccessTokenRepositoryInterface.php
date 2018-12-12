@@ -24,6 +24,13 @@ interface AccessTokenRepositoryInterface
     public function createAccessTokenEntity();
     
     /**
+     * 生成访问令牌唯一标识。
+     * 
+     * @return string 访问令牌唯一标识。
+     */
+    public function generateAccessTokenUniqueIdentifier();
+    
+    /**
      * 保存访问令牌。
      * 
      * @param AccessTokenEntityInterface $accessTokenEntity 访问令牌。

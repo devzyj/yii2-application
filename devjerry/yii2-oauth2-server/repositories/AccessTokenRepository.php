@@ -9,8 +9,8 @@ namespace devjerry\yii2\oauth2\server\repositories;
 use Yii;
 use devjerry\oauth2\server\interfaces\AccessTokenRepositoryInterface;
 use devjerry\oauth2\server\interfaces\AccessTokenEntityInterface;
+use devjerry\oauth2\server\traits\AccessTokenRepositoryTrait;
 use devjerry\yii2\oauth2\server\entities\AccessTokenEntity;
-use devjerry\yii2\oauth2\server\repositories\traits\AccessTokenRepositoryTrait;
 
 /**
  * AccessTokenRepository class.
@@ -29,6 +29,12 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
     {
         return Yii::createObject(AccessTokenEntity::class);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function generateAccessTokenUniqueIdentifier()
+    {}
     
     /**
      * {@inheritdoc}

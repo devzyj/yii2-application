@@ -20,9 +20,9 @@ class ServerRequest extends \yii\web\Request implements ServerRequestInterface
     /**
      * {@inheritdoc}
      */
-    public function getHeader($name)
+    public function getHeaders()
     {
-        return $this->getHeaders()->get($name, [], false);
+        return $this->getHeaders()->toArray();
     }
 
     /**
@@ -31,5 +31,13 @@ class ServerRequest extends \yii\web\Request implements ServerRequestInterface
     public function getParsedBody()
     {
         return $this->getBodyParams();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getServerParams()
+    {
+        return $_SERVER;
     }
 }

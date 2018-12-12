@@ -7,20 +7,16 @@
 namespace devjerry\oauth2\server\grants;
 
 use devjerry\oauth2\server\exceptions\OAuthServerException;
-use devjerry\oauth2\server\interfaces\GrantTypeInterface;
 use devjerry\oauth2\server\interfaces\ServerRequestInterface;
-use devjerry\oauth2\server\interfaces\AccessTokenRepositoryInterface;
-use devjerry\oauth2\server\interfaces\AuthorizationCodeRepositoryInterface;
-use devjerry\oauth2\server\interfaces\ClientRepositoryInterface;
-use devjerry\oauth2\server\interfaces\RefreshTokenRepositoryInterface;
-use devjerry\oauth2\server\interfaces\ScopeRepositoryInterface;
-use devjerry\oauth2\server\interfaces\UserRepositoryInterface;
 use devjerry\oauth2\server\interfaces\AccessTokenEntityInterface;
 use devjerry\oauth2\server\interfaces\ClientEntityInterface;
 use devjerry\oauth2\server\interfaces\RefreshTokenEntityInterface;
 use devjerry\oauth2\server\interfaces\ScopeEntityInterface;
 use devjerry\oauth2\server\interfaces\UserEntityInterface;
 use devjerry\oauth2\server\exceptions\UniqueIdentifierException;
+use devjerry\oauth2\server\base\RepositoryTrait;
+use devjerry\oauth2\server\base\ServerRequestTrait;
+use devjerry\oauth2\server\base\GenerateUniqueIdentifierTrait;
 
 /**
  * AbstractGrant class.
@@ -30,6 +26,8 @@ use devjerry\oauth2\server\exceptions\UniqueIdentifierException;
  */
 abstract class AbstractGrant implements GrantTypeInterface
 {
+    use RepositoryTrait, ServerRequestTrait, GenerateUniqueIdentifierTrait;
+    
     /**
      * @var string 授权码模式。
      */
@@ -61,36 +59,6 @@ abstract class AbstractGrant implements GrantTypeInterface
     const GENERATE_IDENDIFIER_MAX = 10;
     
     /**
-     * @var AccessTokenRepositoryInterface 访问令牌存储库。
-     */
-    private $_accessTokenRepository;
-
-    /**
-     * @var AuthorizationCodeRepositoryInterface 授权码存储库。
-     */
-    private $_authorizationCodeRepository;
-    
-    /**
-     * @var ClientRepositoryInterface 客户端存储库。
-     */
-    private $_clientRepository;
-
-    /**
-     * @var RefreshTokenRepositoryInterface 更新令牌存储库。
-     */
-    private $_refreshTokenRepository;
-    
-    /**
-     * @var ScopeRepositoryInterface 权限存储库。
-     */
-    private $_scopeRepository;
-
-    /**
-     * @var UserRepositoryInterface 用户存储库。
-     */
-    private $_userRepository;
-
-    /**
      * @var mixed 访问令牌密钥。
      */
     private $_accessTokenCryptKey;
@@ -101,125 +69,20 @@ abstract class AbstractGrant implements GrantTypeInterface
     private $_refreshTokenCryptKey;
     
     /**
-     * 获取访问令牌存储库。
-     *
-     * @return AccessTokenRepositoryInterface
+     * @var integer 访问令牌持续时间（秒）。
      */
-    public function getAccessTokenRepository()
-    {
-        return $this->_accessTokenRepository;
-    }
+    private $_accessTokenDuration;
 
     /**
-     * 设置访问令牌存储库。
-     *
-     * @param AccessTokenRepositoryInterface $accessTokenRepository
+     * @var integer 更新令牌持续时间（秒）。
      */
-    public function setAccessTokenRepository(AccessTokenRepositoryInterface $accessTokenRepository)
-    {
-        $this->_accessTokenRepository = $accessTokenRepository;
-    }
+    private $_refreshTokenDuration;
     
     /**
-     * 获取授权码存储库。
-     *
-     * @return AuthorizationCodeRepositoryInterface
+     * @var string[] 默认权限。
      */
-    public function getAuthorizationCodeRepository()
-    {
-        return $this->_authorizationCodeRepository;
-    }
-
-    /**
-     * 设置授权码存储库。
-     *
-     * @param AuthorizationCodeRepositoryInterface $authorizationCodeRepository
-     */
-    public function setAuthorizationCodeRepository(AuthorizationCodeRepositoryInterface $authorizationCodeRepository)
-    {
-        $this->_authorizationCodeRepository = $authorizationCodeRepository;
-    }
+    private $_defaultScopes = [];
     
-    /**
-     * 获取客户端存储库。
-     *
-     * @return ClientRepositoryInterface
-     */
-    public function getClientRepository()
-    {
-        return $this->_clientRepository;
-    }
-
-    /**
-     * 设置客户端存储库。
-     *
-     * @param ClientRepositoryInterface $clientRepository
-     */
-    public function setClientRepository(ClientRepositoryInterface $clientRepository)
-    {
-        $this->_clientRepository = $clientRepository;
-    }
-    
-    /**
-     * 获取更新令牌存储库。
-     *
-     * @return RefreshTokenRepositoryInterface
-     */
-    public function getRefreshTokenRepository()
-    {
-        return $this->_refreshTokenRepository;
-    }
-
-    /**
-     * 设置更新令牌存储库。
-     *
-     * @param RefreshTokenRepositoryInterface $refreshTokenRepository
-     */
-    public function setRefreshTokenRepository(RefreshTokenRepositoryInterface $refreshTokenRepository)
-    {
-        $this->_refreshTokenRepository = $refreshTokenRepository;
-    }
-    
-    /**
-     * 获取权限存储库。
-     *
-     * @return ScopeRepositoryInterface
-     */
-    public function getScopeRepository()
-    {
-        return $this->_scopeRepository;
-    }
-
-    /**
-     * 设置权限存储库。
-     *
-     * @param ScopeRepositoryInterface $scopeRepository
-     */
-    public function setScopeRepository(ScopeRepositoryInterface $scopeRepository)
-    {
-        $this->_scopeRepository = $scopeRepository;
-    }
-    
-    /**
-     * 获取用户存储库。
-     *
-     * @return UserRepositoryInterface
-     */
-    public function getUserRepository()
-    {
-        return $this->_userRepository;
-    }
-
-    /**
-     * 设置用户存储库。
-     *
-     * @param UserRepositoryInterface $userRepository
-     */
-    public function setUserRepository(UserRepositoryInterface $userRepository)
-    {
-        $this->_userRepository = $userRepository;
-    }
-
     /**
      * 获取访问令牌密钥。
      *
@@ -259,6 +122,66 @@ abstract class AbstractGrant implements GrantTypeInterface
     {
         $this->_refreshTokenCryptKey = $key;
     }
+
+    /**
+     * 获取默认权限。
+     *
+     * @return string[]
+     */
+    public function getDefaultScopes()
+    {
+        return $this->_defaultScopes;
+    }
+    
+    /**
+     * 设置默认权限。
+     *
+     * @param string[] $scopes
+     */
+    public function setDefaultScopes(array $scopes)
+    {
+        $this->_defaultScopes = $scopes;
+    }
+
+    /**
+     * 获取访问令牌持续时间。
+     *
+     * @return integer 持续的秒数。
+     */
+    public function getAccessTokenDuration()
+    {
+        return $this->_accessTokenDuration;
+    }
+    
+    /**
+     * 设置访问令牌持续时间。
+     * 
+     * @param integer $duration 以秒为单位的持续时间。
+     */
+    public function setAccessTokenDuration($duration)
+    {
+        $this->_accessTokenDuration = $duration;
+    }
+
+    /**
+     * 获取更新令牌持续时间。
+     *
+     * @return integer 持续的秒数。
+     */
+    public function getRefreshTokenDuration()
+    {
+        return $this->_refreshTokenDuration;
+    }
+    
+    /**
+     * 设置更新令牌持续时间。
+     *
+     * @param integer $duration 以秒为单位的持续时间。
+     */
+    public function setRefreshTokenDuration($duration)
+    {
+        $this->_refreshTokenDuration = $duration;
+    }
     
     /**
      * {@inheritdoc}
@@ -267,65 +190,6 @@ abstract class AbstractGrant implements GrantTypeInterface
     {
         $grantType = $this->getRequestBodyParam($request, 'grant_type');
         return $this->getIdentifier() === $grantType;
-    }
-
-    /**
-     * 获取请求的实体参数。
-     *
-     * @param ServerRequestInterface $request 服务器请求。
-     * @param string $name 参数名称。
-     * @param mixed $default 默认值。
-     * @return null|string
-     */
-    protected function getRequestBodyParam(ServerRequestInterface $request, $name, $default = null)
-    {
-        $params = (array) $request->getParsedBody();
-        return isset($params[$name]) ? $params[$name] : $default;
-    }
-    
-    /**
-     * 获取请求的查询字符串参数。
-     *
-     * @param ServerRequestInterface $request 服务器请求。
-     * @param string $name 参数名称。
-     * @param mixed $default 默认值。
-     * @return null|string
-     */
-    protected function getRequestQueryParam(ServerRequestInterface $request, $name, $default = null)
-    {
-        $params = (array) $request->getQueryParams();
-        return isset($params[$name]) ? $params[$name] : $default;
-    }
-    
-    /**
-     * 使用请求的授权头检索 HTTP 基本身份验证凭据。
-     * 返回数组的第一个索引是用户名，第二个是密码。
-     * 如果报头不存在，或者是无效的 HTTP 基本报头，则返回 [null, null]。
-     *
-     * @param ServerRequestInterface $request 服务器请求。
-     * @return string[]|null[]
-     */
-    protected function getRequestAuthCredentials(ServerRequestInterface $request)
-    {
-        $authorization = $request->getHeader('Authorization');
-        if (empty($authorization)) {
-            return [null, null];
-        }
-        
-        $header = reset($authorization);
-        if (strpos($header, 'Basic ') !== 0) {
-            return [null, null];
-        }
-    
-        if (!($decoded = base64_decode(substr($header, 6)))) {
-            return [null, null];
-        }
-    
-        if (strpos($decoded, ':') === false) {
-            return [null, null]; // HTTP Basic header without colon isn't valid
-        }
-    
-        return explode(':', $decoded, 2);
     }
 
     /**
@@ -385,10 +249,10 @@ abstract class AbstractGrant implements GrantTypeInterface
     }
     
     /**
-     * 验证客户端是否允许使用当前的授权类型。
+     * 验证客户端是否允许使用当前的权限授予类型。
      * 
      * @param ClientEntityInterface $client 客户端。
-     * @throws OAuthServerException 禁止的授权类型。
+     * @throws OAuthServerException 禁止的权限授予类型。
      */
     protected function validateClientGrantType(ClientEntityInterface $client)
     {
@@ -397,24 +261,42 @@ abstract class AbstractGrant implements GrantTypeInterface
             throw new OAuthServerException(403, 'The grant type is unauthorized for this client.');
         }
     }
+    
+    /**
+     * 通过客户端或者用户，确定最终使用的默认权限。
+     * 
+     * @param ClientEntityInterface|UserEntityInterface $entity 客户端或者用户实例。
+     * @return ScopeEntityInterface[]|string[] 权限实例列表，或者权限标识列表。
+     * @see ClientEntityInterface::getDefaultScopeEntities()
+     * @see UserEntityInterface::getDefaultScopeEntities()
+     */
+    protected function ensureDefaultScopes($entity)
+    {
+        $entityDefaultScopes = $entity->getDefaultScopeEntities();
+        if (is_array($entityDefaultScopes)) {
+            return $entityDefaultScopes;
+        }
+        
+        return $this->getDefaultScopes();
+    }
 
     /**
      * 获取请求的权限。
      * 
      * @param ServerRequestInterface $request 服务器请求。
-     * @param string|string[] $default 默认权限。多个权限可以是数组，也可以是以 [[SELF::SCOPE_SEPARATOR]] 分隔的字符串。
+     * @param ScopeEntityInterface[]|string[] $default 默认权限。
      * @return ScopeEntityInterface[] 权限列表。
      */
-    protected function getRequestedScopes(ServerRequestInterface $request, $default = null)
+    protected function getRequestedScopes(ServerRequestInterface $request, array $default = null)
     {
         $requestedScopes = $this->getRequestBodyParam($request, 'scope', $default);
-        if ($requestedScopes) {
-            if (!is_array($requestedScopes)) {
-                $requestedScopes = array_filter(explode(self::SCOPE_SEPARATOR, trim($requestedScopes)), function ($scope) {
-                    return $scope !== '';
-                });
-            }
-            
+        if (is_string($requestedScopes)) {
+            $requestedScopes = array_filter(explode(self::SCOPE_SEPARATOR, trim($requestedScopes)), function ($scope) {
+                return $scope !== '';
+            });
+        }
+        
+        if (is_array($requestedScopes)) {
             return $this->validateScopes($requestedScopes);
         }
         
@@ -424,7 +306,7 @@ abstract class AbstractGrant implements GrantTypeInterface
     /**
      * 验证权限。
      * 
-     * @param string[] $scopes 需要验证的权限标识。
+     * @param ScopeEntityInterface[]|string[] $scopes 需要验证的权限标识。
      * @return ScopeEntityInterface[] 验证有效的权限。
      * @throws OAuthServerException 权限无效。
      */
@@ -432,12 +314,14 @@ abstract class AbstractGrant implements GrantTypeInterface
     {
         $validScopes = [];
         foreach ($scopes as $scope) {
-            if (!isset($validScopes[$scope])) {
+            if ($scope instanceof ScopeEntityInterface) {
+                $validScopes[$scope->getIdentifier()] = $scope;
+            } elseif (is_string($scope) && !isset($validScopes[$scope])) {
                 $scopeEntity = $this->getScopeRepository()->getScopeEntity($scope);
                 if (!$scopeEntity instanceof ScopeEntityInterface) {
                     throw new OAuthServerException('Scope is invalid.');
                 }
-        
+
                 $validScopes[$scope] = $scopeEntity;
             }
         }
@@ -456,7 +340,8 @@ abstract class AbstractGrant implements GrantTypeInterface
      */
     protected function generateAccessToken(array $scopes, ClientEntityInterface $client, UserEntityInterface $user = null)
     {
-        $accessToken = $this->getAccessTokenRepository()->createAccessTokenEntity();
+        $accessTokenRepository = $this->getAccessTokenRepository();
+        $accessToken = $accessTokenRepository->createAccessTokenEntity();
 
         // 添加权限。
         foreach ($scopes as $scope) {
@@ -472,17 +357,27 @@ abstract class AbstractGrant implements GrantTypeInterface
         }
 
         // 设置过期时间。
-        $accessToken->setExpires(time() + $client->getAccessTokenDuration());
+        $duration = $client->getAccessTokenDuration();
+        if ($duration === null) {
+            $duration = $this->getAccessTokenDuration();
+        }
+        $accessToken->setExpires(time() + (int) $duration);
         
         // 生成唯一标识，并保存令牌。
         $count = self::GENERATE_IDENDIFIER_MAX;
         while ($count-- > 0) {
-            // 生成并设置唯一标识。
-            $accessToken->setIdentifier($this->generateUniqueIdentifier());
-            
+            // 生成唯一标识。
+            $identifier = $accessTokenRepository->generateAccessTokenUniqueIdentifier();
+            if ($identifier === null) {
+                $identifier = $this->generateUniqueIdentifier();
+            }
+
+            // 设置唯一标识。
+            $accessToken->setIdentifier($identifier);
+        
             try {
                 // 保存令牌。
-                $this->getAccessTokenRepository()->saveAccessTokenEntity($accessToken);
+                $accessTokenRepository->saveAccessTokenEntity($accessToken);
                 
                 // 返回保存成功的令牌。
                 return $accessToken;
@@ -503,7 +398,8 @@ abstract class AbstractGrant implements GrantTypeInterface
      */
     protected function generateRefreshToken(AccessTokenEntityInterface $accessToken)
     {
-        $refreshToken = $this->getRefreshTokenRepository()->createRefreshTokenEntity();
+        $refreshTokenRepository = $this->getRefreshTokenRepository();
+        $refreshToken = $refreshTokenRepository->createRefreshTokenEntity();
         
         // 设置关联的访问令牌。
         $refreshToken->setAccessTokenEntity($accessToken);
@@ -523,19 +419,29 @@ abstract class AbstractGrant implements GrantTypeInterface
         foreach ($scopes as $scope) {
             $refreshToken->addScopeIdentifier($scope->getIdentifier());
         }
-        
-        // 设置过期时间。
-        $refreshToken->setExpires(time() + $client->getRefreshTokenDuration());
 
+        // 设置过期时间。
+        $duration = $client->getRefreshTokenDuration();
+        if ($duration === null) {
+            $duration = $this->getRefreshTokenDuration();
+        }
+        $refreshToken->setExpires(time() + (int) $duration);
+        
         // 生成唯一标识，并保存令牌。
         $count = self::GENERATE_IDENDIFIER_MAX;
         while ($count-- > 0) {
-            // 生成并设置唯一标识。
-            $refreshToken->setIdentifier($this->generateUniqueIdentifier());
+            // 生成唯一标识。
+            $identifier = $refreshTokenRepository->generateRefreshTokenUniqueIdentifier();
+            if ($identifier === null) {
+                $identifier = $this->generateUniqueIdentifier();
+            }
+
+            // 设置唯一标识。
+            $refreshToken->setIdentifier($identifier);
         
             try {
                 // 保存令牌。
-                $this->getRefreshTokenRepository()->saveRefreshTokenEntity($refreshToken);
+                $refreshTokenRepository->saveRefreshTokenEntity($refreshToken);
         
                 // 返回保存成功的令牌。
                 return $refreshToken;
@@ -544,26 +450,6 @@ abstract class AbstractGrant implements GrantTypeInterface
                     throw $e;
                 }
             }
-        }
-    }
-    
-    /**
-     * 生成唯一标识。
-     * 
-     * @param int $length 长度。
-     * @return string 唯一标识。
-     * @throws OAuthServerException 生成失败。
-     */
-    protected function generateUniqueIdentifier($length = 40)
-    {
-        try {
-            return bin2hex(random_bytes($length));
-        } catch (\TypeError $e) {
-            throw new OAuthServerException(500, 'An unexpected error has occurred.');
-        } catch (\Error $e) {
-            throw new OAuthServerException(500, 'An unexpected error has occurred.');
-        } catch (\Exception $e) {
-            throw new OAuthServerException(500, 'Could not generate a random string.');
         }
     }
     

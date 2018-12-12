@@ -22,6 +22,13 @@ interface AuthorizationCodeRepositoryInterface
      * @return AuthorizationCodeEntityInterface 新的授权码实例。
      */
     public function createAuthorizationCodeEntity();
+
+    /**
+     * 生成授权码唯一标识。
+     *
+     * @return string 授权码唯一标识。
+     */
+    public function generateAuthorizationCodeUniqueIdentifier();
     
     /**
      * 保存授权码。

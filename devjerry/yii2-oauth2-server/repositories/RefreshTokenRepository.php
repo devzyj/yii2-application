@@ -9,8 +9,8 @@ namespace devjerry\yii2\oauth2\server\repositories;
 use Yii;
 use devjerry\oauth2\server\interfaces\RefreshTokenRepositoryInterface;
 use devjerry\oauth2\server\interfaces\RefreshTokenEntityInterface;
+use devjerry\oauth2\server\traits\RefreshTokenRepositoryTrait;
 use devjerry\yii2\oauth2\server\entities\RefreshTokenEntity;
-use devjerry\yii2\oauth2\server\repositories\traits\RefreshTokenRepositoryTrait;
 
 /**
  * RefreshTokenRepository class.
@@ -29,6 +29,12 @@ class RefreshTokenRepository implements RefreshTokenRepositoryInterface
     {
         return Yii::createObject(RefreshTokenEntity::class);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function generateRefreshTokenUniqueIdentifier()
+    {}
     
     /**
      * {@inheritdoc}

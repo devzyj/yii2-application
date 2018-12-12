@@ -22,30 +22,30 @@ interface ClientEntityInterface
     public function getIdentifier();
 
     /**
-     * 获取客户端授权类型。
+     * 获取客户端回调地址。
+     *
+     * @return string|string[]
+     */
+    public function getRedirectUri();
+    
+    /**
+     * 获取客户端权限授予类型。
      * 
      * @return string[]|null 如果返回 `null`，则不进行验证。
      */
     public function getGrantTypes();
 
     /**
-     * 获取客户端回调地址。
-     *
-     * @return string|string[]
-     */
-    public function getRedirectUri();
-
-    /**
      * 获取访问令牌的持续时间（秒）。
      * 
-     * @return integer
+     * @return integer|null 如果返回 `null`，则使用设置的全局时间。
      */
     public function getAccessTokenDuration();
 
     /**
      * 获取更新令牌的持续时间（秒）。
      *
-     * @return integer
+     * @return integer|null 如果返回 `null`，则使用设置的全局时间。
      */
     public function getRefreshTokenDuration();
     

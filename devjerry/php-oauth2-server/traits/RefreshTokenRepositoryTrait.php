@@ -1,23 +1,22 @@
 <?php
 /**
- * @link https://github.com/devzyj/yii2-oauth2-server
+ * @link https://github.com/devzyj/php-oauth2-server
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace devjerry\yii2\oauth2\server\repositories\traits;
+namespace devjerry\oauth2\server\traits;
 
-use Yii;
-use yii\helpers\Json;
-use yii\helpers\ArrayHelper;
-use yii\base\InvalidArgumentException;
-use yii\web\UnauthorizedHttpException;
 use Defuse\Crypto\Crypto;
 use Defuse\Crypto\Key;
 use Defuse\Crypto\Exception\WrongKeyOrModifiedCiphertextException;
 use devjerry\oauth2\server\interfaces\RefreshTokenEntityInterface;
+use devjerry\oauth2\server\base\ArrayHelper;
+use devjerry\oauth2\server\exceptions\OAuthServerException;
 
 /**
- * RefreshTokenRepositoryTrait
+ * RefreshTokenRepositoryTrait 提供了序列化和反序列化更新令牌的方法。
+ * 
+ * 使用 `defuse/php-encryption` 库，加密和解密更新令牌。
  *
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
@@ -28,14 +27,17 @@ trait RefreshTokenRepositoryTrait
      * 序列化更新令牌，用于最终的响应结果。
      *
      * @param RefreshTokenEntityInterface $refreshTokenEntity 更新令牌。
-     * @param mixed $cryptKey 更新令牌密钥。
+     * @param array $cryptKey 更新令牌密钥。数组可以指定以下三个元素中的一个：
+     *     - `ascii` 使用 `vendor/bin/generate-defuse-key` 生成的字符串。
+     *     - `path` 保存了 `vendor/bin/generate-defuse-key` 生成的字符串的文件路径。
+     *     - `password` 任意字符串。
      * @return string
      */
     public function serializeRefreshTokenEntity(RefreshTokenEntityInterface $refreshTokenEntity, $cryptKey)
     {
         $accessToken = $refreshTokenEntity->getAccessTokenEntity();
         
-        $refreshTokenData = Json::encode([
+        $refreshTokenData = json_encode([
             'refresh_token_id' => $refreshTokenEntity->getIdentifier(),
             'access_token_id' => $accessToken->getIdentifier(),
             'client_id' => $refreshTokenEntity->getClientIdentifier(),
@@ -49,7 +51,7 @@ trait RefreshTokenRepositoryTrait
             $key = Key::loadFromAsciiSafeString($cryptKey['ascii']);
             return Crypto::encrypt($refreshTokenData, $key);
         } elseif (isset($cryptKey['path'])) {
-            $ascii = file_get_contents(Yii::getAlias($cryptKey['path']));
+            $ascii = file_get_contents($cryptKey['path']);
             $key = Key::loadFromAsciiSafeString($ascii);
             return Crypto::encrypt($refreshTokenData, $key);
         } elseif (isset($cryptKey['password'])) {
@@ -64,9 +66,12 @@ trait RefreshTokenRepositoryTrait
      * 反序列化更新令牌，用于从请求中接收到的更新令牌。
      *
      * @param string $serializedRefreshToken 已序列化的更新令牌。
-     * @param mixed $cryptKey 更新令牌密钥。
+     * @param array $cryptKey 更新令牌密钥。数组可以指定以下三个元素中的一个：
+     *     - `ascii` 使用 `vendor/bin/generate-defuse-key` 生成的字符串。
+     *     - `path` 保存了 `vendor/bin/generate-defuse-key` 生成的字符串的文件路径。
+     *     - `password` 任意字符串。
      * @return RefreshTokenEntityInterface 更新令牌实例。
-     * @throws UnauthorizedHttpException 更新令牌无效。
+     * @throws OAuthServerException 更新令牌无效。
      */
     public function unserializeRefreshTokenEntity($serializedRefreshToken, $cryptKey)
     {
@@ -76,7 +81,7 @@ trait RefreshTokenRepositoryTrait
                 $key = Key::loadFromAsciiSafeString($cryptKey['ascii']);
                 $serializedRefreshToken = Crypto::decrypt($serializedRefreshToken, $key);
             } elseif (isset($cryptKey['path'])) {
-                $ascii = file_get_contents(Yii::getAlias($cryptKey['path']));
+                $ascii = file_get_contents($cryptKey['path']);
                 $key = Key::loadFromAsciiSafeString($ascii);
                 $serializedRefreshToken = Crypto::decrypt($serializedRefreshToken, $key);
             } elseif (isset($cryptKey['password'])) {
@@ -84,7 +89,10 @@ trait RefreshTokenRepositoryTrait
                 $serializedRefreshToken = Crypto::decryptWithPassword($serializedRefreshToken, $key);
             }
             
-            $data = Json::decode($serializedRefreshToken);
+            $data = json_decode($serializedRefreshToken, true);
+            if (empty($data)) {
+                return null;
+            }
             
             // 创建更新令牌实例。
             $refreshToken = $this->createRefreshTokenEntity();
@@ -102,9 +110,14 @@ trait RefreshTokenRepositoryTrait
             
             return $refreshToken;
         } catch (WrongKeyOrModifiedCiphertextException $e) {
-            throw new UnauthorizedHttpException('Refresh token is invalid.', 0, $e);
-        } catch (InvalidArgumentException $e) {
-            throw new UnauthorizedHttpException('Refresh token is invalid.', 0, $e);
+            throw new OAuthServerException(401, 'Refresh token is invalid.', 0, $e);
         }
     }
+    
+    /**
+     * 创建新的更新令牌实例。
+     * 
+     * @return RefreshTokenEntityInterface 新的更新令牌实例。
+     */
+    abstract public function createRefreshTokenEntity();
 }
