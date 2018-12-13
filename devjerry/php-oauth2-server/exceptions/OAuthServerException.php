@@ -7,7 +7,7 @@
 namespace devjerry\oauth2\server\exceptions;
 
 /**
- * OAuthServerException 是授权服务器的异常类。
+ * OAuthServerException 授权服务器异常类。
  * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0

@@ -45,56 +45,84 @@ interface AuthorizationCodeEntityInterface
     /**
      * 获取授权码的回调地址。
      *
-     * @return string|null 回调地址。
+     * @return string 回调地址。
      */
     public function getRedirectUri();
     
     /**
      * 设置授权码的回调地址。
      *
-     * @param string $uri 回调地址。
+     * @param string $redirectUri 回调地址。
      */
-    public function setRedirectUri($uri);
-    
-    /**
-     * 获取与授权码关联的客户端。
-     *
-     * @return ClientEntityInterface 客户端实例。
-     */
-    public function getClientEntity();
-    
-    /**
-     * 设置与授权码关联的客户端。
-     * 
-     * @param ClientEntityInterface $clientEntity 客户端实例。
-     */
-    public function setClientEntity(ClientEntityInterface $clientEntity);
+    public function setRedirectUri($redirectUri);
 
     /**
-     * 获取与授权码关联的用户。
+     * 获取与授权码关联的客户端标识。
      *
-     * @return UserEntityInterface 用户实例。
+     * @return string 客户端标识。
      */
-    public function getUserEntity();
+    public function getClientIdentifier();
     
     /**
-     * 设置与授权码关联的用户。
+     * 设置与授权码关联的客户端标识。
      *
-     * @param UserEntityInterface $userEntity 用户实例。
+     * @param string $clientIdentifier 客户端标识。
      */
-    public function setUserEntity(UserEntityInterface $userEntity);
+    public function setClientIdentifier($clientIdentifier);
+    
+    /**
+     * 获取与授权码关联的用户标识。
+     *
+     * @return string 用户标识。
+     */
+    public function getUserIdentifier();
+    
+    /**
+     * 设置与授权码关联的用户标识。
+     *
+     * @param string $userIdentifier 用户标识。
+     */
+    public function setUserIdentifier($userIdentifier);
+    
+    /**
+     * 获取与授权码关联的权限标识符。
+     *
+     * @return string[] 权限标识符列表。
+     */
+    public function getScopeIdentifiers();
+    
+    /**
+     * 添加与授权码关联的权限标识符。
+     *
+     * @param string $scopeIdentifier 权限标识符。
+     */
+    public function addScopeIdentifier($scopeIdentifier);
+    
+    /**
+     * 获取交换验证代码。
+     *
+     * @return string 交换验证代码。
+     */
+    public function getCodeChallenge();
+    
+    /**
+     * 设置交换验证代码。
+     *
+     * @param string $codeChallenge 交换验证代码。
+     */
+    public function setCodeChallenge($codeChallenge);
 
     /**
-     * 获取与授权码关联的权限。
+     * 获取交换验证方法。
      *
-     * @return ScopeEntityInterface[] 权限实例列表。
+     * @return string 交换验证方法。
      */
-    public function getScopeEntities();
-
+    public function getCodeChallengeMethod();
+    
     /**
-     * 添加与授权码关联的权限。
-     * 
-     * @param ScopeEntityInterface $scopeEntity 权限实例。
+     * 设置交换验证方法。
+     *
+     * @param string $codeChallengeMethod 交换验证方法。
      */
-    public function addScopeEntity(ScopeEntityInterface $scopeEntity);
+    public function setCodeChallengeMethod($codeChallengeMethod);
 }

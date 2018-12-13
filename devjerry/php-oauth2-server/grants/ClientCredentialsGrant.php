@@ -7,6 +7,7 @@
 namespace devjerry\oauth2\server\grants;
 
 use devjerry\oauth2\server\interfaces\ServerRequestInterface;
+use devjerry\oauth2\server\interfaces\ClientEntityInterface;
 
 /**
  * ClientCredentialsGrant class.
@@ -27,15 +28,9 @@ class ClientCredentialsGrant extends AbstractGrant
     /**
      * {@inheritdoc}
      */
-    public function run(ServerRequestInterface $request)
+    protected function runGrant(ServerRequestInterface $request, ClientEntityInterface $client)
     {
-        // 获取正在请求授权的客户端。
-        $client = $this->getAuthorizeClient($request);
-
-        // 验证客户端是否允许使用当前的权限授予类型。
-        $this->validateClientGrantType($client);
-        
-        // 获取请求中的权限。
+        // 获取请求的权限。
         $requestedScopes = $this->getRequestedScopes($request, $this->ensureDefaultScopes($client));
         
         // 确定最终授予的权限列表。

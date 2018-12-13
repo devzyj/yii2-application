@@ -7,6 +7,7 @@
 namespace devjerry\oauth2\server\authorizes;
 
 use devjerry\oauth2\server\interfaces\ServerRequestInterface;
+use devjerry\oauth2\server\exceptions\UserDeniedAuthorizeException;
 
 /**
  * 授权类型接口。
@@ -22,6 +23,13 @@ interface AuthorizeTypeInterface
      * @return string 授权标识。
      */
     public function getIdentifier();
+
+    /**
+     * 获取授予标识。
+     *
+     * @return string 授予标识。
+     */
+    public function getGrantIdentifier();
     
     /**
      * 是否可以运行授权。
@@ -43,14 +51,8 @@ interface AuthorizeTypeInterface
      * 运行授权。
      *
      * @param AuthorizeRequestInterface $authorizeRequest 授权请求。
-     * @return array 回调地址信息。
+     * @return string 回调地址。
+     * @throws UserDeniedAuthorizeException 用户拒绝授权。
      */
     public function run(AuthorizeRequestInterface $authorizeRequest);
-
-    /**
-     * 获取与授权类型有关的授予类型标识。
-     *
-     * @return string 授予标识。
-     */
-    public function getGrantIdentifier();
 }

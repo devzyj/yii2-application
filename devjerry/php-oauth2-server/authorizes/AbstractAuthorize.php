@@ -9,7 +9,9 @@ namespace devjerry\oauth2\server\authorizes;
 use devjerry\oauth2\server\base\AbstractAuthorizeGrant;
 use devjerry\oauth2\server\interfaces\ServerRequestInterface;
 use devjerry\oauth2\server\interfaces\ClientEntityInterface;
+use devjerry\oauth2\server\interfaces\UserEntityInterface;
 use devjerry\oauth2\server\exceptions\OAuthServerException;
+use devjerry\oauth2\server\exceptions\UserDeniedAuthorizeException;
 
 /**
  * AbstractAuthorize class.
@@ -41,40 +43,40 @@ abstract class AbstractAuthorize extends AbstractAuthorizeGrant implements Autho
         
         // 获取客户端实例。
         $client = $this->getClientByCredentials($clientId);
-        
-        // 验证客户端是否允许使用当前的权限授予类型。
+
+        // 验证客户端是否允许执行指定的权限授予类型。
         $this->validateClientGrantType($client, $this->getGrantIdentifier());
         
         // 获取回调地址。
         $redirectUri = $this->getRequestQueryParam($request, 'redirect_uri');
         
-        // 验证回调地址。
+        // 确认客户端的回调地址。
         $redirectUri = $this->ensureRedirectUri($client, $redirectUri);
         if ($redirectUri === null) {
             throw new OAuthServerException(400, 'Redirect uri is invalid.');
         }
         
-        // 获取请求中的权限。
+        // 获取请求的权限。
         $requestedScopes = $this->getRequestedScopes($request, $this->getDefaultScopes());
 
         // 获取请求的 `state`。
         $requestedState = $this->getRequestQueryParam($request, 'state');
         
         // 实例化授权请求。
-        /* @var $authorizeRequest AuthorizeRequestInterface  */
-        //$authorizeRequest = '';
+        $authorizeRequest = new AuthorizeRequest();
         $authorizeRequest->setAuthorizeType($this);
         $authorizeRequest->setClientEntity($client);
         $authorizeRequest->setRedirectUri($redirectUri);
         $authorizeRequest->setState($requestedState);
         $authorizeRequest->setScopeEntities($requestedScopes);
         
+        // 返回授权请求。
         return $authorizeRequest;
     }
-    
+
     /**
      * 确认客户端的回调地址。
-     * 
+     *
      * @param ClientEntityInterface $client 客户端实例。
      * @param string $redirectUri 请求的回调地址。
      * @return string 回调地址。
@@ -93,7 +95,71 @@ abstract class AbstractAuthorize extends AbstractAuthorizeGrant implements Autho
         } elseif (is_string($clientRedirectUri) && strcmp($clientRedirectUri, $redirectUri) === 0) {
             return $redirectUri;
         }
-        
+    
         return null;
+    }
+
+    /**
+     * 获取请求的权限。
+     *
+     * @param ServerRequestInterface $request 服务器请求。
+     * @param ScopeEntityInterface[]|string[] $default 默认权限。
+     * @return ScopeEntityInterface[] 权限列表。
+     */
+    protected function getRequestedScopes(ServerRequestInterface $request, array $default = null)
+    {
+        $requestedScopes = $this->getRequestQueryParam($request, 'scope', $default);
+        return $this->validateScopes($requestedScopes);
+    }
+    
+    /**
+     * {@inheritdoc}
+     * 
+     * @throws UserDeniedAuthorizeException 用户拒绝授权。
+     */
+    public function run(AuthorizeRequestInterface $authorizeRequest)
+    {
+        if ($authorizeRequest->getUsertEntity() instanceof UserEntityInterface === false) {
+            throw new \LogicException('An instance of UserEntityInterface should be set on the AuthorizationRequest.');
+        }
+
+        if (!$authorizeRequest->getApproved()) {
+            // 用户拒绝授权。
+            $redirectUri = $this->makeRedirectUri($authorizeRequest->getRedirectUri(), [
+                'state' => $authorizeRequest->getState()
+            ]);
+            throw new UserDeniedAuthorizeException($redirectUri);
+        }
+        
+        // 运行用户允许授权的具体方法。
+        return $this->runUserAllowed($authorizeRequest);
+    }
+    
+    /**
+     * 用户允许授权的具体方法。
+     * 
+     * @param AuthorizeRequestInterface $authorizeRequest 授权请求。 
+     * @return string 回调地址。 
+     */
+    abstract protected function runUserAllowed(AuthorizeRequestInterface $authorizeRequest);
+    
+    /**
+     * 构造回调地址。
+     * 
+     * @param string $uri
+     * @param array $params
+     * @return string
+     */
+    public function makeRedirectUri($uri, array $params = [])
+    {
+        $anchor = isset($params['#']) ? '#' . $params['#'] : '';
+        unset($params['#']);
+        
+        $delimiter = '';
+        if ($params) {
+            $delimiter = strpos($uri, '?') === false ? '?' : '&';
+        }
+        
+        return $uri . $delimiter . http_build_query($params) . $anchor;
     }
 }

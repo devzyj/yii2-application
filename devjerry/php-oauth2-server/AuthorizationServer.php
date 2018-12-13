@@ -10,6 +10,7 @@ use devjerry\oauth2\server\authorizes\AuthorizeTypeInterface;
 use devjerry\oauth2\server\authorizes\AuthorizeRequestInterface;
 use devjerry\oauth2\server\grants\GrantTypeInterface;
 use devjerry\oauth2\server\exceptions\OAuthServerException;
+use devjerry\oauth2\server\exceptions\UserDeniedAuthorizeException;
 use devjerry\oauth2\server\interfaces\ServerRequestInterface;
 
 /**
@@ -91,7 +92,8 @@ class AuthorizationServer
      * 运行授权。
      * 
      * @param AuthorizeRequestInterface $authorizeRequest 授权请求。
-     * @return array 回调地址信息。
+     * @return string 回调地址。
+     * @throws UserDeniedAuthorizeException 用户拒绝授权。
      */
     public function runAuthorizeTypes(AuthorizeRequestInterface $authorizeRequest)
     {

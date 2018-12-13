@@ -6,10 +6,11 @@
  */
 namespace devjerry\oauth2\server\grants;
 
-use devjerry\oauth2\server\interfaces\RefreshTokenEntityInterface;
-use devjerry\oauth2\server\interfaces\ClientEntityInterface;
 use devjerry\oauth2\server\interfaces\ServerRequestInterface;
+use devjerry\oauth2\server\interfaces\ClientEntityInterface;
+use devjerry\oauth2\server\interfaces\RefreshTokenEntityInterface;
 use devjerry\oauth2\server\exceptions\OAuthServerException;
+use devjerry\oauth2\server\interfaces\UserEntityInterface;
 
 /**
  * RefreshTokenGrant class.
@@ -30,31 +31,28 @@ class RefreshTokenGrant extends AbstractGrant
     /**
      * {@inheritdoc}
      */
-    public function run(ServerRequestInterface $request)
+    protected function runGrant(ServerRequestInterface $request, ClientEntityInterface $client)
     {
-        // 获取正在请求授权的客户端。
-        $client = $this->getAuthorizeClient($request);
-
-        // 验证客户端是否允许使用当前的权限授予类型。
-        $this->validateClientGrantType($client);
-
         // 获取请求的更新令牌。
         $requestedRefreshToken = $this->getRequestedRefreshToken($request);
         
         // 验证请求的更新令牌。
         $this->validateRefreshToken($requestedRefreshToken, $client);
         
-        // 获取请求中的权限。
+        // 获取请求的权限。
         $refreshTokenScopeIdentifiers = $requestedRefreshToken->getScopeIdentifiers();
         $requestedScopes = $this->getRequestedScopes($request, $refreshTokenScopeIdentifiers);
         foreach ($requestedScopes as $scope) {
-            if (in_array($scope->getIdentifier(), $refreshTokenScopeIdentifiers, true) === false) {
+            if (!in_array($scope->getIdentifier(), $refreshTokenScopeIdentifiers, true)) {
                 throw new OAuthServerException(400, 'The requested scope is invalid.');
             }
         }
         
         // 获取与更新令牌关联的用户。
         $user = $this->getUserRepository()->getUserEntity($requestedRefreshToken->getUserIdentifier());
+        if (!$user instanceof UserEntityInterface) {
+            throw new OAuthServerException(400, 'Invalid user.');
+        }
         
         // 创建访问令牌。
         $accessToken = $this->generateAccessToken($requestedScopes, $client, $user);
@@ -80,7 +78,7 @@ class RefreshTokenGrant extends AbstractGrant
      *
      * @param ServerRequestInterface $request 服务器请求。
      * @return RefreshTokenEntityInterface 更新令牌。
-     * @throws BadRequestHttpException 缺少参数。
+     * @throws OAuthServerException 缺少参数。
      */
     protected function getRequestedRefreshToken(ServerRequestInterface $request)
     {
@@ -100,9 +98,9 @@ class RefreshTokenGrant extends AbstractGrant
     /**
      * 验证请求的更新令牌。
      * 
-     * @param RefreshTokenEntityInterface $refreshToken
-     * @param ClientEntityInterface $client
-     * @throws UnauthorizedHttpException 令牌没有关联到当前客户端，或者令牌过期，或者令牌已撤销。
+     * @param RefreshTokenEntityInterface $refreshToken 更新令牌。
+     * @param ClientEntityInterface $client 客户端。
+     * @throws OAuthServerException 令牌没有关联到当前客户端，或者令牌过期，或者令牌已撤销。
      */
     protected function validateRefreshToken(RefreshTokenEntityInterface $refreshToken, ClientEntityInterface $client)
     {

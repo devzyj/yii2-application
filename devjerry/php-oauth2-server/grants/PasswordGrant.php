@@ -6,8 +6,9 @@
  */
 namespace devjerry\oauth2\server\grants;
 
-use devjerry\oauth2\server\interfaces\UserEntityInterface;
 use devjerry\oauth2\server\interfaces\ServerRequestInterface;
+use devjerry\oauth2\server\interfaces\ClientEntityInterface;
+use devjerry\oauth2\server\interfaces\UserEntityInterface;
 use devjerry\oauth2\server\exceptions\OAuthServerException;
 
 /**
@@ -29,18 +30,12 @@ class PasswordGrant extends AbstractGrant
     /**
      * {@inheritdoc}
      */
-    public function run(ServerRequestInterface $request)
+    protected function runGrant(ServerRequestInterface $request, ClientEntityInterface $client)
     {
-        // 获取正在请求授权的客户端。
-        $client = $this->getAuthorizeClient($request);
-
-        // 验证客户端是否允许使用当前的权限授予类型。
-        $this->validateClientGrantType($client);
-
         // 获取正在请求授权的用户。
         $user = $this->getAuthorizeUser($request);
         
-        // 获取请求中的权限。
+        // 获取请求的权限。
         $requestedScopes = $this->getRequestedScopes($request, $this->ensureDefaultScopes($user));
         
         // 确定最终授予的权限列表。
@@ -61,32 +56,19 @@ class PasswordGrant extends AbstractGrant
      *
      * @param ServerRequestInterface $request 服务器请求。
      * @return UserEntityInterface 用户实例。
+     * @throws OAuthServerException 缺少参数。
      */
     protected function getAuthorizeUser(ServerRequestInterface $request)
     {
         // 获取用户的认证信息。
-        list ($username, $password) = $this->getUserAuthCredentials($request);
-        
-        // 获取并返回用户实例。
-        return $this->getUserByCredentials($username, $password);
-    }
-
-    /**
-     * 获取用户的认证信息。
-     *
-     * @param ServerRequestInterface $request 服务器请求。
-     * @return array 认证信息。第一个元素为 `username`，第二个元素为 `password`。
-     * @throws BadRequestHttpException 缺少参数。
-     */
-    protected function getUserAuthCredentials(ServerRequestInterface $request)
-    {
         $username = $this->getRequestBodyParam($request, 'username');
         $password = $this->getRequestBodyParam($request, 'password');
         if ($username === null || $password === null) {
             throw new OAuthServerException(400, 'Missing parameters: "username" and "password" required.');
         }
-    
-        return [$username, $password];
+        
+        // 获取并返回用户实例。
+        return $this->getUserByCredentials($username, $password);
     }
 
     /**
