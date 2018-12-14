@@ -9,6 +9,8 @@ namespace devjerry\oauth2\server\interfaces;
 /**
  * 服务器请求接口。
  * 
+ * 不强制要求 `服务器请求实例` 实现这个接口，只需要 `服务器请求实例` 中存在该接口的方法。
+ * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */

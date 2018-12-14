@@ -430,7 +430,7 @@ abstract class AbstractAuthorizeGrant
     protected function validateClientGrantType(ClientEntityInterface $client, $grantType)
     {
         $grantTypes = $client->getGrantTypes();
-        if ($grantTypes !== null && !in_array($grantType, $grantTypes)) {
+        if (is_array($grantTypes) && !in_array($grantType, $grantTypes)) {
             throw new OAuthServerException(403, 'The grant type is unauthorized for this client.');
         }
     }
@@ -543,13 +543,13 @@ abstract class AbstractAuthorizeGrant
 
         // 设置授权码属性。
         $authorizationCode->setExpires(time() + (int) $this->getAuthorizationCodeDuration());
-        $authorizationCode->setClientIdentifier($authorizeRequest->getClientEntity()->getIdentifier());
-        $authorizationCode->setUserIdentifier($authorizeRequest->getUsertEntity()->getIdentifier());
+        $authorizationCode->setClientEntity($authorizeRequest->getClientEntity());
+        $authorizationCode->setUserEntity($authorizeRequest->getUsertEntity());
         $authorizationCode->setRedirectUri($authorizeRequest->getRedirectUri());
         $authorizationCode->setCodeChallenge($authorizeRequest->getCodeChallenge());
         $authorizationCode->getCodeChallengeMethod($authorizeRequest->getCodeChallengeMethod());
         foreach ($authorizeRequest->getScopeEntities() as $scopeEntity) {
-            $authorizationCode->addScopeIdentifier($scopeEntity->getIdentifier());
+            $authorizationCode->addScopeEntity($scopeEntity);
         }
         
         // 生成唯一标识，并保存授权码。
@@ -595,18 +595,18 @@ abstract class AbstractAuthorizeGrant
 
         // 设置客户端。
         $client = $accessToken->getClientEntity();
-        $refreshToken->setClientIdentifier($client->getIdentifier());
+        $refreshToken->setClientEntity($client);
 
         // 设置用户。
         $user = $accessToken->getUserEntity();
         if ($user) {
-            $refreshToken->setUserIdentifier($user->getIdentifier());
+            $refreshToken->setUserEntity($user);
         }
 
         // 添加权限。
         $scopes = $accessToken->getScopeEntities();
         foreach ($scopes as $scope) {
-            $refreshToken->addScopeIdentifier($scope->getIdentifier());
+            $refreshToken->addScopeEntity($scope);
         }
 
         // 设置过期时间。
@@ -652,8 +652,7 @@ abstract class AbstractAuthorizeGrant
     protected function generateCredentials(AccessTokenEntityInterface $accessToken, RefreshTokenEntityInterface $refreshToken = null)
     {
         // 获取访问令牌中的权限标识列表。
-        $scopes = array_map(function ($scopeEntity) {
-            /* @var $scopeEntity ScopeEntityInterface */
+        $scopes = array_map(function (ScopeEntityInterface $scopeEntity) {
             return $scopeEntity->getIdentifier();
         }, $accessToken->getScopeEntities());
         

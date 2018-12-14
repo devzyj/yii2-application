@@ -64,7 +64,15 @@ interface AuthorizationCodeRepositoryInterface
     
     /**
      * 反序列化授权码，用于从请求中接收到的授权码。
-     *
+     * 
+     * 返回的实例必需要设置的属性如下：
+     *     - [[setIdentifier()]]
+     *     - [[setExpires()]]
+     *     - [[setRedirectUri()]]
+     *     - [[setClientIdentifier()]]
+     *     - [[setUserIdentifier()]]
+     *     - [[addScopeIdentifier()]]
+     * 
      * @param string $serializedAuthorizationCode 已序列化的授权码。
      * @param mixed $cryptKey 授权码密钥。
      * @return AuthorizationCodeEntityInterface 授权码实例。

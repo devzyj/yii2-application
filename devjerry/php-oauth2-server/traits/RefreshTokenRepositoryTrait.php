@@ -12,6 +12,7 @@ use Defuse\Crypto\Exception\WrongKeyOrModifiedCiphertextException;
 use devjerry\oauth2\server\interfaces\RefreshTokenEntityInterface;
 use devjerry\oauth2\server\base\ArrayHelper;
 use devjerry\oauth2\server\exceptions\OAuthServerException;
+use devjerry\oauth2\server\interfaces\ScopeEntityInterface;
 
 /**
  * RefreshTokenRepositoryTrait 提供了序列化和反序列化更新令牌的方法。
@@ -36,14 +37,19 @@ trait RefreshTokenRepositoryTrait
     public function serializeRefreshTokenEntity(RefreshTokenEntityInterface $refreshTokenEntity, $cryptKey)
     {
         $accessToken = $refreshTokenEntity->getAccessTokenEntity();
+        $client = $refreshTokenEntity->getClientEntity();
+        $user = $refreshTokenEntity->getUserEntity();
+        $scopes = array_map(function (ScopeEntityInterface $scopeEntity) {
+            return $scopeEntity->getIdentifier();
+        }, $refreshTokenEntity->getScopeEntities());
         
         $refreshTokenData = json_encode([
             'refresh_token_id' => $refreshTokenEntity->getIdentifier(),
-            'access_token_id' => $accessToken->getIdentifier(),
-            'client_id' => $refreshTokenEntity->getClientIdentifier(),
-            'user_id' => $refreshTokenEntity->getUserIdentifier() ? $refreshTokenEntity->getUserIdentifier() : null,
-            'scopes' => $refreshTokenEntity->getScopeIdentifiers(),
             'expires' => $refreshTokenEntity->getExpires(),
+            'access_token_id' => $accessToken->getIdentifier(),
+            'client_id' => $client->getIdentifier(),
+            'user_id' => $user ? $user->getIdentifier() : null,
+            'scopes' => $scopes,
         ]);
         
         // 加密数据。
@@ -65,6 +71,14 @@ trait RefreshTokenRepositoryTrait
     /**
      * 反序列化更新令牌，用于从请求中接收到的更新令牌。
      *
+     * 返回的实例必需要设置的属性如下：
+     *     - [[setIdentifier()]]
+     *     - [[setExpires()]]
+     *     - [[setAccessTokenIdentifier()]]
+     *     - [[setClientIdentifier()]]
+     *     - [[setUserIdentifier()]] 如果没有用户，可以不设置。在客户端授权模式中没有用户。
+     *     - [[addScopeIdentifier()]]
+     * 
      * @param string $serializedRefreshToken 已序列化的更新令牌。
      * @param array $cryptKey 更新令牌密钥。数组可以指定以下三个元素中的一个：
      *     - `ascii` 使用 `vendor/bin/generate-defuse-key` 生成的字符串。

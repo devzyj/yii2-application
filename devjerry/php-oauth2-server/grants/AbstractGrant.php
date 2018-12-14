@@ -22,7 +22,7 @@ abstract class AbstractGrant extends AbstractAuthorizeGrant implements GrantType
     /**
      * {@inheritdoc}
      */
-    public function canRun(ServerRequestInterface $request)
+    public function canRun($request)
     {
         $grantType = $this->getRequestBodyParam($request, 'grant_type');
         return $this->getIdentifier() === $grantType;
@@ -31,7 +31,7 @@ abstract class AbstractGrant extends AbstractAuthorizeGrant implements GrantType
     /**
      * {@inheritdoc}
      */
-    public function run(ServerRequestInterface $request)
+    public function run($request)
     {
         // 获取正在请求授权的客户端。
         $client = $this->getAuthorizeClient($request);
@@ -49,7 +49,7 @@ abstract class AbstractGrant extends AbstractAuthorizeGrant implements GrantType
      * @param ServerRequestInterface $request 服务器请求。
      * @return array 认证信息。
      */
-    abstract protected function runGrant(ServerRequestInterface $request, ClientEntityInterface $client);
+    abstract protected function runGrant($request, ClientEntityInterface $client);
 
     /**
      * 获取正在请求授权的客户端。
@@ -58,7 +58,7 @@ abstract class AbstractGrant extends AbstractAuthorizeGrant implements GrantType
      * @return ClientEntityInterface 客户端。
      * @throws OAuthServerException 缺少参数。
      */
-    protected function getAuthorizeClient(ServerRequestInterface $request)
+    protected function getAuthorizeClient($request)
     {
         // 获取客户端认证信息。
         list ($identifier, $secret) = $this->getClientAuthCredentials($request);
@@ -77,7 +77,7 @@ abstract class AbstractGrant extends AbstractAuthorizeGrant implements GrantType
      * @param ServerRequestInterface $request 服务器请求。
      * @return array 认证信息。第一个元素为 `client_id`，第二个元素为 `client_secret`。
      */
-    protected function getClientAuthCredentials(ServerRequestInterface $request)
+    protected function getClientAuthCredentials($request)
     {
         // 从请求头中获取。
         list ($authUser, $authPassword) = $this->getRequestAuthCredentials($request);
@@ -91,31 +91,13 @@ abstract class AbstractGrant extends AbstractAuthorizeGrant implements GrantType
     }
     
     /**
-     * 通过客户端或者用户，确定最终使用的默认权限。
-     * 
-     * @param ClientEntityInterface|UserEntityInterface $entity 客户端或者用户实例。
-     * @return ScopeEntityInterface[]|string[] 权限实例列表，或者权限标识列表。
-     * @see ClientEntityInterface::getDefaultScopeEntities()
-     * @see UserEntityInterface::getDefaultScopeEntities()
-     */
-    protected function ensureDefaultScopes($entity)
-    {
-        $entityDefaultScopes = $entity->getDefaultScopeEntities();
-        if (is_array($entityDefaultScopes)) {
-            return $entityDefaultScopes;
-        }
-        
-        return $this->getDefaultScopes();
-    }
-    
-    /**
      * 获取请求的权限。
      * 
      * @param ServerRequestInterface $request 服务器请求。
      * @param ScopeEntityInterface[]|string[] $default 默认权限。
      * @return ScopeEntityInterface[] 权限列表。
      */
-    protected function getRequestedScopes(ServerRequestInterface $request, array $default = null)
+    protected function getRequestedScopes($request, array $default = null)
     {
         $requestedScopes = $this->getRequestBodyParam($request, 'scope', $default);
         return $this->validateScopes($requestedScopes);

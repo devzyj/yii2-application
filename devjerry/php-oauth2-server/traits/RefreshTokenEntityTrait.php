@@ -16,31 +16,8 @@ use devjerry\oauth2\server\interfaces\AccessTokenEntityInterface;
  */
 trait RefreshTokenEntityTrait
 {
-    /**
-     * @var string
-     */
-    private $_identifier;
+    use BaseTokenCodeEntityTrait;
     
-    /**
-     * @var integer
-     */
-    private $_expires;
-    
-    /**
-     * @var string
-     */
-    private $_clientIdentifier;
-
-    /**
-     * @var string
-     */
-    private $_userIdentifier;
-    
-    /**
-     * @var array
-     */
-    private $_scopeIdentifiers = [];
-
     /**
      * @var string
      */
@@ -52,108 +29,9 @@ trait RefreshTokenEntityTrait
     private $_accessTokenEntity;
 
     /**
-     * 获取更新令牌标识符。
+     * 获取关联的访问令牌标识。
      *
-     * @return string 标识符。
-     */
-    public function getIdentifier()
-    {
-        return $this->_identifier;
-    }
-    
-    /**
-     * 设置更新令牌标识符。
-     *
-     * @param string $identifier 标识符。
-     */
-    public function setIdentifier($identifier)
-    {
-        $this->_identifier = $identifier;
-    }
-    /**
-     * 获取更新令牌的过期时间。
-     *
-     * @return integer 过期的时间戳。
-     */
-    public function getExpires()
-    {
-        return $this->_expires;
-    }
-
-    /**
-     * 设置更新令牌的过期时间。
-     *
-     * @param integer $expires 过期时间的时间戳。
-     */
-    public function setExpires($expires)
-    {
-        $this->_expires = $expires;
-    }
-
-    /**
-     * 获取与更新令牌关联的客户端标识。
-     *
-     * @return string 客户端标识。
-     */
-    public function getClientIdentifier()
-    {
-        return $this->_clientIdentifier;
-    }
-
-    /**
-     * 设置与更新令牌关联的客户端标识。
-     *
-     * @param string $clientIdentifier 客户端标识。
-     */
-    public function setClientIdentifier($clientIdentifier)
-    {
-        $this->_clientIdentifier = $clientIdentifier;
-    }
-    
-    /**
-     * 获取与更新令牌关联的用户标识。
-     *
-     * @return string 用户标识。
-     */
-    public function getUserIdentifier()
-    {
-        return $this->_userIdentifier;
-    }
-    
-    /**
-     * 设置与更新令牌关联的用户标识。
-     *
-     * @param string $userIdentifier 用户标识。
-     */
-    public function setUserIdentifier($userIdentifier)
-    {
-        $this->_userIdentifier = $userIdentifier;
-    }
-    
-    /**
-     * 获取与更新令牌关联的权限标识符。
-     *
-     * @return string[] 权限标识符列表。
-     */
-    public function getScopeIdentifiers()
-    {
-        return array_keys($this->_scopeIdentifiers);
-    }
-    
-    /**
-     * 添加与更新令牌关联的权限标识符。
-     *
-     * @param string $scopeIdentifier 权限标识符。
-     */
-    public function addScopeIdentifier($scopeIdentifier)
-    {
-        $this->_scopeIdentifiers[$scopeIdentifier] = true;
-    }
-
-    /**
-     * 获取与更新令牌关联的访问令牌标识。
-     *
-     * @param string 访问令牌标识。
+     * @param string
      */
     public function getAccessTokenIdentifier()
     {
@@ -161,9 +39,9 @@ trait RefreshTokenEntityTrait
     }
     
     /**
-     * 设置与更新令牌关联的访问令牌标识。
+     * 设置关联的访问令牌标识。
      * 
-     * @param string $accessTokenIdentifier 访问令牌标识。
+     * @param string $accessTokenIdentifier
      */
     public function setAccessTokenIdentifier($accessTokenIdentifier)
     {
@@ -171,9 +49,9 @@ trait RefreshTokenEntityTrait
     }
     
     /**
-     * 获取与更新令牌关联的访问令牌。
+     * 获取关联的访问令牌。
      *
-     * @return AccessTokenEntityInterface 访问令牌实例。
+     * @return AccessTokenEntityInterface
      */
     public function getAccessTokenEntity()
     {
@@ -181,9 +59,9 @@ trait RefreshTokenEntityTrait
     }
     
     /**
-     * 设置与更新令牌关联的访问令牌。
+     * 设置关联的访问令牌。
      * 
-     * @param AccessTokenEntityInterface $accessTokenEntity 访问令牌实例。
+     * @param AccessTokenEntityInterface $accessTokenEntity
      */
     public function setAccessTokenEntity(AccessTokenEntityInterface $accessTokenEntity)
     {

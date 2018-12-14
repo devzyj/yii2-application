@@ -15,6 +15,7 @@ use devjerry\oauth2\server\interfaces\ScopeEntityInterface;
  *
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
+ * @deprecated
  */
 trait ScopeRepositoryTrait
 {
@@ -54,7 +55,7 @@ trait ScopeRepositoryTrait
     protected function ensureClientCredentials(array $scopes, ClientEntityInterface $client)
     {
         $clientScopes = $client->getScopeEntities();
-        if ($clientScopes === null) {
+        if (!is_array($clientScopes)) {
             return $scopes;
         }
         
@@ -72,7 +73,7 @@ trait ScopeRepositoryTrait
     protected function ensureUserCredentials(array $scopes, ClientEntityInterface $client, UserEntityInterface $user)
     {
         $userScopes = $user->getScopeEntities();
-        if ($userScopes === null) {
+        if (!is_array($userScopes)) {
             return $scopes;
         }
         

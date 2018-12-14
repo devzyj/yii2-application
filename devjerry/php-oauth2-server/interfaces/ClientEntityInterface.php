@@ -31,35 +31,38 @@ interface ClientEntityInterface
     /**
      * 获取客户端权限授予类型。
      * 
-     * @return string[]|null 如果返回 `null`，则不进行验证。
+     * @return string[] 如果返回值不是数组，则不进行验证。
      */
     public function getGrantTypes();
 
     /**
      * 获取访问令牌的持续时间（秒）。
      * 
-     * @return integer|null 如果返回 `null`，则使用设置的全局时间。
+     * @return integer|null 如果返回 `null`，则使用全局的持续时间。
      */
     public function getAccessTokenDuration();
 
     /**
      * 获取更新令牌的持续时间（秒）。
      *
-     * @return integer|null 如果返回 `null`，则使用设置的全局时间。
+     * @return integer|null 如果返回 `null`，则使用全局的持续时间。
      */
     public function getRefreshTokenDuration();
     
     /**
-     * 获取客户端全部权限。
-     *
-     * @return ScopeEntityInterface[]
-     */
-    public function getScopeEntities();
-    
-    /**
      * 获取客户端默认权限。
      *
-     * @return ScopeEntityInterface[]
+     * 只有在 `client_credentials` 授予模式时才会生效。
+     *
+     * @return ScopeEntityInterface[] 如果返回值不是数组，则使用全局的默认权限。
      */
     public function getDefaultScopeEntities();
+    
+    /**
+     * 获取客户端全部权限。
+     * 
+     * @return ScopeEntityInterface[]
+     * @deprecated
+     */
+    public function getScopeEntities();
 }

@@ -65,6 +65,13 @@ interface AccessTokenRepositoryInterface
     /**
      * 反序列化访问令牌，用于从请求中接收到的访问令牌。
      *
+     * 返回的实例必需要设置的属性如下：
+     *     - [[setIdentifier()]]
+     *     - [[setExpires()]]
+     *     - [[setClientIdentifier()]]
+     *     - [[setUserIdentifier()]] 如果没有用户，可以不设置。在客户端授权模式中没有用户。
+     *     - [[addScopeIdentifier()]]
+     * 
      * @param string $serializedAccessToken 已序列化的访问令牌。
      * @param mixed $cryptKey 访问令牌密钥。
      * @return AccessTokenEntityInterface 访问令牌实例。

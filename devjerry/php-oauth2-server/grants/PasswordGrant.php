@@ -30,13 +30,19 @@ class PasswordGrant extends AbstractGrant
     /**
      * {@inheritdoc}
      */
-    protected function runGrant(ServerRequestInterface $request, ClientEntityInterface $client)
+    protected function runGrant($request, ClientEntityInterface $client)
     {
         // 获取正在请求授权的用户。
         $user = $this->getAuthorizeUser($request);
+
+        // 获取默认权限。
+        $defaultScopes = $user->getDefaultScopeEntities();
+        if (!is_array($defaultScopes)) {
+            $defaultScopes = $this->getDefaultScopes();
+        }
         
         // 获取请求的权限。
-        $requestedScopes = $this->getRequestedScopes($request, $this->ensureDefaultScopes($user));
+        $requestedScopes = $this->getRequestedScopes($request, $defaultScopes);
         
         // 确定最终授予的权限列表。
         $finalizedScopes = $this->getScopeRepository()->finalizeEntities($requestedScopes, $this->getIdentifier(), $client, $user);
@@ -58,7 +64,7 @@ class PasswordGrant extends AbstractGrant
      * @return UserEntityInterface 用户实例。
      * @throws OAuthServerException 缺少参数。
      */
-    protected function getAuthorizeUser(ServerRequestInterface $request)
+    protected function getAuthorizeUser($request)
     {
         // 获取用户的认证信息。
         $username = $this->getRequestBodyParam($request, 'username');

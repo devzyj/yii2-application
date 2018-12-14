@@ -65,6 +65,14 @@ interface RefreshTokenRepositoryInterface
     /**
      * 反序列化更新令牌，用于从请求中接收到的更新令牌。
      *
+     * 返回的实例必需要设置的属性如下：
+     *     - [[setIdentifier()]]
+     *     - [[setExpires()]]
+     *     - [[setAccessTokenIdentifier()]]
+     *     - [[setClientIdentifier()]]
+     *     - [[setUserIdentifier()]] 如果没有用户，可以不设置。在客户端授权模式中没有用户。
+     *     - [[addScopeIdentifier()]]
+     * 
      * @param string $serializedRefreshToken 已序列化的更新令牌。
      * @param mixed $cryptKey 更新令牌密钥。
      * @return RefreshTokenEntityInterface 更新令牌实例。

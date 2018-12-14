@@ -24,7 +24,7 @@ abstract class AbstractAuthorize extends AbstractAuthorizeGrant implements Autho
     /**
      * {@inheritdoc}
      */
-    public function canRun(ServerRequestInterface $request)
+    public function canRun($request)
     {
         $responseType = $this->getRequestQueryParam($request, 'response_type');
         return $this->getIdentifier() === $responseType;
@@ -33,7 +33,7 @@ abstract class AbstractAuthorize extends AbstractAuthorizeGrant implements Autho
     /**
      * {@inheritdoc}
      */
-    public function getAuthorizeRequest(ServerRequestInterface $request)
+    public function getAuthorizeRequest($request)
     {
         // 获取客户端标识。
         $clientId = $this->getRequestQueryParam($request, 'client_id', $this->getRequestAuthUser($request));
@@ -106,7 +106,7 @@ abstract class AbstractAuthorize extends AbstractAuthorizeGrant implements Autho
      * @param ScopeEntityInterface[]|string[] $default 默认权限。
      * @return ScopeEntityInterface[] 权限列表。
      */
-    protected function getRequestedScopes(ServerRequestInterface $request, array $default = null)
+    protected function getRequestedScopes($request, array $default = null)
     {
         $requestedScopes = $this->getRequestQueryParam($request, 'scope', $default);
         return $this->validateScopes($requestedScopes);
@@ -115,6 +115,7 @@ abstract class AbstractAuthorize extends AbstractAuthorizeGrant implements Autho
     /**
      * {@inheritdoc}
      * 
+     * @throws \LogicException 没有设置用户。
      * @throws UserDeniedAuthorizeException 用户拒绝授权。
      */
     public function run(AuthorizeRequestInterface $authorizeRequest)

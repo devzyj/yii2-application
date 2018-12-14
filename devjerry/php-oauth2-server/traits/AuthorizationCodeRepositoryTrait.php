@@ -12,6 +12,7 @@ use Defuse\Crypto\Exception\WrongKeyOrModifiedCiphertextException;
 use devjerry\oauth2\server\interfaces\AuthorizationCodeEntityInterface;
 use devjerry\oauth2\server\exceptions\OAuthServerException;
 use devjerry\oauth2\server\base\ArrayHelper;
+use devjerry\oauth2\server\interfaces\ScopeEntityInterface;
 
 /**
  * AuthorizationCodeRepositoryTrait 提供了序列化和反序列化授权码的方法。
@@ -35,13 +36,20 @@ trait AuthorizationCodeRepositoryTrait
      */
     public function serializeAuthorizationCodeEntity(AuthorizationCodeEntityInterface $authorizationCodeEntity, $cryptKey)
     {
+        $client = $authorizationCodeEntity->getClientEntity();
+        $user = $authorizationCodeEntity->getUserEntity();
+        $scopes = array_map(function (ScopeEntityInterface $scopeEntity) {
+            return $scopeEntity->getIdentifier();
+        }, $authorizationCodeEntity->getScopeEntities());
+        
+        // 授权码数据。
         $authorizationCodeData = json_encode([
             'authorization_code_id' => $authorizationCodeEntity->getIdentifier(),
             'expires' => $authorizationCodeEntity->getExpires(),
             'redirect_uri' => $authorizationCodeEntity->getRedirectUri(),
-            'client_id' => $authorizationCodeEntity->getClientIdentifier(),
-            'user_id' => $authorizationCodeEntity->getUserIdentifier(),
-            'scopes' => $authorizationCodeEntity->getScopeIdentifiers(),
+            'client_id' => $client->getIdentifier(),
+            'user_id' => $user->getIdentifier(),
+            'scopes' => $scopes,
             'code_challenge' => $authorizationCodeEntity->getCodeChallenge(),
             'code_challenge_method' => $authorizationCodeEntity->getCodeChallengeMethod(),
         ]);
@@ -65,6 +73,14 @@ trait AuthorizationCodeRepositoryTrait
     /**
      * 反序列化授权码，用于从请求中接收到的授权码。
      *
+     * 返回的实例必需要设置的属性如下：
+     *     - [[setIdentifier()]]
+     *     - [[setExpires()]]
+     *     - [[setRedirectUri()]]
+     *     - [[setClientIdentifier()]]
+     *     - [[setUserIdentifier()]]
+     *     - [[addScopeIdentifier()]]
+     * 
      * @param string $serializedAuthorizationCode 已序列化的授权码。
      * @param mixed $cryptKey 授权码密钥。数组可以指定以下三个元素中的一个：
      *     - `ascii` 使用 `vendor/bin/generate-defuse-key` 生成的字符串。

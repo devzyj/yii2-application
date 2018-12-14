@@ -37,7 +37,7 @@ interface AuthorizeTypeInterface
      * @param ServerRequestInterface $request 服务器请求。
      * @return boolean
      */
-    public function canRun(ServerRequestInterface $request);
+    public function canRun($request);
     
     /**
      * 获取授权请求。
@@ -45,7 +45,7 @@ interface AuthorizeTypeInterface
      * @param ServerRequestInterface $request 服务器请求。
      * @return AuthorizeRequestInterface 授权请求。
      */
-    public function getAuthorizeRequest(ServerRequestInterface $request);
+    public function getAuthorizeRequest($request);
 
     /**
      * 运行授权。

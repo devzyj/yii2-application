@@ -24,7 +24,7 @@ trait ServerRequestTrait
      * @param mixed $default 默认值。
      * @return null|string
      */
-    protected function getRequestQueryParam(ServerRequestInterface $request, $name, $default = null)
+    protected function getRequestQueryParam($request, $name, $default = null)
     {
         $params = (array) $request->getQueryParams();
         return isset($params[$name]) ? $params[$name] : $default;
@@ -38,7 +38,7 @@ trait ServerRequestTrait
      * @param mixed $default 默认值。
      * @return null|string
      */
-    protected function getRequestBodyParam(ServerRequestInterface $request, $name, $default = null)
+    protected function getRequestBodyParam($request, $name, $default = null)
     {
         $params = (array) $request->getParsedBody();
         return isset($params[$name]) ? $params[$name] : $default;
@@ -52,7 +52,7 @@ trait ServerRequestTrait
      * @param mixed $default 默认值。
      * @return null|string
      */
-    protected function getRequestServerParam(ServerRequestInterface $request, $name, $default = null)
+    protected function getRequestServerParam($request, $name, $default = null)
     {
         $params = (array) $request->getServerParams();
         return isset($params[$name]) ? $params[$name] : $default;
@@ -67,7 +67,7 @@ trait ServerRequestTrait
      * @param boolean $first 是否返回第一个元素。
      * @return null|string|array
      */
-    protected function getRequestHeaderParam(ServerRequestInterface $request, $name, $default = null, $first = true)
+    protected function getRequestHeaderParam($request, $name, $default = null, $first = true)
     {
         $params = (array) $request->getHeaders();
         $name = strtolower($name);
@@ -86,7 +86,7 @@ trait ServerRequestTrait
      * @param ServerRequestInterface $request 服务器请求。
      * @return string[]|null[]
      */
-    protected function getRequestAuthCredentials(ServerRequestInterface $request)
+    protected function getRequestAuthCredentials($request)
     {
         $username = $this->getRequestServerParam($request, 'PHP_AUTH_USER');
         $password = $this->getRequestServerParam($request, 'PHP_AUTH_PW');
@@ -116,7 +116,7 @@ trait ServerRequestTrait
      * @param ServerRequestInterface $request 服务器请求。
      * @return string|null
      */
-    protected function getRequestAuthUser(ServerRequestInterface $request)
+    protected function getRequestAuthUser($request)
     {
         return $this->getRequestAuthCredentials($request)[0];
     }
@@ -127,7 +127,7 @@ trait ServerRequestTrait
      * @param ServerRequestInterface $request 服务器请求。
      * @return string|null
      */
-    protected function getRequestAuthPassword(ServerRequestInterface $request)
+    protected function getRequestAuthPassword($request)
     {
         return $this->getRequestAuthCredentials($request)[1];
     }

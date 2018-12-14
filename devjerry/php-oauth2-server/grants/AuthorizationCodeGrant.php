@@ -11,6 +11,7 @@ use devjerry\oauth2\server\interfaces\AuthorizationCodeEntityInterface;
 use devjerry\oauth2\server\interfaces\ClientEntityInterface;
 use devjerry\oauth2\server\interfaces\UserEntityInterface;
 use devjerry\oauth2\server\exceptions\OAuthServerException;
+use devjerry\oauth2\server\base\FunctionHelper;
 
 /**
  * AuthorizationCodeGrant class.
@@ -44,7 +45,7 @@ class AuthorizationCodeGrant extends AbstractGrant
     /**
      * {@inheritdoc}
      */
-    protected function runGrant(ServerRequestInterface $request, ClientEntityInterface $client)
+    protected function runGrant($request, ClientEntityInterface $client)
     {
         // 获取请求的授权码。
         $authorizationCode = $this->getRequestedAuthorizationCode($request);
@@ -96,7 +97,7 @@ class AuthorizationCodeGrant extends AbstractGrant
      * @return AuthorizationCodeEntityInterface 授权码。
      * @throws OAuthServerException 缺少参数。
      */
-    protected function getRequestedAuthorizationCode(ServerRequestInterface $request)
+    protected function getRequestedAuthorizationCode($request)
     {
         $requestedCode = $this->getRequestBodyParam($request, 'code');
         if ($requestedCode === null) {
@@ -119,7 +120,7 @@ class AuthorizationCodeGrant extends AbstractGrant
      * @param string $redirectUri 回调地址。
      * @throws OAuthServerException 授权码没有关联到当前客户端，或者授权码过期，或者回调地址错误，或者授权码已撤销。
      */
-    protected function validateRefreshToken(AuthorizationCodeEntityInterface $authorizationCode, ClientEntityInterface $client, $redirectUri)
+    protected function validateAuthorizationCode(AuthorizationCodeEntityInterface $authorizationCode, ClientEntityInterface $client, $redirectUri)
     {
         if ($authorizationCode->getClientIdentifier() != $client->getIdentifier()) {
             throw new OAuthServerException(401, 'Authorization code was not issued to this client.');
@@ -139,7 +140,7 @@ class AuthorizationCodeGrant extends AbstractGrant
      * @param AuthorizationCodeEntityInterface $authorizationCode 授权码。
      * @throws OAuthServerException 验证错误。
      */
-    protected function validateCodeChallenge(ServerRequestInterface $request, $authorizationCode)
+    protected function validateCodeChallenge($request, $authorizationCode)
     {
         if ($this->enableCodeChallenge === true) {
             $codeVerifier = $this->getRequestBodyParam('code_verifier', $request);
@@ -157,13 +158,13 @@ class AuthorizationCodeGrant extends AbstractGrant
             $codeChallengeMethod = $authorizationCode->getCodeChallengeMethod();
             switch ($codeChallengeMethod) {
                 case 'plain':
-                    if (hash_equals($codeVerifier, $codeChallenge) === false) {
+                    if (FunctionHelper::hashEquals($codeVerifier, $codeChallenge) === false) {
                         throw new OAuthServerException(400, 'Failed to verify `code_verifier`.');
                     }
                     break;
                 case 'S256':
                     $codeVerifier = strtr(rtrim(base64_encode(hash('sha256', $codeVerifier, true)), '='), '+/', '-_');
-                    if (hash_equals($codeVerifier, $codeChallenge) === false) {
+                    if (FunctionHelper::hashEquals($codeVerifier, $codeChallenge) === false) {
                         throw new OAuthServerException(400, 'Failed to verify `code_verifier`.');
                     }
                     break;
@@ -171,13 +172,5 @@ class AuthorizationCodeGrant extends AbstractGrant
                     throw new OAuthServerException(500, sprintf('Unsupported code challenge method `%s`', $codeChallengeMethod));
             }
         }
-    }
-}
-
-// PHP < 5.6
-if (!function_exists('hash_equals')) {
-    function hash_equals($a, $b)
-    {
-        return substr_count($a ^ $b, "\0") * 2 === strlen($a . $b);
     }
 }

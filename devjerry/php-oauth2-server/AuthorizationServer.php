@@ -77,7 +77,7 @@ class AuthorizationServer
      * @param ServerRequestInterface $request 服务器请求。
      * @return AuthorizeRequestInterface 授权请求。
      */
-    public function getAuthorizeRequest(ServerRequestInterface $request)
+    public function getAuthorizeRequest($request)
     {
         foreach ($this->getAuthorizeTypes() as $identifier => $authorizeType) {
             if ($authorizeType->canRun($request)) {
@@ -106,7 +106,7 @@ class AuthorizationServer
      * @param ServerRequestInterface $request 服务器请求。
      * @return array 认证信息。
      */
-    public function runGrantTypes(ServerRequestInterface $request)
+    public function runGrantTypes($request)
     {
         foreach ($this->getGrantTypes() as $identifier => $grantType) {
             if ($grantType->canRun($request)) {

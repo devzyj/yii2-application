@@ -6,7 +6,6 @@
  */
 namespace devjerry\oauth2\server\authorizes;
 
-use devjerry\oauth2\server\interfaces\ServerRequestInterface;
 use devjerry\oauth2\server\exceptions\OAuthServerException;
 
 /**
@@ -54,7 +53,7 @@ class CodeAuthorize extends AbstractAuthorize
     /**
      * {@inheritdoc}
      */
-    public function getAuthorizeRequest(ServerRequestInterface $request)
+    public function getAuthorizeRequest($request)
     {
         $authorizeRequest = parent::getAuthorizeRequest($request);
 
@@ -88,9 +87,10 @@ class CodeAuthorize extends AbstractAuthorize
      */
     public function runUserAllowed(AuthorizeRequestInterface $authorizeRequest)
     {
-        $authorizationCodeRepository = $this->getAuthorizationCodeRepository();
         $authorizationCode = $this->generateAuthorizationCode($authorizeRequest);
         $authorizationCryptKey = $this->getAuthorizationCodeCryptKey();
+        
+        $authorizationCodeRepository = $this->getAuthorizationCodeRepository();
         $code = $authorizationCodeRepository->serializeAuthorizationCodeEntity($authorizationCode, $authorizationCryptKey);
         
         // 返回授权成功的回调地址。

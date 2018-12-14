@@ -29,7 +29,7 @@ interface GrantTypeInterface
      * @param ServerRequestInterface $request 服务器请求。
      * @return boolean
      */
-    public function canRun(ServerRequestInterface $request);
+    public function canRun($request);
     
     /**
      * 运行权限授予。
@@ -37,5 +37,5 @@ interface GrantTypeInterface
      * @param ServerRequestInterface $request 服务器请求。
      * @return array 认证信息。
      */
-    public function run(ServerRequestInterface $request);
+    public function run($request);
 }
