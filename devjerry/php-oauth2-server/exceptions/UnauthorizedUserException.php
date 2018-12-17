@@ -7,12 +7,12 @@
 namespace devjerry\oauth2\server\exceptions;
 
 /**
- * UserDeniedAuthorizeException 表示用户拒绝授权，状态码为 401 的 HTTP 异常。
+ * UnauthorizedUserException 表求用户未授权，状态码为 401 的 HTTP 异常。
  * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
-class UserDeniedAuthorizeException extends UnauthorizedUserException
+class UnauthorizedUserException extends OAuthServerException
 {
     /**
      * Constructor.
@@ -23,6 +23,6 @@ class UserDeniedAuthorizeException extends UnauthorizedUserException
      */
     public function __construct($message, $code = 0, \Exception $previous = null)
     {
-        parent::__construct($message, $code, $previous);
+        parent::__construct(401, $message, $code, $previous);
     }
 }

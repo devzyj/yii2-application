@@ -6,12 +6,12 @@
  */
 namespace devjerry\oauth2\server;
 
+use devjerry\oauth2\server\interfaces\ServerRequestInterface;
+use devjerry\oauth2\server\grants\GrantTypeInterface;
 use devjerry\oauth2\server\authorizes\AuthorizeTypeInterface;
 use devjerry\oauth2\server\authorizes\AuthorizeRequestInterface;
-use devjerry\oauth2\server\grants\GrantTypeInterface;
-use devjerry\oauth2\server\exceptions\OAuthServerException;
+use devjerry\oauth2\server\exceptions\UnsupportedAuthTypeException;
 use devjerry\oauth2\server\exceptions\UserDeniedAuthorizeException;
-use devjerry\oauth2\server\interfaces\ServerRequestInterface;
 
 /**
  * AuthorizationServer class.
@@ -76,6 +76,7 @@ class AuthorizationServer
      * 
      * @param ServerRequestInterface $request 服务器请求。
      * @return AuthorizeRequestInterface 授权请求。
+     * @throws UnsupportedAuthTypeException 不支持的授权类型。
      */
     public function getAuthorizeRequest($request)
     {
@@ -85,7 +86,7 @@ class AuthorizationServer
             }
         }
         
-        throw new OAuthServerException(400, 'The authorization type is not supported by the authorization server.');
+        throw new UnsupportedAuthTypeException('The authorization type is not supported by the authorization server.');
     }
     
     /**
@@ -105,6 +106,7 @@ class AuthorizationServer
      * 
      * @param ServerRequestInterface $request 服务器请求。
      * @return array 认证信息。
+     * @throws UnsupportedAuthTypeException 不支持的授予类型。
      */
     public function runGrantTypes($request)
     {
@@ -114,6 +116,6 @@ class AuthorizationServer
             }
         }
         
-        throw new OAuthServerException(400, 'The authorization grant type is not supported by the authorization server.');
+        throw new UnsupportedAuthTypeException('The grant type is not supported by the authorization server.');
     }
 }

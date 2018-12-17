@@ -10,8 +10,9 @@ use devjerry\oauth2\server\base\AbstractAuthorizeGrant;
 use devjerry\oauth2\server\interfaces\ServerRequestInterface;
 use devjerry\oauth2\server\interfaces\ClientEntityInterface;
 use devjerry\oauth2\server\interfaces\UserEntityInterface;
-use devjerry\oauth2\server\exceptions\OAuthServerException;
+use devjerry\oauth2\server\exceptions\BadRequestException;
 use devjerry\oauth2\server\exceptions\UserDeniedAuthorizeException;
+use devjerry\oauth2\server\exceptions\OAuthServerException;
 
 /**
  * AbstractAuthorize class.
@@ -32,13 +33,15 @@ abstract class AbstractAuthorize extends AbstractAuthorizeGrant implements Autho
 
     /**
      * {@inheritdoc}
+     * 
+     * @throws BadRequestException 缺少参数，或者回调地址无效。
      */
     public function getAuthorizeRequest($request)
     {
         // 获取客户端标识。
         $clientId = $this->getRequestQueryParam($request, 'client_id', $this->getRequestAuthUser($request));
         if ($clientId === null) {
-            throw new OAuthServerException(400, 'Missing parameters: "client_id" required.');
+            throw new BadRequestException('Missing parameters: `client_id` required.');
         }
         
         // 获取客户端实例。
@@ -53,15 +56,21 @@ abstract class AbstractAuthorize extends AbstractAuthorizeGrant implements Autho
         // 确认客户端的回调地址。
         $redirectUri = $this->ensureRedirectUri($client, $redirectUri);
         if ($redirectUri === null) {
-            throw new OAuthServerException(400, 'Redirect uri is invalid.');
+            throw new BadRequestException('The redirect uri is invalid.');
         }
-        
-        // 获取请求的权限。
-        $requestedScopes = $this->getRequestedScopes($request, $this->getDefaultScopes());
 
         // 获取请求的 `state`。
         $requestedState = $this->getRequestQueryParam($request, 'state');
         
+        try {
+            // 获取请求的权限。
+            $requestedScopes = $this->getRequestedScopes($request, $this->getDefaultScopes());
+        } catch (OAuthServerException $exception) {
+            // 设置异常的回调地址。
+            $exception->setRedirectUri($this->makeRedirectUri($redirectUri, ['state' => $requestedState]));
+            throw $exception;
+        }
+
         // 实例化授权请求。
         $authorizeRequest = new AuthorizeRequest();
         $authorizeRequest->setAuthorizeType($this);
@@ -90,9 +99,9 @@ abstract class AbstractAuthorize extends AbstractAuthorizeGrant implements Autho
             } elseif ($clientRedirectUri && is_string($clientRedirectUri)) {
                 return $clientRedirectUri;
             }
-        } elseif (is_array($clientRedirectUri) && in_array($redirectUri, $clientRedirectUri, true)) {
-            return $redirectUri;
         } elseif (is_string($clientRedirectUri) && strcmp($clientRedirectUri, $redirectUri) === 0) {
+            return $redirectUri;
+        } elseif (is_array($clientRedirectUri) && in_array($redirectUri, $clientRedirectUri, true)) {
             return $redirectUri;
         }
     
@@ -123,17 +132,23 @@ abstract class AbstractAuthorize extends AbstractAuthorizeGrant implements Autho
         if ($authorizeRequest->getUsertEntity() instanceof UserEntityInterface === false) {
             throw new \LogicException('An instance of UserEntityInterface should be set on the AuthorizationRequest.');
         }
-
-        if (!$authorizeRequest->getApproved()) {
-            // 用户拒绝授权。
-            $redirectUri = $this->makeRedirectUri($authorizeRequest->getRedirectUri(), [
-                'state' => $authorizeRequest->getState()
-            ]);
-            throw new UserDeniedAuthorizeException($redirectUri);
-        }
         
-        // 运行用户允许授权的具体方法。
-        return $this->runUserAllowed($authorizeRequest);
+        try {
+            if (!$authorizeRequest->getApproved()) {
+                // 用户拒绝授权。
+                throw new UserDeniedAuthorizeException('The user denied the authorization.');
+            }
+            
+            // 运行用户允许授权的具体方法。
+            return $this->runUserAllowed($authorizeRequest);
+        } catch (OAuthServerException $exception) {
+            $redirectUri = $authorizeRequest->getRedirectUri();
+            $state = $authorizeRequest->getState();
+            
+            // 设置异常的回调地址。
+            $exception->setRedirectUri($this->makeRedirectUri($redirectUri, ['state' => $state]));
+            throw $exception;
+        }
     }
     
     /**

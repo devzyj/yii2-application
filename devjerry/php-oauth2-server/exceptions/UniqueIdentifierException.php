@@ -7,12 +7,12 @@
 namespace devjerry\oauth2\server\exceptions;
 
 /**
- * UniqueIdentifierException 是唯一标识重复的异常。
+ * UniqueIdentifierException 表示唯一标识重复，状态码为 500 的 HTTP 异常。
  * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
-class UniqueIdentifierException extends OAuthServerException
+class UniqueIdentifierException extends ServerErrorException
 {
     /**
      * Constructor.
@@ -27,6 +27,6 @@ class UniqueIdentifierException extends OAuthServerException
             $message = 'Could not create unique identifier.';
         }
         
-        parent::__construct(500, $message, $code, $previous);
+        parent::__construct($message, $code, $previous);
     }
 }

@@ -11,7 +11,7 @@ use Defuse\Crypto\Key;
 use Defuse\Crypto\Exception\WrongKeyOrModifiedCiphertextException;
 use devjerry\oauth2\server\interfaces\RefreshTokenEntityInterface;
 use devjerry\oauth2\server\base\ArrayHelper;
-use devjerry\oauth2\server\exceptions\OAuthServerException;
+use devjerry\oauth2\server\exceptions\InvalidRefreshTokenException;
 use devjerry\oauth2\server\interfaces\ScopeEntityInterface;
 
 /**
@@ -85,7 +85,7 @@ trait RefreshTokenRepositoryTrait
      *     - `path` 保存了 `vendor/bin/generate-defuse-key` 生成的字符串的文件路径。
      *     - `password` 任意字符串。
      * @return RefreshTokenEntityInterface 更新令牌实例。
-     * @throws OAuthServerException 更新令牌无效。
+     * @throws InvalidRefreshTokenException 更新令牌无效。
      */
     public function unserializeRefreshTokenEntity($serializedRefreshToken, $cryptKey)
     {
@@ -123,8 +123,8 @@ trait RefreshTokenRepositoryTrait
             }
             
             return $refreshToken;
-        } catch (WrongKeyOrModifiedCiphertextException $e) {
-            throw new OAuthServerException(401, 'Refresh token is invalid.', 0, $e);
+        } catch (WrongKeyOrModifiedCiphertextException $exception) {
+            throw new InvalidRefreshTokenException('Refresh token is invalid.', 0, $exception);
         }
     }
     

@@ -131,4 +131,20 @@ trait ServerRequestTrait
     {
         return $this->getRequestAuthCredentials($request)[1];
     }
+
+    /**
+     * 在请求的授权头中检索 HTTP authentication。
+     *
+     * @param ServerRequestInterface $request 服务器请求。
+     * @return string|null
+     */
+    protected function getRequestAuthorization($request)
+    {
+        $authorization = $this->getRequestHeaderParam($request, 'authorization');
+        if ($authorization !== null && preg_match('/^Bearer\s+(.*?)$/', $authorization, $matches)) {
+            return $matches[1];
+        }
+        
+        return null;
+    }
 }

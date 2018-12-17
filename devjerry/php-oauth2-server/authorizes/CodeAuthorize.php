@@ -7,6 +7,7 @@
 namespace devjerry\oauth2\server\authorizes;
 
 use devjerry\oauth2\server\exceptions\OAuthServerException;
+use devjerry\oauth2\server\exceptions\BadRequestException;
 
 /**
  * CodeAuthorize class.
@@ -52,31 +53,42 @@ class CodeAuthorize extends AbstractAuthorize
     
     /**
      * {@inheritdoc}
+     * 
+     * @throws BadRequestException 缺少参数，或者参数无效。
      */
     public function getAuthorizeRequest($request)
     {
         $authorizeRequest = parent::getAuthorizeRequest($request);
 
-        // 启用交换码的验证。
-        if ($this->enableCodeChallenge === true) {
-            $codeChallenge = $this->getRequestQueryParam($request, 'code_challenge');
-            if ($codeChallenge === null) {
-                throw new OAuthServerException(400, 'Missing parameters: "code_challenge" required.');
+        try {
+            // 启用交换码的验证。
+            if ($this->enableCodeChallenge === true) {
+                $codeChallenge = $this->getRequestQueryParam($request, 'code_challenge');
+                if ($codeChallenge === null) {
+                    throw new BadRequestException('Missing parameters: `code_challenge` required.');
+                }
+                
+                $codeChallengeMethod = $this->getRequestQueryParam($request, 'code_challenge_method', $this->defaultCodeChallengeMethod);
+                if (!in_array($codeChallengeMethod, ['plain', 'S256'], true)) {
+                    throw new BadRequestException('Code challenge method must be `plain` or `S256`.');
+                }
+                
+                // Validate code_challenge according to RFC-7636
+                // @see: https://tools.ietf.org/html/rfc7636#section-4.2
+                if (preg_match('/^[A-Za-z0-9-._~]{43,128}$/', $codeChallenge) !== 1) {
+                    throw new BadRequestException('Code challenge must follow the specifications of RFC-7636.');
+                }
+    
+                $authorizeRequest->setCodeChallenge($codeChallenge);
+                $authorizeRequest->setCodeChallengeMethod($codeChallengeMethod);
             }
+        } catch (OAuthServerException $exception) {
+            $redirectUri = $authorizeRequest->getRedirectUri();
+            $state = $authorizeRequest->getState();
             
-            $codeChallengeMethod = $this->getRequestQueryParam($request, 'code_challenge_method', $this->defaultCodeChallengeMethod);
-            if (!in_array($codeChallengeMethod, ['plain', 'S256'], true)) {
-                throw new OAuthServerException(400, 'Code challenge method must be `plain` or `S256`.');
-            }
-            
-            // Validate code_challenge according to RFC-7636
-            // @see: https://tools.ietf.org/html/rfc7636#section-4.2
-            if (preg_match('/^[A-Za-z0-9-._~]{43,128}$/', $codeChallenge) !== 1) {
-                throw new OAuthServerException(400, 'Code challenge must follow the specifications of RFC-7636.');
-            }
-
-            $authorizeRequest->setCodeChallenge($codeChallenge);
-            $authorizeRequest->setCodeChallengeMethod($codeChallengeMethod);
+            // 设置异常的回调地址。
+            $exception->setRedirectUri($this->makeRedirectUri($redirectUri, ['state' => $state]));
+            throw $exception;
         }
         
         return $authorizeRequest;

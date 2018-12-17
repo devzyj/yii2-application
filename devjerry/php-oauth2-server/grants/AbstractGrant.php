@@ -9,7 +9,7 @@ namespace devjerry\oauth2\server\grants;
 use devjerry\oauth2\server\base\AbstractAuthorizeGrant;
 use devjerry\oauth2\server\interfaces\ServerRequestInterface;
 use devjerry\oauth2\server\interfaces\ClientEntityInterface;
-use devjerry\oauth2\server\exceptions\OAuthServerException;
+use devjerry\oauth2\server\exceptions\BadRequestException;
 
 /**
  * AbstractGrant class.
@@ -56,14 +56,14 @@ abstract class AbstractGrant extends AbstractAuthorizeGrant implements GrantType
      *
      * @param ServerRequestInterface $request 服务器请求。
      * @return ClientEntityInterface 客户端。
-     * @throws OAuthServerException 缺少参数。
+     * @throws BadRequestException 缺少参数。
      */
     protected function getAuthorizeClient($request)
     {
         // 获取客户端认证信息。
         list ($identifier, $secret) = $this->getClientAuthCredentials($request);
         if ($identifier === null || $secret === null) {
-            throw new OAuthServerException(400, 'Missing parameters: "client_id" and "client_secret" required.');
+            throw new BadRequestException('Missing parameters: `client_id` and `client_secret` required.');
         }
     
         // 获取并返回正在授权的客户端实例。

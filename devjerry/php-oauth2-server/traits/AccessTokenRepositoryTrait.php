@@ -9,8 +9,9 @@ namespace devjerry\oauth2\server\traits;
 use devjerry\oauth2\server\base\ArrayHelper;
 use devjerry\oauth2\server\base\JwtHelper;
 use devjerry\oauth2\server\interfaces\AccessTokenEntityInterface;
-use devjerry\oauth2\server\exceptions\OAuthServerException;
 use devjerry\oauth2\server\interfaces\ScopeEntityInterface;
+use devjerry\oauth2\server\exceptions\InvalidAccessTokenException;
+use devjerry\oauth2\server\exceptions\ServerErrorException;
 
 /**
  * AccessTokenRepositoryTrait 提供了序列化和反序列化访问令牌的方法。
@@ -77,6 +78,8 @@ trait AccessTokenRepositoryTrait
      * @param string|array $cryptKey 访问令牌密钥。可以是字符串密钥，或者包括以下一个元素的数组：
      *     - publicKey 公钥路径。
      * @return AccessTokenEntityInterface 访问令牌实例。
+     * @throws InvalidAccessTokenException 访问令牌无效。
+     * @throws ServerErrorException 解析 JSON 数据错误。
      */
     public function unserializeAccessTokenEntity($serializedAccessToken, $cryptKey)
     {
@@ -93,20 +96,13 @@ trait AccessTokenRepositoryTrait
 
             // 验证签名。
             if (!JwtHelper::verify($token, $signKey)) {
-                throw new OAuthServerException(401, 'Access token is invalid.');
+                throw new InvalidAccessTokenException('Access token is invalid.');
             }
             
             // 验证是否过期。
             if (!JwtHelper::validateExpires($token)) {
-                throw new OAuthServerException(401, 'Access token has expired.');
+                throw new InvalidAccessTokenException('Access token has expired.');
             }
-            
-            /*
-            //  TODO 的外部验证是否已撤销。
-            if ($this->isAccessTokenEntityRevoked($token->getClaim('jti'))) {
-                throw new OAuthServerException(401, 'Access token has been revoked.');
-            }
-            */
             
             // 创建访问令牌实例。
             $accessToken = $this->createAccessTokenEntity();
@@ -123,12 +119,12 @@ trait AccessTokenRepositoryTrait
             
             // 返回访问令牌实例。
             return $accessToken;
-        } catch (\InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException $exception) {
             // JWT 无法解析。
-            throw new OAuthServerException(401, $e->getMessage(), 0, $e);
+            throw new InvalidAccessTokenException($exception->getMessage(), 0, $exception);
         } catch (\RuntimeException $exception) {
             // JSON 无法解析。
-            throw new OAuthServerException(500, 'Error while decoding to JSON.', 0, $e);
+            throw new ServerErrorException(500, 'Error while decoding to JSON.', 0, $exception);
         }
     }
     

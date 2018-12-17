@@ -19,7 +19,9 @@ use devjerry\oauth2\server\interfaces\RefreshTokenEntityInterface;
 use devjerry\oauth2\server\interfaces\ScopeEntityInterface;
 use devjerry\oauth2\server\interfaces\UserEntityInterface;
 use devjerry\oauth2\server\authorizes\AuthorizeRequestInterface;
-use devjerry\oauth2\server\exceptions\OAuthServerException;
+use devjerry\oauth2\server\exceptions\UnauthorizedClientException;
+use devjerry\oauth2\server\exceptions\ForbiddenException;
+use devjerry\oauth2\server\exceptions\InvalidScopeException;
 use devjerry\oauth2\server\exceptions\UniqueIdentifierException;
 
 /**
@@ -408,13 +410,13 @@ abstract class AbstractAuthorizeGrant
      * @param string $identifier 客户端标识。
      * @param string|null $secret 客户端密钥。如果为 `null`，则不验证。 
      * @return ClientEntityInterface 客户端。
-     * @throws OAuthServerException 客户端无效。
+     * @throws UnauthorizedClientException 客户端认证失败。
      */
     protected function getClientByCredentials($identifier, $secret = null)
     {
         $client = $this->getClientRepository()->getClientEntityByCredentials($identifier, $secret);
         if (!$client instanceof ClientEntityInterface) {
-            throw new OAuthServerException(401, 'Client authentication failed.');
+            throw new UnauthorizedClientException('Client authentication failed.');
         }
         
         return $client;
@@ -425,13 +427,13 @@ abstract class AbstractAuthorizeGrant
      * 
      * @param ClientEntityInterface $client 客户端。
      * @param string $grantType 权限授予类型。
-     * @throws OAuthServerException 禁止的权限授予类型。
+     * @throws ForbiddenException 禁止的权限授予类型。
      */
     protected function validateClientGrantType(ClientEntityInterface $client, $grantType)
     {
         $grantTypes = $client->getGrantTypes();
         if (is_array($grantTypes) && !in_array($grantType, $grantTypes)) {
-            throw new OAuthServerException(403, 'The grant type is unauthorized for this client.');
+            throw new ForbiddenException('The grant type is unauthorized for this client.');
         }
     }
     
@@ -440,7 +442,7 @@ abstract class AbstractAuthorizeGrant
      * 
      * @param ScopeEntityInterface[]|string[]|string $scopes 需要验证的权限标识。
      * @return ScopeEntityInterface[] 验证有效的权限。
-     * @throws OAuthServerException 权限无效。
+     * @throws InvalidScopeException 无效的权限。
      */
     protected function validateScopes($scopes)
     {
@@ -459,7 +461,7 @@ abstract class AbstractAuthorizeGrant
             } elseif (is_string($scope) && !isset($validScopes[$scope])) {
                 $scopeEntity = $this->getScopeRepository()->getScopeEntity($scope);
                 if (!$scopeEntity instanceof ScopeEntityInterface) {
-                    throw new OAuthServerException('Scope is invalid.');
+                    throw new InvalidScopeException('The scope is invalid.');
                 }
 
                 $validScopes[$scope] = $scopeEntity;
@@ -476,7 +478,6 @@ abstract class AbstractAuthorizeGrant
      * @param ClientEntityInterface $client 需要关联的客户端。
      * @param UserEntityInterface $user 需要关联的用户。
      * @return AccessTokenEntityInterface 生成并且保存成功的访问令牌。
-     * @throws UniqueIdentifierException 保存令牌时唯一标识重复。
      */
     protected function generateAccessToken(array $scopes, ClientEntityInterface $client, UserEntityInterface $user = null)
     {
@@ -534,7 +535,6 @@ abstract class AbstractAuthorizeGrant
      * 
      * @param AuthorizeRequestInterface $authorizeRequest 授权请求。
      * @return AuthorizationCodeEntityInterface 生成并且保存成功的访问授权码。
-     * @throws UniqueIdentifierException 保存授权码时唯一标识重复。
      */
     protected function generateAuthorizationCode(AuthorizeRequestInterface $authorizeRequest)
     {
@@ -583,7 +583,6 @@ abstract class AbstractAuthorizeGrant
      *
      * @param AccessTokenEntityInterface $accessToken 访问令牌。
      * @return RefreshTokenEntityInterface 生成并且保存成功的更新令牌。
-     * @throws UniqueIdentifierException 保存令牌时唯一标识重复。
      */
     protected function generateRefreshToken(AccessTokenEntityInterface $accessToken)
     {

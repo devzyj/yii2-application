@@ -9,7 +9,8 @@ namespace devjerry\oauth2\server\grants;
 use devjerry\oauth2\server\interfaces\ServerRequestInterface;
 use devjerry\oauth2\server\interfaces\ClientEntityInterface;
 use devjerry\oauth2\server\interfaces\UserEntityInterface;
-use devjerry\oauth2\server\exceptions\OAuthServerException;
+use devjerry\oauth2\server\exceptions\BadRequestException;
+use devjerry\oauth2\server\exceptions\UnauthorizedUserException;
 
 /**
  * PasswordGrant class.
@@ -62,7 +63,7 @@ class PasswordGrant extends AbstractGrant
      *
      * @param ServerRequestInterface $request 服务器请求。
      * @return UserEntityInterface 用户实例。
-     * @throws OAuthServerException 缺少参数。
+     * @throws BadRequestException 缺少参数。
      */
     protected function getAuthorizeUser($request)
     {
@@ -70,7 +71,7 @@ class PasswordGrant extends AbstractGrant
         $username = $this->getRequestBodyParam($request, 'username');
         $password = $this->getRequestBodyParam($request, 'password');
         if ($username === null || $password === null) {
-            throw new OAuthServerException(400, 'Missing parameters: "username" and "password" required.');
+            throw new BadRequestException('Missing parameters: `username` and `password` required.');
         }
         
         // 获取并返回用户实例。
@@ -83,12 +84,13 @@ class PasswordGrant extends AbstractGrant
      * @param string $username 用户名。
      * @param string $password 用户密码。
      * @return UserEntityInterface 用户实例。
+     * @throws UnauthorizedUserException 用户认证失败。
      */
     protected function getUserByCredentials($username, $password)
     {
         $user = $this->getUserRepository()->getUserEntityByCredentials($username, $password);
         if (!$user instanceof UserEntityInterface) {
-            throw new OAuthServerException(401, 'User authentication failed.');
+            throw new UnauthorizedUserException('User authentication failed.');
         }
         
         return $user;

@@ -10,7 +10,7 @@ use Defuse\Crypto\Crypto;
 use Defuse\Crypto\Key;
 use Defuse\Crypto\Exception\WrongKeyOrModifiedCiphertextException;
 use devjerry\oauth2\server\interfaces\AuthorizationCodeEntityInterface;
-use devjerry\oauth2\server\exceptions\OAuthServerException;
+use devjerry\oauth2\server\exceptions\InvalidAuthorizationCodeException;
 use devjerry\oauth2\server\base\ArrayHelper;
 use devjerry\oauth2\server\interfaces\ScopeEntityInterface;
 
@@ -87,7 +87,7 @@ trait AuthorizationCodeRepositoryTrait
      *     - `path` 保存了 `vendor/bin/generate-defuse-key` 生成的字符串的文件路径。
      *     - `password` 任意字符串。
      * @return AuthorizationCodeEntityInterface 授权码实例。
-     * @throws OAuthServerException 授权码无效。
+     * @throws InvalidAuthorizationCodeException 授权码无效。
      */
     public function unserializeAuthorizationCodeEntity($serializedAuthorizationCode, $cryptKey)
     {
@@ -127,8 +127,8 @@ trait AuthorizationCodeRepositoryTrait
             }
             
             return $authorizationCode;
-        } catch (WrongKeyOrModifiedCiphertextException $e) {
-            throw new OAuthServerException(401, 'Authorization code is invalid.', 0, $e);
+        } catch (WrongKeyOrModifiedCiphertextException $exception) {
+            throw new InvalidAuthorizationCodeException('Authorization code is invalid.', 0, $exception);
         }
     }
 

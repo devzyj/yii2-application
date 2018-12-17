@@ -6,7 +6,7 @@
  */
 namespace devjerry\oauth2\server\base;
 
-use devjerry\oauth2\server\exceptions\OAuthServerException;
+use devjerry\oauth2\server\exceptions\ServerErrorException;
 
 /**
  * GenerateUniqueIdentifierTrait 提供了生成唯一标识的方法。
@@ -21,18 +21,18 @@ trait GenerateUniqueIdentifierTrait
      * 
      * @param int $length 长度。
      * @return string 唯一标识。
-     * @throws OAuthServerException 生成失败。
+     * @throws ServerErrorException 生成失败。
      */
     protected function generateUniqueIdentifier($length = 40)
     {
         try {
             return bin2hex(random_bytes($length));
         } catch (\TypeError $e) {
-            throw new OAuthServerException(500, 'An unexpected error has occurred.');
+            throw new ServerErrorException('An unexpected error has occurred.');
         } catch (\Error $e) {
-            throw new OAuthServerException(500, 'An unexpected error has occurred.');
+            throw new ServerErrorException('An unexpected error has occurred.');
         } catch (\Exception $e) {
-            throw new OAuthServerException(500, 'Could not generate a random string.');
+            throw new ServerErrorException('Could not generate a random string.');
         }
     }
 }

@@ -10,7 +10,10 @@ use devjerry\oauth2\server\interfaces\ServerRequestInterface;
 use devjerry\oauth2\server\interfaces\AuthorizationCodeEntityInterface;
 use devjerry\oauth2\server\interfaces\ClientEntityInterface;
 use devjerry\oauth2\server\interfaces\UserEntityInterface;
-use devjerry\oauth2\server\exceptions\OAuthServerException;
+use devjerry\oauth2\server\exceptions\BadRequestException;
+use devjerry\oauth2\server\exceptions\ForbiddenException;
+use devjerry\oauth2\server\exceptions\InvalidAuthorizationCodeException;
+use devjerry\oauth2\server\exceptions\ServerErrorException;
 use devjerry\oauth2\server\base\FunctionHelper;
 
 /**
@@ -44,6 +47,9 @@ class AuthorizationCodeGrant extends AbstractGrant
 
     /**
      * {@inheritdoc}
+     * 
+     * @throws BadRequestException 缺少参数。
+     * @throws ForbiddenException 授权码关联的用户无效。
      */
     protected function runGrant($request, ClientEntityInterface $client)
     {
@@ -53,7 +59,7 @@ class AuthorizationCodeGrant extends AbstractGrant
         // 获取回调地址。
         $redirectUri = $this->getRequestBodyParam($request, 'redirect_uri');
         if ($redirectUri === null) {
-            throw new OAuthServerException(400, 'Missing parameters: "redirect_uri" required.');
+            throw new BadRequestException('Missing parameters: `redirect_uri` required.');
         }
         
         // 验证请求的授权码。
@@ -65,7 +71,7 @@ class AuthorizationCodeGrant extends AbstractGrant
         // 获取与授权码关联的用户。
         $user = $this->getUserRepository()->getUserEntity($authorizationCode->getUserIdentifier());
         if (!$user instanceof UserEntityInterface) {
-            throw new OAuthServerException(400, 'Invalid user.');
+            throw new ForbiddenException('The authorization user is invalid.');
         }
         
         // 验证与授权码关联的权限。
@@ -95,18 +101,19 @@ class AuthorizationCodeGrant extends AbstractGrant
      *
      * @param ServerRequestInterface $request 服务器请求。
      * @return AuthorizationCodeEntityInterface 授权码。
-     * @throws OAuthServerException 缺少参数。
+     * @throws BadRequestException 缺少参数。
+     * @throws InvalidAuthorizationCodeException 授权码无效。
      */
     protected function getRequestedAuthorizationCode($request)
     {
         $requestedCode = $this->getRequestBodyParam($request, 'code');
         if ($requestedCode === null) {
-            throw new OAuthServerException(400, 'Missing parameters: "code" required.');
+            throw new BadRequestException('Missing parameters: `code` required.');
         }
         
         $authorizationCode = $this->getAuthorizationCodeRepository()->unserializeAuthorizationCodeEntity($requestedCode, $this->getAuthorizationCodeCryptKey());
         if (!$authorizationCode instanceof AuthorizationCodeEntityInterface) {
-            throw new OAuthServerException(401, 'Authorization code is invalid.');
+            throw new InvalidAuthorizationCodeException('Authorization code is invalid.');
         }
         
         return $authorizationCode;
@@ -118,18 +125,18 @@ class AuthorizationCodeGrant extends AbstractGrant
      * @param AuthorizationCodeEntityInterface $authorizationCode 授权码。
      * @param ClientEntityInterface $client 客户端。
      * @param string $redirectUri 回调地址。
-     * @throws OAuthServerException 授权码没有关联到当前客户端，或者授权码过期，或者回调地址错误，或者授权码已撤销。
+     * @throws InvalidAuthorizationCodeException 授权码没有关联到当前客户端，或者授权码过期，或者回调地址错误，或者授权码已撤销。
      */
     protected function validateAuthorizationCode(AuthorizationCodeEntityInterface $authorizationCode, ClientEntityInterface $client, $redirectUri)
     {
         if ($authorizationCode->getClientIdentifier() != $client->getIdentifier()) {
-            throw new OAuthServerException(401, 'Authorization code was not issued to this client.');
+            throw new InvalidAuthorizationCodeException('Authorization code was not issued to this client.');
         } elseif ($authorizationCode->getExpires() < time()) {
-            throw new OAuthServerException(401, 'Authorization code has expired.');
+            throw new InvalidAuthorizationCodeException('Authorization code has expired.');
         } elseif ($authorizationCode->getRedirectUri() !== $redirectUri) {
-            throw new OAuthServerException(401, 'Invalid redirect URI.');
+            throw new InvalidAuthorizationCodeException('Invalid redirect URI.');
         } elseif ($this->getAuthorizationCodeRepository()->isAuthorizationCodeEntityRevoked($authorizationCode->getIdentifier())) {
-            throw new OAuthServerException(401, 'Authorization code has been revoked.');
+            throw new InvalidAuthorizationCodeException('Authorization code has been revoked.');
         }
     }
     
@@ -138,20 +145,22 @@ class AuthorizationCodeGrant extends AbstractGrant
      * 
      * @param ServerRequestInterface $request 服务器请求。
      * @param AuthorizationCodeEntityInterface $authorizationCode 授权码。
-     * @throws OAuthServerException 验证错误。
+     * @throws BadRequestException 缺少参数，或者参数错误。
+     * @throws ForbiddenException 验证错误。
+     * @throws ServerErrorException 不支持的验证类型。
      */
     protected function validateCodeChallenge($request, $authorizationCode)
     {
         if ($this->enableCodeChallenge === true) {
             $codeVerifier = $this->getRequestBodyParam('code_verifier', $request);
             if ($codeVerifier === null) {
-                throw new OAuthServerException(400, 'Missing parameters: "code_verifier" required.');
+                throw new BadRequestException('Missing parameters: `code_verifier` required.');
             }
             
             // Validate code_verifier according to RFC-7636
             // @see: https://tools.ietf.org/html/rfc7636#section-4.1
             if (preg_match('/^[A-Za-z0-9-._~]{43,128}$/', $codeVerifier) !== 1) {
-                throw new OAuthServerException(400, 'Code Verifier must follow the specifications of RFC-7636.');
+                throw new BadRequestException('Code Verifier must follow the specifications of RFC-7636.');
             }
 
             $codeChallenge = $authorizationCode->getCodeChallenge();
@@ -159,17 +168,17 @@ class AuthorizationCodeGrant extends AbstractGrant
             switch ($codeChallengeMethod) {
                 case 'plain':
                     if (FunctionHelper::hashEquals($codeVerifier, $codeChallenge) === false) {
-                        throw new OAuthServerException(400, 'Failed to verify `code_verifier`.');
+                        throw new ForbiddenException('Failed to verify `code_verifier`.');
                     }
                     break;
                 case 'S256':
                     $codeVerifier = strtr(rtrim(base64_encode(hash('sha256', $codeVerifier, true)), '='), '+/', '-_');
                     if (FunctionHelper::hashEquals($codeVerifier, $codeChallenge) === false) {
-                        throw new OAuthServerException(400, 'Failed to verify `code_verifier`.');
+                        throw new ForbiddenException('Failed to verify `code_verifier`.');
                     }
                     break;
                 default:
-                    throw new OAuthServerException(500, sprintf('Unsupported code challenge method `%s`', $codeChallengeMethod));
+                    throw new ServerErrorException(sprintf('Unsupported code challenge method `%s`', $codeChallengeMethod));
             }
         }
     }

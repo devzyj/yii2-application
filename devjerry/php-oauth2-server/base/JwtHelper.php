@@ -126,7 +126,7 @@ class JwtHelper
      *
      * @param string $jwt 令牌。
      * @return Token 令牌实例。
-     * @throws \InvalidArgumentException
+     * @throws \InvalidArgumentException 解析令牌出错。
      * @throws \RuntimeException 解码JSON时出错。
      */
     public static function parseJwt($jwt)
