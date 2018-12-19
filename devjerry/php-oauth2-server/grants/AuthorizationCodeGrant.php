@@ -19,6 +19,40 @@ use devjerry\oauth2\server\base\FunctionHelper;
 /**
  * AuthorizationCodeGrant class.
  *
+ * ```php
+ * use devjerry\oauth2\server\grants\AuthorizationCodeGrant;
+ * 
+ * // 实例化对像。
+ * $authorizationCodeGrant = new AuthorizationCodeGrant([
+ *     'accessTokenRepository' => new AccessTokenRepository(),
+ *     'authorizationCodeRepository' => new AuthorizationCodeRepository(),
+ *     'clientRepository' => new ClientRepository(),
+ *     'refreshTokenRepository' => new RefreshTokenRepository(),
+ *     'scopeRepository' => new ScopeRepository(),
+ *     'userRepository' => new UserRepository(),
+ *     'accessTokenDuration' => 3600, // 访问令牌持续 1 小时。
+ *     'accessTokenCryptKey' => [
+ *         'privateKey' => '/path/to/privateKey', // 访问令牌的私钥路径。
+ *         'passphrase' => null, // 访问令牌的私钥密码。没有密码可以为 `null`。
+ *     ],
+ *     //'accessTokenCryptKey' => 'string key', // 字符串密钥。
+ *     'authorizationCodeCryptKey' => [
+ *         'ascii' => 'def0000086937b.....', // 使用 `vendor/bin/generate-defuse-key` 生成的字符串。
+ *         //'path' => '/path/to/asciiFile', // 保存了 `vendor/bin/generate-defuse-key` 生成的字符串的文件路径。
+ *         //'password' => 'string key', // 字符串密钥。
+ *     ],
+ *     'refreshTokenDuration' => 2592000, // 更新令牌持续 30 天。
+ *     'refreshTokenCryptKey' => [
+ *         'ascii' => 'def0000086937b.....', // 使用 `vendor/bin/generate-defuse-key` 生成的字符串。
+ *         //'path' => '/path/to/asciiFile', // 保存了 `vendor/bin/generate-defuse-key` 生成的字符串的文件路径。
+ *         //'password' => 'string key', // 字符串密钥。
+ *     ],
+ *     //'enableCodeChallenge' => true,
+ * ]);
+ * ```
+ * 
+ * @property boolean $enableCodeChallenge 是否启用代码交换验证。
+ * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
@@ -27,24 +61,64 @@ class AuthorizationCodeGrant extends AbstractGrant
     /**
      * @var boolean
      */
-    protected $enableCodeChallenge = false;
+    private $_enableCodeChallenge;
 
     /**
-     * 启用代码交换验证。
+     * 获取是否启用代码交换验证。
+     * 
+     * @return boolean
      */
-    public function enableCodeChallenge()
+    public function getEnableCodeChallenge()
     {
-        $this->enableCodeChallenge = true;
+        return $this->_enableCodeChallenge;
+    }
+    
+    /**
+     * 设置是否启用代码交换验证。
+     * 
+     * @param boolean $value
+     */
+    public function setEnableCodeChallenge($value)
+    {
+        $this->_enableCodeChallenge = (bool) $value;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function init()
+    {
+        parent::init();
+
+        if ($this->getEnableCodeChallenge() === null) {
+            $this->setEnableCodeChallenge(false);
+        }
     }
     
     /**
      * {@inheritdoc}
      */
-    public function getIdentifier()
+    protected function getIdentifier()
     {
         return self::GRANT_TYPE_AUTHORIZATION_CODE;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function canRun($request)
+    {
+        if ($this->getAuthorizationCodeRepository() === null) {
+            throw new \LogicException('The `authorizationCodeRepository` property must be set.');
+        } elseif ($this->getUserRepository() === null) {
+            throw new \LogicException('The `userRepository` property must be set.');
+        } elseif ($this->getRefreshTokenRepository() === null) {
+            throw new \LogicException('The `refreshTokenRepository` property must be set.');
+        }
+        
+        return parent::canRun($request);
+    }
+    
     /**
      * {@inheritdoc}
      * 
@@ -151,7 +225,7 @@ class AuthorizationCodeGrant extends AbstractGrant
      */
     protected function validateCodeChallenge($request, $authorizationCode)
     {
-        if ($this->enableCodeChallenge === true) {
+        if ($this->getEnableCodeChallenge() === true) {
             $codeVerifier = $this->getRequestBodyParam('code_verifier', $request);
             if ($codeVerifier === null) {
                 throw new BadRequestException('Missing parameters: `code_verifier` required.');

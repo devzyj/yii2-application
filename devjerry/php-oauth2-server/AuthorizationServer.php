@@ -6,21 +6,35 @@
  */
 namespace devjerry\oauth2\server;
 
+use devjerry\oauth2\server\base\AuthorizeGrantPropertyTrait;
+use devjerry\oauth2\server\base\RepositoryPropertyTrait;
 use devjerry\oauth2\server\interfaces\ServerRequestInterface;
-use devjerry\oauth2\server\grants\GrantTypeInterface;
 use devjerry\oauth2\server\authorizes\AuthorizeTypeInterface;
+use devjerry\oauth2\server\authorizes\CodeAuthorize;
+use devjerry\oauth2\server\authorizes\ImplicitAuthorize;
 use devjerry\oauth2\server\authorizes\AuthorizeRequestInterface;
+use devjerry\oauth2\server\grants\GrantTypeInterface;
+use devjerry\oauth2\server\grants\AuthorizationCodeGrant;
+use devjerry\oauth2\server\grants\ClientCredentialsGrant;
+use devjerry\oauth2\server\grants\PasswordGrant;
+use devjerry\oauth2\server\grants\RefreshTokenGrant;
 use devjerry\oauth2\server\exceptions\UnsupportedAuthTypeException;
 use devjerry\oauth2\server\exceptions\UserDeniedAuthorizeException;
 
 /**
  * AuthorizationServer class.
- *
+ * 
+ * ```php
+ * 
+ * ```
+ * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
 class AuthorizationServer
 {
+    use AuthorizeGrantPropertyTrait, RepositoryPropertyTrait;
+    
     /**
      * @var AuthorizeTypeInterface[]
      */
@@ -36,9 +50,42 @@ class AuthorizationServer
      *
      * @return AuthorizeTypeInterface[] 授权类型实例列表。
      */
-    public function getAuthorizeTypes()
+    protected function getAuthorizeTypes()
     {
         return $this->_authorizeTypes;
+    }
+
+    /**
+     * 添加授权类型。
+     *
+     * @param AuthorizeTypeInterface $authorizeType 授权类型。
+     * @param boolean $configure 是否使用全局配置。
+     */
+    public function addAuthorizeType(AuthorizeTypeInterface $authorizeType, $configure = true)
+    {
+        if ($configure) {
+            if ($authorizeType instanceof CodeAuthorize) {
+                $authorizeType->configure([
+                    'authorizationCodeRepository' => $this->getAuthorizationCodeRepository(),
+                    'clientRepository' => $this->getClientRepository(),
+                    'scopeRepository' => $this->getScopeRepository(),
+                    'defaultScopes' => $this->getDefaultScopes(),
+                    'authorizationCodeDuration' => $this->getAuthorizationCodeDuration(),
+                    'authorizationCodeCryptKey' => $this->getAuthorizationCodeCryptKey(),
+                ]);
+            } elseif ($authorizeType instanceof ImplicitAuthorize) {
+                $authorizeType->configure([
+                    'accessTokenRepository' => $this->getAccessTokenRepository(),
+                    'clientRepository' => $this->getClientRepository(),
+                    'scopeRepository' => $this->getScopeRepository(),
+                    'defaultScopes' => $this->getDefaultScopes(),
+                    'accessTokenDuration' => $this->getAccessTokenDuration(),
+                    'accessTokenCryptKey' => $this->getAccessTokenCryptKey(),
+                ]);
+            }
+        }
+        
+        $this->_grantTypes[$authorizeType->getIdentifier()] = $authorizeType;
     }
     
     /**
@@ -46,28 +93,71 @@ class AuthorizationServer
      * 
      * @return GrantTypeInterface[] 权限授予类型实例列表。
      */
-    public function getGrantTypes()
+    protected function getGrantTypes()
     {
         return $this->_grantTypes;
-    }
-
-    /**
-     * 添加授权类型。
-     *
-     * @param AuthorizeTypeInterface $authorizeType 授权类型。
-     */
-    public function addAuthorizeType(AuthorizeTypeInterface $authorizeType)
-    {
-        $this->_grantTypes[$authorizeType->getIdentifier()] = $authorizeType;
     }
     
     /**
      * 添加权限授予类型。
      * 
      * @param GrantTypeInterface $grantType 权限授予类型。
+     * @param boolean $configure 是否使用全局配置。
      */
-    public function addGrantType(GrantTypeInterface $grantType)
+    public function addGrantType(GrantTypeInterface $grantType, $configure = true)
     {
+        if ($configure) {
+            if ($grantType instanceof AuthorizationCodeGrant) {
+                $grantType->configure([
+                    'accessTokenRepository' => $this->getAccessTokenRepository(),
+                    'authorizationCodeRepository' => $this->getAuthorizationCodeRepository(),
+                    'clientRepository' => $this->getClientRepository(),
+                    'refreshTokenRepository' => $this->getRefreshTokenRepository(),
+                    'scopeRepository' => $this->getScopeRepository(),
+                    'userRepository' => $this->getUserRepository(),
+                    'accessTokenDuration' => $this->getAccessTokenDuration(),
+                    'accessTokenCryptKey' => $this->getAccessTokenCryptKey(),
+                    'authorizationCodeCryptKey' => $this->getAuthorizationCodeCryptKey(),
+                    'refreshTokenDuration' => $this->getRefreshTokenDuration(),
+                    'refreshTokenCryptKey' => $this->getRefreshTokenCryptKey(),
+                ]);
+            } elseif ($grantType instanceof ClientCredentialsGrant) {
+                $grantType->configure([
+                    'accessTokenRepository' => $this->getAccessTokenRepository(),
+                    'clientRepository' => $this->getClientRepository(),
+                    'scopeRepository' => $this->getScopeRepository(),
+                    'defaultScopes' => $this->getDefaultScopes(),
+                    'accessTokenDuration' => $this->getAccessTokenDuration(),
+                    'accessTokenCryptKey' => $this->getAccessTokenCryptKey(),
+                ]);
+            } elseif ($grantType instanceof PasswordGrant) {
+                $grantType->configure([
+                    'accessTokenRepository' => $this->getAccessTokenRepository(),
+                    'clientRepository' => $this->getClientRepository(),
+                    'refreshTokenRepository' => $this->getRefreshTokenRepository(),
+                    'scopeRepository' => $this->getScopeRepository(),
+                    'userRepository' => $this->getUserRepository(),
+                    'defaultScopes' => $this->getDefaultScopes(),
+                    'accessTokenDuration' => $this->getAccessTokenDuration(),
+                    'accessTokenCryptKey' => $this->getAccessTokenCryptKey(),
+                    'refreshTokenDuration' => $this->getRefreshTokenDuration(),
+                    'refreshTokenCryptKey' => $this->getRefreshTokenCryptKey(),
+                ]);
+            } elseif ($grantType instanceof RefreshTokenGrant) {
+                $grantType->configure([
+                    'accessTokenRepository' => $this->getAccessTokenRepository(),
+                    'clientRepository' => $this->getClientRepository(),
+                    'refreshTokenRepository' => $this->getRefreshTokenRepository(),
+                    'scopeRepository' => $this->getScopeRepository(),
+                    'userRepository' => $this->getUserRepository(),
+                    'accessTokenDuration' => $this->getAccessTokenDuration(),
+                    'accessTokenCryptKey' => $this->getAccessTokenCryptKey(),
+                    'refreshTokenDuration' => $this->getRefreshTokenDuration(),
+                    'refreshTokenCryptKey' => $this->getRefreshTokenCryptKey(),
+                ]);
+            }
+        }
+        
         $this->_grantTypes[$grantType->getIdentifier()] = $grantType;
     }
     

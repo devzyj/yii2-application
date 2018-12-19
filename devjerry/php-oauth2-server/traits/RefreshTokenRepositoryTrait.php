@@ -116,7 +116,7 @@ trait RefreshTokenRepositoryTrait
             $refreshToken->setClientIdentifier(ArrayHelper::getValue($data, 'client_id'));
             $refreshToken->setUserIdentifier(ArrayHelper::getValue($data, 'user_id'));
             $scopes = ArrayHelper::getValue($data, 'scopes', []);
-            if ($scopes && is_array($scopes)) {
+            if (is_array($scopes)) {
                 foreach ($scopes as $scope) {
                     $refreshToken->addScopeIdentifier($scope);
                 }

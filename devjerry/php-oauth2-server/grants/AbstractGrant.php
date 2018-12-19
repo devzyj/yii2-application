@@ -24,6 +24,14 @@ abstract class AbstractGrant extends AbstractAuthorizeGrant implements GrantType
      */
     public function canRun($request)
     {
+        if ($this->getClientRepository() === null) {
+            throw new \LogicException('The `clientRepository` property must be set.');
+        } elseif ($this->getScopeRepository() === null) {
+            throw new \LogicException('The `scopeRepository` property must be set.');
+        } elseif ($this->getAccessTokenRepository() === null) {
+            throw new \LogicException('The `accessTokenRepository` property must be set.');
+        }
+        
         $grantType = $this->getRequestBodyParam($request, 'grant_type');
         return $this->getIdentifier() === $grantType;
     }

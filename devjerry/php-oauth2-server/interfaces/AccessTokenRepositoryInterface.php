@@ -26,7 +26,7 @@ interface AccessTokenRepositoryInterface
     /**
      * 生成访问令牌唯一标识。
      * 
-     * @return string 访问令牌唯一标识。
+     * @return string|null 访问令牌唯一标识。如果返回 `null`，则自动生成。
      */
     public function generateAccessTokenUniqueIdentifier();
     

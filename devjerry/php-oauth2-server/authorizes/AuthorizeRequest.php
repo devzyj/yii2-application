@@ -6,17 +6,28 @@
  */
 namespace devjerry\oauth2\server\authorizes;
 
+use devjerry\oauth2\server\base\BaseObject;
 use devjerry\oauth2\server\interfaces\ClientEntityInterface;
 use devjerry\oauth2\server\interfaces\ScopeEntityInterface;
 use devjerry\oauth2\server\interfaces\UserEntityInterface;
 
 /**
  * AuthorizeRequest class.
- *
+ * 
+ * @property AuthorizeTypeInterface $authorizeType 授权类型。
+ * @property ClientEntityInterface $clientEntity 客户端。
+ * @property ScopeEntityInterface[] $scopeEntities 权限。
+ * @property UserEntityInterface $usertEntity 用户。
+ * @property boolean $isApproved 用户是否批准授权。
+ * @property string $redirectUri 回调地址。
+ * @property string $state 请求的状态参数。
+ * @property string $codeChallenge 交换验证代码。
+ * @property string $codeChallengeMethod 交换验证方法。
+ * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
-class AuthorizeRequest implements AuthorizeRequestInterface
+class AuthorizeRequest extends BaseObject implements AuthorizeRequestInterface
 {
     private $_authorizeType;
     private $_clientEntity;
@@ -24,7 +35,7 @@ class AuthorizeRequest implements AuthorizeRequestInterface
     private $_state;
     private $_scopeEntities = [];
     private $_userEntity;
-    private $_approved;
+    private $_isApproved;
     private $_codeChallenge;
     private $_codeChallengeMethod;
     
@@ -138,17 +149,17 @@ class AuthorizeRequest implements AuthorizeRequestInterface
     /**
      * {@inheritdoc}
      */
-    public function getApproved()
+    public function getIsApproved()
     {
-        return $this->_approved;
+        return $this->_isApproved;
     }
     
     /**
      * {@inheritdoc}
      */
-    public function setApproved($approved)
+    public function setIsApproved($approved)
     {
-        $this->_approved = $approved;
+        $this->_isApproved = $approved;
     }
 
     /**

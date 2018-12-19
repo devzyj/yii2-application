@@ -11,7 +11,30 @@ use devjerry\oauth2\server\exceptions\BadRequestException;
 
 /**
  * CodeAuthorize class.
- *
+ * 
+ * ```php
+ * use devjerry\oauth2\server\authorizes\CodeAuthorize;
+ * 
+ * // 实例化对像。
+ * $codeAuthorize = new CodeAuthorize([
+ *     'authorizationCodeRepository' => new AuthorizationCodeRepository(),
+ *     'clientRepository' => new ClientRepository(),
+ *     'scopeRepository' => new ScopeRepository(),
+ *     'defaultScopes' => ['basic', 'basic2'], // 默认权限。
+ *     'authorizationCodeDuration' => 600, // 授权码持续 10 分钟。
+ *     'authorizationCodeCryptKey' => [
+ *         'ascii' => 'def0000086937b.....', // 使用 `vendor/bin/generate-defuse-key` 生成的字符串。
+ *         //'path' => '/path/to/asciiFile', // 保存了 `vendor/bin/generate-defuse-key` 生成的字符串的文件路径。
+ *         //'password' => 'string key', // 字符串密钥。
+ *     ]
+ *     //'enableCodeChallenge' => true,
+ *     //'defaultCodeChallengeMethod' => 'plain',
+ * ]);
+ * ```
+ * 
+ * @property boolean $enableCodeChallenge 是否启用代码交换验证。
+ * @property string $defaultCodeChallengeMethod 代码交换验证方法。
+ * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
@@ -20,25 +43,73 @@ class CodeAuthorize extends AbstractAuthorize
     /**
      * @var boolean
      */
-    protected $enableCodeChallenge = false;
-    
-    /**
-     * @var string 代码交换验证方法。
-     */
-    protected $defaultCodeChallengeMethod = 'plain';
+    private $_enableCodeChallenge;
 
     /**
-     * 启用代码交换验证。
+     * @var string
      */
-    public function enableCodeChallenge()
+    private $_defaultCodeChallengeMethod;
+    
+    /**
+     * 获取是否启用代码交换验证。
+     * 
+     * @return boolean
+     */
+    public function getEnableCodeChallenge()
     {
-        $this->enableCodeChallenge = true;
+        return $this->_enableCodeChallenge;
+    }
+    
+    /**
+     * 设置是否启用代码交换验证。
+     * 
+     * @param boolean $value
+     */
+    public function setEnableCodeChallenge($value)
+    {
+        $this->_enableCodeChallenge = (bool) $value;
+    }
+
+    /**
+     * 获取代码交换验证方法。
+     *
+     * @return string
+     */
+    public function getDefaultCodeChallengeMethod()
+    {
+        return $this->_defaultCodeChallengeMethod;
+    }
+    
+    /**
+     * 设置代码交换验证方法。
+     *
+     * @param string $value
+     */
+    public function setDefaultCodeChallengeMethod($value)
+    {
+        $this->_defaultCodeChallengeMethod = $value;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function init()
+    {
+        parent::init();
+        
+        if ($this->getEnableCodeChallenge() === null) {
+            $this->setEnableCodeChallenge(false);
+        }
+        
+        if ($this->getDefaultCodeChallengeMethod() === null) {
+            $this->setDefaultCodeChallengeMethod('plain');
+        }
     }
     
     /**
      * {@inheritdoc}
      */
-    public function getIdentifier()
+    protected function getIdentifier()
     {
         return self::AUTHORIZE_TYPE_CODE;
     }
@@ -46,9 +117,21 @@ class CodeAuthorize extends AbstractAuthorize
     /**
      * {@inheritdoc}
      */
-    public function getGrantIdentifier()
+    protected function getGrantIdentifier()
     {
         return self::GRANT_TYPE_AUTHORIZATION_CODE;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function canRun($request)
+    {
+        if ($this->getAuthorizationCodeRepository() === null) {
+            throw new \LogicException('The `authorizationCodeRepository` property must be set.');
+        }
+        
+        return parent::canRun($request);
     }
     
     /**
@@ -62,13 +145,13 @@ class CodeAuthorize extends AbstractAuthorize
 
         try {
             // 启用交换码的验证。
-            if ($this->enableCodeChallenge === true) {
+            if ($this->getEnableCodeChallenge() === true) {
                 $codeChallenge = $this->getRequestQueryParam($request, 'code_challenge');
                 if ($codeChallenge === null) {
                     throw new BadRequestException('Missing parameters: `code_challenge` required.');
                 }
                 
-                $codeChallengeMethod = $this->getRequestQueryParam($request, 'code_challenge_method', $this->defaultCodeChallengeMethod);
+                $codeChallengeMethod = $this->getRequestQueryParam($request, 'code_challenge_method', $this->getDefaultCodeChallengeMethod());
                 if (!in_array($codeChallengeMethod, ['plain', 'S256'], true)) {
                     throw new BadRequestException('Code challenge method must be `plain` or `S256`.');
                 }
@@ -97,7 +180,7 @@ class CodeAuthorize extends AbstractAuthorize
     /**
      * {@inheritdoc}
      */
-    public function runUserAllowed(AuthorizeRequestInterface $authorizeRequest)
+    protected function runUserAllowed(AuthorizeRequestInterface $authorizeRequest)
     {
         $authorizationCode = $this->generateAuthorizationCode($authorizeRequest);
         $authorizationCryptKey = $this->getAuthorizationCodeCryptKey();

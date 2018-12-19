@@ -26,7 +26,7 @@ interface AuthorizationCodeRepositoryInterface
     /**
      * 生成授权码唯一标识。
      *
-     * @return string 授权码唯一标识。
+     * @return string|null 授权码唯一标识。如果返回 `null`，则自动生成。
      */
     public function generateAuthorizationCodeUniqueIdentifier();
     

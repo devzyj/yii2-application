@@ -114,14 +114,14 @@ interface AuthorizeRequestInterface
      * 
      * @return boolean
      */
-    public function getApproved();
+    public function getIsApproved();
     
     /**
      * 设置用户是否批准授权。
      * 
      * @param boolean $approved
      */
-    public function setApproved($approved);
+    public function setIsApproved($approved);
 
     /**
      * 获取交换验证代码。

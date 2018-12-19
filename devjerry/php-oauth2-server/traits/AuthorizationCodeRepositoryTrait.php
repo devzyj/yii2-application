@@ -120,7 +120,7 @@ trait AuthorizationCodeRepositoryTrait
             $authorizationCode->setCodeChallenge(ArrayHelper::getValue($data, 'code_challenge'));
             $authorizationCode->setCodeChallengeMethod(ArrayHelper::getValue($data, 'code_challenge_method'));
             $scopes = ArrayHelper::getValue($data, 'scopes', []);
-            if ($scopes && is_array($scopes)) {
+            if (is_array($scopes)) {
                 foreach ($scopes as $scope) {
                     $authorizationCode->addScopeIdentifier($scope);
                 }

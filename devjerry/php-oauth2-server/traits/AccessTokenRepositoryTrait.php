@@ -29,7 +29,7 @@ trait AccessTokenRepositoryTrait
      * @param AccessTokenEntityInterface $accessTokenEntity 访问令牌。
      * @param string|array $cryptKey 访问令牌密钥。可以是字符串密钥，或者包括以下二个元素的数组：
      *     - privateKey 私钥路径。
-     *     - passphrase 私钥密码。
+     *     - passphrase 私钥密码。没有密码可以为 `null`。
      * @return string 序列化的访问令牌。
      */
     public function serializeAccessTokenEntity(AccessTokenEntityInterface $accessTokenEntity, $cryptKey)
@@ -111,7 +111,7 @@ trait AccessTokenRepositoryTrait
             $accessToken->setClientIdentifier($token->getClaim('aud'));
             $accessToken->setUserIdentifier($token->getClaim('sub'));
             $scopes = $token->getClaim('scopes');
-            if ($scopes && is_array($scopes)) {
+            if (is_array($scopes)) {
                 foreach ($scopes as $scope) {
                     $accessToken->addScopeIdentifier($scope);
                 }

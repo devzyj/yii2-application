@@ -26,7 +26,7 @@ interface RefreshTokenRepositoryInterface
     /**
      * 生成更新令牌唯一标识。
      *
-     * @return string 更新令牌唯一标识。
+     * @return string|null 更新令牌唯一标识。如果返回 `null`，则自动生成。
      */
     public function generateRefreshTokenUniqueIdentifier();
     

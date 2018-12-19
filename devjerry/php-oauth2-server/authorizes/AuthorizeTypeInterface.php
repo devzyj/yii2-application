@@ -22,14 +22,14 @@ interface AuthorizeTypeInterface
      * 
      * @return string 授权标识。
      */
-    public function getIdentifier();
+    protected function getIdentifier();
 
     /**
      * 获取授予标识。
      *
      * @return string 授予标识。
      */
-    public function getGrantIdentifier();
+    protected function getGrantIdentifier();
     
     /**
      * 是否可以运行授权。

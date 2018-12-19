@@ -27,6 +27,12 @@ abstract class AbstractAuthorize extends AbstractAuthorizeGrant implements Autho
      */
     public function canRun($request)
     {
+        if ($this->getClientRepository() === null) {
+            throw new \LogicException('The `clientRepository` property must be set.');
+        } elseif ($this->getScopeRepository() === null) {
+            throw new \LogicException('The `scopeRepository` property must be set.');
+        }
+        
         $responseType = $this->getRequestQueryParam($request, 'response_type');
         return $this->getIdentifier() === $responseType;
     }
@@ -134,7 +140,7 @@ abstract class AbstractAuthorize extends AbstractAuthorizeGrant implements Autho
         }
         
         try {
-            if (!$authorizeRequest->getApproved()) {
+            if (!$authorizeRequest->getIsApproved()) {
                 // 用户拒绝授权。
                 throw new UserDeniedAuthorizeException('The user denied the authorization.');
             }
@@ -166,7 +172,7 @@ abstract class AbstractAuthorize extends AbstractAuthorizeGrant implements Autho
      * @param array $params
      * @return string
      */
-    public function makeRedirectUri($uri, array $params = [])
+    protected function makeRedirectUri($uri, array $params = [])
     {
         $anchor = isset($params['#']) ? '#' . $params['#'] : '';
         unset($params['#']);

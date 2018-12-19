@@ -6,12 +6,6 @@
  */
 namespace devjerry\oauth2\server\base;
 
-use devjerry\oauth2\server\interfaces\AccessTokenRepositoryInterface;
-use devjerry\oauth2\server\interfaces\AuthorizationCodeRepositoryInterface;
-use devjerry\oauth2\server\interfaces\ClientRepositoryInterface;
-use devjerry\oauth2\server\interfaces\RefreshTokenRepositoryInterface;
-use devjerry\oauth2\server\interfaces\ScopeRepositoryInterface;
-use devjerry\oauth2\server\interfaces\UserRepositoryInterface;
 use devjerry\oauth2\server\interfaces\AccessTokenEntityInterface;
 use devjerry\oauth2\server\interfaces\AuthorizationCodeEntityInterface;
 use devjerry\oauth2\server\interfaces\ClientEntityInterface;
@@ -23,16 +17,17 @@ use devjerry\oauth2\server\exceptions\UnauthorizedClientException;
 use devjerry\oauth2\server\exceptions\ForbiddenException;
 use devjerry\oauth2\server\exceptions\InvalidScopeException;
 use devjerry\oauth2\server\exceptions\UniqueIdentifierException;
+use devjerry\oauth2\server\exceptions\ServerErrorException;
 
 /**
  * AbstractAuthorizeGrant class.
- *
+ * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
-abstract class AbstractAuthorizeGrant
+abstract class AbstractAuthorizeGrant extends BaseObject
 {
-    use ServerRequestTrait, GenerateUniqueIdentifierTrait;
+    use AuthorizeGrantPropertyTrait, RepositoryPropertyTrait, ServerRequestTrait;
 
     /**
      * @var string 授权码授权模式。
@@ -78,331 +73,6 @@ abstract class AbstractAuthorizeGrant
      * @var integer 生成标识的最大次数。
      */
     const GENERATE_IDENDIFIER_MAX = 10;
-    
-    /**
-     * @var AccessTokenRepositoryInterface 访问令牌存储库。
-     */
-    private $_accessTokenRepository;
-
-    /**
-     * @var AuthorizationCodeRepositoryInterface 授权码存储库。
-     */
-    private $_authorizationCodeRepository;
-    
-    /**
-     * @var ClientRepositoryInterface 客户端存储库。
-     */
-    private $_clientRepository;
-
-    /**
-     * @var RefreshTokenRepositoryInterface 更新令牌存储库。
-     */
-    private $_refreshTokenRepository;
-    
-    /**
-     * @var ScopeRepositoryInterface 权限存储库。
-     */
-    private $_scopeRepository;
-
-    /**
-     * @var UserRepositoryInterface 用户存储库。
-     */
-    private $_userRepository;
-    
-    /**
-     * @var string[] 默认权限。
-     */
-    private $_defaultScopes = [];
-
-    /**
-     * @var mixed 访问令牌密钥。
-     */
-    private $_accessTokenCryptKey;
-    
-    /**
-     * @var integer 访问令牌持续时间（秒）。
-     */
-    private $_accessTokenDuration;
-
-    /**
-     * @var mixed 授权码密钥。
-     */
-    private $_authorizationCodeCryptKey;
-    
-    /**
-     * @var integer 授权码持续时间（秒）。
-     */
-    private $_authorizationCodeDuration;
-    
-    /**
-     * @var mixed 更新令牌密钥。
-     */
-    private $_refreshTokenCryptKey;
-
-    /**
-     * @var integer 更新令牌持续时间（秒）。
-     */
-    private $_refreshTokenDuration;
-
-    /**
-     * 获取访问令牌存储库。
-     *
-     * @return AccessTokenRepositoryInterface
-     */
-    public function getAccessTokenRepository()
-    {
-        return $this->_accessTokenRepository;
-    }
-    
-    /**
-     * 设置访问令牌存储库。
-     *
-     * @param AccessTokenRepositoryInterface $accessTokenRepository
-     */
-    public function setAccessTokenRepository(AccessTokenRepositoryInterface $accessTokenRepository)
-    {
-        $this->_accessTokenRepository = $accessTokenRepository;
-    }
-
-    /**
-     * 获取授权码存储库。
-     *
-     * @return AuthorizationCodeRepositoryInterface
-     */
-    public function getAuthorizationCodeRepository()
-    {
-        return $this->_authorizationCodeRepository;
-    }
-    
-    /**
-     * 设置授权码存储库。
-     *
-     * @param AuthorizationCodeRepositoryInterface $authorizationCodeRepository
-     */
-    public function setAuthorizationCodeRepository(AuthorizationCodeRepositoryInterface $authorizationCodeRepository)
-    {
-        $this->_authorizationCodeRepository = $authorizationCodeRepository;
-    }
-    
-    /**
-     * 获取客户端存储库。
-     *
-     * @return ClientRepositoryInterface
-     */
-    public function getClientRepository()
-    {
-        return $this->_clientRepository;
-    }
-    
-    /**
-     * 设置客户端存储库。
-     *
-     * @param ClientRepositoryInterface $clientRepository
-     */
-    public function setClientRepository(ClientRepositoryInterface $clientRepository)
-    {
-        $this->_clientRepository = $clientRepository;
-    }
-
-    /**
-     * 获取更新令牌存储库。
-     *
-     * @return RefreshTokenRepositoryInterface
-     */
-    public function getRefreshTokenRepository()
-    {
-        return $this->_refreshTokenRepository;
-    }
-    
-    /**
-     * 设置更新令牌存储库。
-     *
-     * @param RefreshTokenRepositoryInterface $refreshTokenRepository
-     */
-    public function setRefreshTokenRepository(RefreshTokenRepositoryInterface $refreshTokenRepository)
-    {
-        $this->_refreshTokenRepository = $refreshTokenRepository;
-    }
-    
-    /**
-     * 获取权限存储库。
-     *
-     * @return ScopeRepositoryInterface
-     */
-    public function getScopeRepository()
-    {
-        return $this->_scopeRepository;
-    }
-    
-    /**
-     * 设置权限存储库。
-     *
-     * @param ScopeRepositoryInterface $scopeRepository
-     */
-    public function setScopeRepository(ScopeRepositoryInterface $scopeRepository)
-    {
-        $this->_scopeRepository = $scopeRepository;
-    }
-
-    /**
-     * 获取用户存储库。
-     *
-     * @return UserRepositoryInterface
-     */
-    public function getUserRepository()
-    {
-        return $this->_userRepository;
-    }
-    
-    /**
-     * 设置用户存储库。
-     *
-     * @param UserRepositoryInterface $userRepository
-     */
-    public function setUserRepository(UserRepositoryInterface $userRepository)
-    {
-        $this->_userRepository = $userRepository;
-    }
-    
-    /**
-     * 获取默认权限。
-     *
-     * @return string[]
-     */
-    public function getDefaultScopes()
-    {
-        return $this->_defaultScopes;
-    }
-    
-    /**
-     * 设置默认权限。
-     *
-     * @param string[] $scopes
-     */
-    public function setDefaultScopes(array $scopes)
-    {
-        $this->_defaultScopes = $scopes;
-    }
-
-    /**
-     * 获取访问令牌密钥。
-     *
-     * @return mixed
-     */
-    public function getAccessTokenCryptKey()
-    {
-        return $this->_accessTokenCryptKey;
-    }
-    
-    /**
-     * 设置访问令牌密钥。
-     *
-     * @param mixed $key
-     */
-    public function setAccessTokenCryptKey($key)
-    {
-        $this->_accessTokenCryptKey = $key;
-    }
-
-    /**
-     * 获取访问令牌持续时间。
-     *
-     * @return integer 持续的秒数。
-     */
-    public function getAccessTokenDuration()
-    {
-        return $this->_accessTokenDuration;
-    }
-    
-    /**
-     * 设置访问令牌持续时间。
-     *
-     * @param integer $duration 以秒为单位的持续时间。
-     */
-    public function setAccessTokenDuration($duration)
-    {
-        $this->_accessTokenDuration = $duration;
-    }
-
-    /**
-     * 获取授权码密钥。
-     *
-     * @return mixed
-     */
-    public function getAuthorizationCodeCryptKey()
-    {
-        return $this->_authorizationCodeCryptKey;
-    }
-    
-    /**
-     * 设置授权码密钥。
-     *
-     * @param mixed $key
-     */
-    public function setAuthorizationCodeCryptKey($key)
-    {
-        $this->_authorizationCodeCryptKey = $key;
-    }
-    
-    /**
-     * 获取授权码持续时间。
-     *
-     * @return integer 持续的秒数。
-     */
-    public function getAuthorizationCodeDuration()
-    {
-        return $this->_authorizationCodeDuration;
-    }
-    
-    /**
-     * 设置授权码持续时间。
-     *
-     * @param integer $duration 以秒为单位的持续时间。
-     */
-    public function setAuthorizationCodeDuration($duration)
-    {
-        $this->_authorizationCodeDuration = $duration;
-    }
-    
-    /**
-     * 获取更新令牌密钥。
-     *
-     * @return mixed
-     */
-    public function getRefreshTokenCryptKey()
-    {
-        return $this->_refreshTokenCryptKey;
-    }
-    
-    /**
-     * 设置更新令牌密钥。
-     *
-     * @param mixed $key
-     */
-    public function setRefreshTokenCryptKey($key)
-    {
-        $this->_refreshTokenCryptKey = $key;
-    }
-
-    /**
-     * 获取更新令牌持续时间。
-     *
-     * @return integer 持续的秒数。
-     */
-    public function getRefreshTokenDuration()
-    {
-        return $this->_refreshTokenDuration;
-    }
-    
-    /**
-     * 设置更新令牌持续时间。
-     *
-     * @param integer $duration 以秒为单位的持续时间。
-     */
-    public function setRefreshTokenDuration($duration)
-    {
-        $this->_refreshTokenDuration = $duration;
-    }
     
     /**
      * 使用客户端认证信息，获取客户端实例。
@@ -469,6 +139,26 @@ abstract class AbstractAuthorizeGrant
         }
         
         return array_values($validScopes);
+    }
+    
+    /**
+     * 生成唯一标识。
+     * 
+     * @param int $length 长度。
+     * @return string 唯一标识。
+     * @throws ServerErrorException 生成失败。
+     */
+    protected function generateUniqueIdentifier($length = 40)
+    {
+        try {
+            return bin2hex(random_bytes($length));
+        } catch (\TypeError $e) {
+            throw new ServerErrorException('An unexpected error has occurred.');
+        } catch (\Error $e) {
+            throw new ServerErrorException('An unexpected error has occurred.');
+        } catch (\Exception $e) {
+            throw new ServerErrorException('Could not generate a random string.');
+        }
     }
 
     /**

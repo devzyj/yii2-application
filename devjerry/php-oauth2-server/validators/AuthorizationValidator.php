@@ -6,26 +6,40 @@
  */
 namespace devjerry\oauth2\server\validators;
 
+use devjerry\oauth2\server\base\BaseObject;
+use devjerry\oauth2\server\base\ServerRequestTrait;
 use devjerry\oauth2\server\interfaces\AccessTokenRepositoryInterface;
 use devjerry\oauth2\server\interfaces\AccessTokenEntityInterface;
-use devjerry\oauth2\server\base\ServerRequestTrait;
 use devjerry\oauth2\server\exceptions\BadRequestException;
 use devjerry\oauth2\server\exceptions\InvalidAccessTokenException;
 
 /**
  * 授权信息验证器接口。
  * 
+ * ```php
+ * use devjerry\oauth2\server\validators\AuthorizationValidator;
+ * 
+ * // 实例化对像。
+ * $authorizationValidator = new AuthorizationValidator([
+ *     'accessTokenRepository' => new AccessTokenRepository(),
+ *     'accessTokenCryptKey' => [
+ *         'publicKey' => '/path/to/publicKey' // 公钥路径。
+ *     ],
+ *     //'accessTokenCryptKey' => 'string key', // 字符串密钥。
+ *     //'accessTokenQueryParam' => 'access-token', // 只在 [[validateServerRequest()]] 中有效。
+ * ]);
+ * ```
+ * 
+ * @property AccessTokenRepositoryInterface $accessTokenRepository 访问令牌存储库。
+ * @property mixed $accessTokenCryptKey 访问令牌密钥。
+ * @property string $accessTokenQueryParam 访问令牌在地址查询参数中的名称。
+ * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
-class AuthorizationValidator implements AuthorizationValidatorInterface
+class AuthorizationValidator extends BaseObject implements AuthorizationValidatorInterface
 {
     use ServerRequestTrait;
-    
-    /**
-     * @var string 访问令牌在地址查询参数中的名称。
-     */
-    public $_accessTokenQueryParam = 'access-token';
     
     /**
      * @var AccessTokenRepositoryInterface 访问令牌存储库。
@@ -36,26 +50,11 @@ class AuthorizationValidator implements AuthorizationValidatorInterface
      * @var mixed 访问令牌密钥。
      */
     private $_accessTokenCryptKey;
-    
+
     /**
-     * 获取访问令牌在地址查询参数中的名称。
-     * 
-     * @return string
+     * @var string 访问令牌在地址查询参数中的名称。
      */
-    public function getAccessTokenQueryParam()
-    {
-        return $this->_accessTokenQueryParam;
-    }
-    
-    /**
-     * 设置访问令牌在地址查询参数中的名称。
-     * 
-     * @param string $name
-     */
-    public function setAccessTokenQueryParam($name)
-    {
-        $this->_accessTokenQueryParam = $name;
-    }
+    public $_accessTokenQueryParam;
     
     /**
      * 获取访问令牌存储库。
@@ -96,23 +95,58 @@ class AuthorizationValidator implements AuthorizationValidatorInterface
     {
         $this->_accessTokenCryptKey = $key;
     }
+
+    /**
+     * 获取访问令牌在地址查询参数中的名称。
+     *
+     * @return string
+     */
+    public function getAccessTokenQueryParam()
+    {
+        return $this->_accessTokenQueryParam;
+    }
+    
+    /**
+     * 设置访问令牌在地址查询参数中的名称。
+     *
+     * @param string $name
+     */
+    public function setAccessTokenQueryParam($name)
+    {
+        $this->_accessTokenQueryParam = $name;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function init()
+    {
+        parent::init();
+    
+        if ($this->getAccessTokenRepository() === null) {
+            throw new \LogicException('The `accessTokenRepository` property must be set.');
+        }
+    }
     
     /**
      * {@inheritdoc}
      * 
-     * @throws BadRequestException 缺少参数。
+     * @throws BadRequestException 缺少访问令牌参数。
      */
     public function validateServerRequest($request)
     {
         // 获取请求头中的授权信息。
-        $authorization = $this->getRequestAuthorization($request);
+        $accessToken = $this->getRequestAuthorization($request);
         
         // 获取地址查询参数中的授权信息。
         $paramName = $this->getAccessTokenQueryParam();
-        $accessToken = $this->getRequestQueryParam($request, $paramName, $authorization);
-        
+        if ($paramName !== null) {
+            $accessToken = $this->getRequestQueryParam($request, $paramName, $accessToken);
+        }
+
+        // 访问令牌不能为空。
         if ($accessToken === null) {
-            throw new BadRequestException(strtr('Missing parameters: `{paramName}` required.', ['{paramName}' => $paramName]));
+            throw new BadRequestException('Missing access token.');
         }
         
         // 验证访问令牌。
