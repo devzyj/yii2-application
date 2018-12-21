@@ -6,7 +6,7 @@
  */
 namespace devjerry\yii2\oauth2\server\repositories;
 
-use devjerry\oauth2\server\interfaces\UserRepositoryInterface;
+use devzyj\oauth2\server\interfaces\UserRepositoryInterface;
 use devjerry\yii2\oauth2\server\entities\UserEntity;
 
 /**

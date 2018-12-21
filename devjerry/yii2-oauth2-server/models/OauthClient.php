@@ -22,8 +22,10 @@ use Yii;
  *
  * @property OauthClientScope[] $oauthClientScopes 客户端与权限的关联关系
  * @property OauthScope[] $oauthScopes 客户端的权限
+ * @property OauthScope[] $defaultOauthScopes 客户端的默认权限
  * 
- * @property array $grantTypes 客户端的授权类型
+ * @property string[] $grantTypes 客户端的授权类型
+ * @property string[] $redirectUri 客户端的回调地址
  *
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
@@ -79,15 +81,29 @@ class OauthClient extends \yii\db\ActiveRecord
      */
     public function getOauthClientScopes()
     {
-        return $this->hasMany(OauthClientScope::className(), ['client_id' => 'id']);
+        return $this->hasMany(OauthClientScope::class, ['client_id' => 'id']);
     }
 
     /**
+     * 获取客户端的权限。
+     * 
      * @return \yii\db\ActiveQuery
      */
     public function getOauthScopes()
     {
-        return $this->hasMany(OauthScope::className(), ['id' => 'scope_id'])->viaTable(OauthClientScope::tableName(), ['client_id' => 'id']);
+        return $this->hasMany(OauthScope::class, ['id' => 'scope_id'])->viaTable(OauthClientScope::tableName(), ['client_id' => 'id']);
+    }
+
+    /**
+     * 获取客户端的默认权限。
+     * 
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDefaultOauthScopes()
+    {
+        return $this->hasMany(OauthScope::class, ['id' => 'scope_id'])->viaTable(OauthClientScope::tableName(), ['client_id' => 'id'], function ($query) {
+            $query->andWhere(['is_default'=>OauthClientScope::IS_DEFAULT_YES]);
+        });
     }
     
     /**
@@ -111,6 +127,21 @@ class OauthClient extends \yii\db\ActiveRecord
         $grantTypes = trim($this->grant_types);
         if ($grantTypes) {
             return explode(' ', $grantTypes);
+        }
+    
+        return [];
+    }
+
+    /**
+     * 获取客户端的回调地址。
+     *
+     * @return string[]
+     */
+    public function getRedirectUri()
+    {
+        $redirectUri = trim($this->redirect_uri);
+        if ($redirectUri) {
+            return explode(' ', $redirectUri);
         }
     
         return [];

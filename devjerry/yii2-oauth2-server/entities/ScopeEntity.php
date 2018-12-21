@@ -6,7 +6,7 @@
  */
 namespace devjerry\yii2\oauth2\server\entities;
 
-use devjerry\oauth2\server\interfaces\ScopeEntityInterface;
+use devzyj\oauth2\server\interfaces\ScopeEntityInterface;
 use devjerry\yii2\oauth2\server\models\OauthScope;
 
 /**

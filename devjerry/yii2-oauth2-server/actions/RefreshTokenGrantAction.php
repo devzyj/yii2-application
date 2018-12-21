@@ -9,8 +9,8 @@ namespace devjerry\yii2\oauth2\server\actions;
 use Yii;
 use yii\web\BadRequestHttpException;
 use yii\web\UnauthorizedHttpException;
-use devjerry\oauth2\server\interfaces\RefreshTokenEntityInterface;
-use devjerry\oauth2\server\interfaces\ClientEntityInterface;
+use devzyj\oauth2\server\interfaces\RefreshTokenEntityInterface;
+use devzyj\oauth2\server\interfaces\ClientEntityInterface;
 
 /**
  * RefreshTokenGrantAction class.

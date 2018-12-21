@@ -6,8 +6,8 @@
  */
 namespace devjerry\yii2\oauth2\server\entities;
 
-use devjerry\oauth2\server\interfaces\RefreshTokenEntityInterface;
-use devjerry\oauth2\server\traits\RefreshTokenEntityTrait;
+use devzyj\oauth2\server\interfaces\RefreshTokenEntityInterface;
+use devzyj\oauth2\server\traits\RefreshTokenEntityTrait;
 
 /**
  * RefreshTokenEntity class.

@@ -6,7 +6,8 @@
  */
 namespace devjerry\yii2\oauth2\server\entities;
 
-use devjerry\oauth2\server\interfaces\AuthorizationCodeEntityInterface;
+use devzyj\oauth2\server\interfaces\AuthorizationCodeEntityInterface;
+use devzyj\oauth2\server\traits\AuthorizationCodeEntityTrait;
 
 /**
  * AuthorizationCodeEntity class.
@@ -16,5 +17,5 @@ use devjerry\oauth2\server\interfaces\AuthorizationCodeEntityInterface;
  */
 class AuthorizationCodeEntity implements AuthorizationCodeEntityInterface
 {
-    
+    use AuthorizationCodeEntityTrait;
 }

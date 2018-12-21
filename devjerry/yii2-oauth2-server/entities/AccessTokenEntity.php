@@ -6,8 +6,8 @@
  */
 namespace devjerry\yii2\oauth2\server\entities;
 
-use devjerry\oauth2\server\interfaces\AccessTokenEntityInterface;
-use devjerry\oauth2\server\traits\AccessTokenEntityTrait;
+use devzyj\oauth2\server\interfaces\AccessTokenEntityInterface;
+use devzyj\oauth2\server\traits\AccessTokenEntityTrait;
 
 /**
  * AccessTokenEntity class.

@@ -7,8 +7,9 @@
 namespace devjerry\yii2\oauth2\server\repositories;
 
 use Yii;
-use devjerry\oauth2\server\interfaces\AuthorizationCodeRepositoryInterface;
-use devjerry\oauth2\server\interfaces\AuthorizationCodeEntityInterface;
+use devzyj\oauth2\server\interfaces\AuthorizationCodeRepositoryInterface;
+use devzyj\oauth2\server\interfaces\AuthorizationCodeEntityInterface;
+use devzyj\oauth2\server\traits\AuthorizationCodeRepositoryTrait;
 use devjerry\yii2\oauth2\server\entities\AuthorizationCodeEntity;
 
 /**
@@ -19,6 +20,8 @@ use devjerry\yii2\oauth2\server\entities\AuthorizationCodeEntity;
  */
 class AuthorizationCodeRepository implements AuthorizationCodeRepositoryInterface
 {
+    use AuthorizationCodeRepositoryTrait;
+    
     /**
      * {@inheritdoc}
      */
@@ -26,11 +29,17 @@ class AuthorizationCodeRepository implements AuthorizationCodeRepositoryInterfac
     {
         return Yii::createObject(AuthorizationCodeEntity::class);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function generateAuthorizationCodeUniqueIdentifier()
+    {}
     
     /**
      * {@inheritdoc}
      */
-    public function saveAuthorizationCodeEntity(AuthorizationCodeEntityInterface $accessTokenEntity)
+    public function saveAuthorizationCodeEntity(AuthorizationCodeEntityInterface $authorizationCodeEntity)
     {}
     
     /**

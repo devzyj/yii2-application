@@ -13,6 +13,7 @@ use Yii;
  *
  * @property int $client_id 客户端 ID
  * @property int $scope_id 权限 ID
+ * @property int $is_default 是否默认（0=否；1=是）
  *
  * @property OauthScope $oauthScope 权限
  * @property OauthClient $oauthClient 客户端
@@ -22,6 +23,16 @@ use Yii;
  */
 class OauthClientScope extends \yii\db\ActiveRecord
 {
+    /**
+     * @var integer 不是默认。
+     */
+    const IS_DEFAULT_NO = 0;
+    
+    /**
+     * @var integer 是默认。
+     */
+    const IS_DEFAULT_YES = 1;
+    
     /**
      * {@inheritdoc}
      */
@@ -38,9 +49,10 @@ class OauthClientScope extends \yii\db\ActiveRecord
         return [
             [['client_id', 'scope_id'], 'required'],
             [['client_id', 'scope_id'], 'integer'],
+            [['is_default'], 'boolean'],
             [['client_id', 'scope_id'], 'unique', 'targetAttribute' => ['client_id', 'scope_id']],
-            [['scope_id'], 'exist', 'skipOnError' => true, 'targetClass' => OauthScope::className(), 'targetAttribute' => ['scope_id' => 'id']],
-            [['client_id'], 'exist', 'skipOnError' => true, 'targetClass' => OauthClient::className(), 'targetAttribute' => ['client_id' => 'id']],
+            [['scope_id'], 'exist', 'skipOnError' => true, 'targetClass' => OauthScope::class, 'targetAttribute' => ['scope_id' => 'id']],
+            [['client_id'], 'exist', 'skipOnError' => true, 'targetClass' => OauthClient::class, 'targetAttribute' => ['client_id' => 'id']],
         ];
     }
 
@@ -52,6 +64,7 @@ class OauthClientScope extends \yii\db\ActiveRecord
         return [
             'client_id' => 'Client ID',
             'scope_id' => 'Scope ID',
+            'is_default' => 'Is Default',
         ];
     }
 
@@ -60,7 +73,7 @@ class OauthClientScope extends \yii\db\ActiveRecord
      */
     public function getOauthScope()
     {
-        return $this->hasOne(OauthScope::className(), ['id' => 'scope_id']);
+        return $this->hasOne(OauthScope::class, ['id' => 'scope_id']);
     }
 
     /**
@@ -68,6 +81,6 @@ class OauthClientScope extends \yii\db\ActiveRecord
      */
     public function getOauthClient()
     {
-        return $this->hasOne(OauthClient::className(), ['id' => 'client_id']);
+        return $this->hasOne(OauthClient::class, ['id' => 'client_id']);
     }
 }

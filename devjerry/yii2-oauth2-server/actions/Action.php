@@ -8,12 +8,12 @@ namespace devjerry\yii2\oauth2\server\actions;
 
 use Yii;
 use yii\base\InvalidConfigException;
-use devjerry\oauth2\server\interfaces\AccessTokenRepositoryInterface;
-use devjerry\oauth2\server\interfaces\AuthorizationCodeRepositoryInterface;
-use devjerry\oauth2\server\interfaces\ClientRepositoryInterface;
-use devjerry\oauth2\server\interfaces\RefreshTokenRepositoryInterface;
-use devjerry\oauth2\server\interfaces\ScopeRepositoryInterface;
-use devjerry\oauth2\server\interfaces\UserRepositoryInterface;
+use devzyj\oauth2\server\interfaces\AccessTokenRepositoryInterface;
+use devzyj\oauth2\server\interfaces\AuthorizationCodeRepositoryInterface;
+use devzyj\oauth2\server\interfaces\ClientRepositoryInterface;
+use devzyj\oauth2\server\interfaces\RefreshTokenRepositoryInterface;
+use devzyj\oauth2\server\interfaces\ScopeRepositoryInterface;
+use devzyj\oauth2\server\interfaces\UserRepositoryInterface;
 use devjerry\yii2\oauth2\server\repositories\AccessTokenRepository;
 use devjerry\yii2\oauth2\server\repositories\AuthorizationCodeRepository;
 use devjerry\yii2\oauth2\server\repositories\ClientRepository;

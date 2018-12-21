@@ -58,7 +58,7 @@ class OauthScope extends \yii\db\ActiveRecord
      */
     public function getOauthClientScopes()
     {
-        return $this->hasMany(OauthClientScope::className(), ['scope_id' => 'id']);
+        return $this->hasMany(OauthClientScope::class, ['scope_id' => 'id']);
     }
 
     /**
@@ -66,7 +66,7 @@ class OauthScope extends \yii\db\ActiveRecord
      */
     public function getOauthClients()
     {
-        return $this->hasMany(OauthClient::className(), ['id' => 'client_id'])->viaTable(OauthClientScope::tableName(), ['scope_id' => 'id']);
+        return $this->hasMany(OauthClient::class, ['id' => 'client_id'])->viaTable(OauthClientScope::tableName(), ['scope_id' => 'id']);
     }
     
     /**

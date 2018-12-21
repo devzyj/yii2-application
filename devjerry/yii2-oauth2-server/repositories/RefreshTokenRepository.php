@@ -7,9 +7,9 @@
 namespace devjerry\yii2\oauth2\server\repositories;
 
 use Yii;
-use devjerry\oauth2\server\interfaces\RefreshTokenRepositoryInterface;
-use devjerry\oauth2\server\interfaces\RefreshTokenEntityInterface;
-use devjerry\oauth2\server\traits\RefreshTokenRepositoryTrait;
+use devzyj\oauth2\server\interfaces\RefreshTokenRepositoryInterface;
+use devzyj\oauth2\server\interfaces\RefreshTokenEntityInterface;
+use devzyj\oauth2\server\traits\RefreshTokenRepositoryTrait;
 use devjerry\yii2\oauth2\server\entities\RefreshTokenEntity;
 
 /**

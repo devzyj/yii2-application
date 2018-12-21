@@ -7,21 +7,13 @@
 namespace devjerry\yii2\oauth2\server\controllers;
 
 use Yii;
-use yii\filters\VerbFilter;
 use yii\filters\ContentNegotiator;
+use yii\filters\VerbFilter;
 use yii\web\Response;
-use yii\web\BadRequestHttpException;
-use devjerry\oauth2\server\AuthorizationServer;
-use devjerry\oauth2\server\grants\ClientCredentialsGrant;
-use devjerry\yii2\oauth2\server\repositories\AccessTokenRepository;
-use devjerry\yii2\oauth2\server\repositories\AuthorizationCodeRepository;
-use devjerry\yii2\oauth2\server\repositories\ClientRepository;
-use devjerry\yii2\oauth2\server\repositories\RefreshTokenRepository;
-use devjerry\yii2\oauth2\server\repositories\ScopeRepository;
-use devjerry\yii2\oauth2\server\repositories\UserRepository;
-use devjerry\yii2\oauth2\server\ServerRequest;
-use devjerry\oauth2\server\grants\PasswordGrant;
-use devjerry\oauth2\server\grants\RefreshTokenGrant;
+use yii\web\HttpException;
+use yii\helpers\ArrayHelper;
+use devzyj\oauth2\server\AuthorizationServer;
+use devzyj\oauth2\server\exceptions\OAuthServerException;
 
 /**
  * TokenController class.
@@ -31,6 +23,11 @@ use devjerry\oauth2\server\grants\RefreshTokenGrant;
  */
 class TokenController extends \yii\web\Controller
 {
+    /**
+     * @var \devjerry\yii2\oauth2\server\Module 控制器所属的模块。
+     */
+    public $module;
+    
     /**
      * {@inheritdoc}
      */
@@ -43,149 +40,19 @@ class TokenController extends \yii\web\Controller
     {
         return [
             'contentNegotiator' => [
-                'class' => ContentNegotiator::className(),
+                'class' => ContentNegotiator::class,
                 'formats' => [
                     'application/json' => Response::FORMAT_JSON,
                     'application/xml' => Response::FORMAT_XML,
                 ],
             ],
             'verbFilter' => [
-                'class' => VerbFilter::className(),
+                'class' => VerbFilter::class,
                 'actions' => $this->verbs(),
             ],
         ];
     }
     
-    /**
-     * {@inheritdoc}
-     */
-    public function actions()
-    {
-        /* @var $module \devjerry\yii2\oauth2\server\Module */
-        $module = $this->module;
-        
-        return [
-            // authorization_code
-            'authorization-code' => [
-                'class' => 'devjerry\yii2\oauth2\server\actions\AuthorizationCodeGrantAction',
-                'accessTokenCryptKey' => $module->accessTokenCryptKey,
-                'refreshTokenCryptKey' => $module->refreshTokenCryptKey,
-            ],
-            // password
-            'user-credentials' => [
-                'class' => 'devjerry\yii2\oauth2\server\actions\PasswordGrantAction',
-                'accessTokenCryptKey' => $module->accessTokenCryptKey,
-                'refreshTokenCryptKey' => $module->refreshTokenCryptKey,
-            ],
-            // client_credentials
-            'client-credentials' => [
-                'class' => 'devjerry\yii2\oauth2\server\actions\ClientCredentialsGrantAction',
-                'accessTokenCryptKey' => $module->accessTokenCryptKey,
-            ],
-            // refresh_token
-            'refresh-token' => [
-                'class' => 'devjerry\yii2\oauth2\server\actions\RefreshTokenGrantAction',
-                'accessTokenCryptKey' => $module->accessTokenCryptKey,
-                'refreshTokenCryptKey' => $module->refreshTokenCryptKey,
-            ],
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function actionIndex()
-    {
-        /* @var $module \devjerry\yii2\oauth2\server\Module */
-        $module = $this->module;
-        
-        /* @var $authorizeServer AuthorizationServer */
-        $authorizeServer = Yii::createObject(AuthorizationServer::class);
-
-        /* @var $accessTokenRepository AccessTokenRepository */
-        $accessTokenRepository = Yii::createObject(AccessTokenRepository::class);
-
-        /* @var $authorizationCodeRepository AuthorizationCodeRepository */
-        //$authorizationCodeRepository = Yii::createObject(AuthorizationCodeRepository::class);
-
-        /* @var $clientRepository ClientRepository */
-        $clientRepository = Yii::createObject(ClientRepository::class);
-
-        /* @var $refreshTokenRepository RefreshTokenRepository */
-        $refreshTokenRepository = Yii::createObject(RefreshTokenRepository::class);
-
-        /* @var $scopeRepository ScopeRepository */
-        $scopeRepository = Yii::createObject(ScopeRepository::class);
-
-        /* @var $userRepository UserRepository */
-        $userRepository = Yii::createObject(UserRepository::class);
-        
-        /* @var $clientCredentialsGrant ClientCredentialsGrant */
-        $clientCredentialsGrant = Yii::createObject(ClientCredentialsGrant::class);
-        $clientCredentialsGrant->setAccessTokenCryptKey($module->accessTokenCryptKey);
-        $clientCredentialsGrant->setAccessTokenRepository($accessTokenRepository);
-        //$clientCredentialsGrant->setAuthorizationCodeRepository($authorizationCodeRepository);
-        $clientCredentialsGrant->setClientRepository($clientRepository);
-        $clientCredentialsGrant->setScopeRepository($scopeRepository);
-        $authorizeServer->addGrantType($clientCredentialsGrant);
-
-        /* @var $passwordGrant PasswordGrant */
-        $passwordGrant = Yii::createObject(PasswordGrant::class);
-        $passwordGrant->setAccessTokenCryptKey($module->accessTokenCryptKey);
-        $passwordGrant->setRefreshTokenCryptKey($module->refreshTokenCryptKey);
-        $passwordGrant->setAccessTokenRepository($accessTokenRepository);
-        $passwordGrant->setClientRepository($clientRepository);
-        $passwordGrant->setRefreshTokenRepository($refreshTokenRepository);
-        $passwordGrant->setScopeRepository($scopeRepository);
-        $passwordGrant->setUserRepository($userRepository);
-        $authorizeServer->addGrantType($passwordGrant);
-
-        /* @var $refreshTokenGrant RefreshTokenGrant */
-        $refreshTokenGrant = Yii::createObject(RefreshTokenGrant::class);
-        $refreshTokenGrant->setAccessTokenCryptKey($module->accessTokenCryptKey);
-        $refreshTokenGrant->setRefreshTokenCryptKey($module->refreshTokenCryptKey);
-        $refreshTokenGrant->setAccessTokenRepository($accessTokenRepository);
-        $refreshTokenGrant->setClientRepository($clientRepository);
-        $refreshTokenGrant->setRefreshTokenRepository($refreshTokenRepository);
-        $refreshTokenGrant->setScopeRepository($scopeRepository);
-        $refreshTokenGrant->setUserRepository($userRepository);
-        $authorizeServer->addGrantType($refreshTokenGrant);
-        
-        /* @var $serverRequest ServerRequest */
-        $serverRequest = Yii::createObject([
-            'class' => ServerRequest::class,
-            'enableCsrfValidation' => false,
-            'enableCookieValidation' => false,
-            'parsers' => [
-                'application/json' => 'yii\web\JsonParser',
-            ],
-        ]);
-        
-        return $authorizeServer->runGrantTypes($serverRequest);
-    }
-    
-    /**
-     * @return array
-     
-    public function actionIndex()
-    {
-        $grantType = Yii::$app->getRequest()->getBodyParam('grant_type');
-        if (empty($grantType)) {
-            throw new BadRequestHttpException('Missing parameters: "grant_type" required.');
-        }
-        
-        // run actions
-        if ($grantType === 'authorization_code') {
-            return $this->runAction('authorization-code');
-        } elseif ($grantType === 'password') {
-            return $this->runAction('user-credentials');
-        } elseif ($grantType === 'client_credentials') {
-            return $this->runAction('client-credentials');
-        } elseif ($grantType === 'refresh_token') {
-            return $this->runAction('refresh-token');
-        }
-    }*/
-
     /**
      * Declares the allowed HTTP verbs.
      * Please refer to [[VerbFilter::actions]] on how to declare the allowed verbs.
@@ -196,10 +63,79 @@ class TokenController extends \yii\web\Controller
     {
         return [
             'index' => ['POST'],
-            'authorization-code' => ['POST'],
-            'user-credentials' => ['POST'],
-            'client-credentials' => ['POST'],
-            'refresh-token' => ['POST'],
         ];
+    }
+    
+    /**
+     * @return array
+     */
+    public function actionIndex()
+    {
+        // 创建授权服务器实例。
+        $authorizationServer = $this->createAuthorizationServer();
+        
+        // 添加授予类型。
+        $this->addGrantTypes($authorizationServer);
+        
+        try {
+            // 运行并获取授予的认证信息。
+            return $authorizationServer->runGrantTypes($this->getServerRequest());
+        } catch (OAuthServerException $e) {
+            throw new HttpException($e->getHttpStatusCode(), $e->getMessage(), $e->getCode(), $e);
+        }
+    }
+    
+    /**
+     * 创建授权服务器实例。
+     * 
+     * @return AuthorizationServer
+     */
+    protected function createAuthorizationServer()
+    {
+        // 创建并返回授权服务器实例。
+        return new AuthorizationServer([
+            'accessTokenRepository' => Yii::createObject($this->module->accessTokenRepository),
+            'authorizationCodeRepository' => Yii::createObject($this->module->authorizationCodeRepository),
+            'clientRepository' => Yii::createObject($this->module->clientRepository),
+            'refreshTokenRepository' => Yii::createObject($this->module->refreshTokenRepository),
+            'scopeRepository' => Yii::createObject($this->module->scopeRepository),
+            'userRepository' => Yii::createObject($this->module->userRepository),
+            'defaultScopes' => $this->module->defaultScopes,
+            'accessTokenDuration' => $this->module->accessTokenDuration,
+            'accessTokenCryptKey' => $this->module->accessTokenCryptKey,
+            'authorizationCodeCryptKey' => $this->module->authorizationCodeCryptKey,
+            'refreshTokenDuration' => $this->module->refreshTokenDuration,
+            'refreshTokenCryptKey' => $this->module->refreshTokenCryptKey,
+        ]);
+    }
+    
+    /**
+     * 添加权限授予类型。
+     * 
+     * @param AuthorizationServer $authorizationServer
+     * @return AuthorizationServer
+     */
+    protected function addGrantTypes($authorizationServer)
+    {
+        foreach ($this->module->grantTypes as $grantType) {
+            $authorizationServer->addGrantType(Yii::createObject($grantType));
+        }
+        
+        return $authorizationServer;
+    }
+    
+    /**
+     * 获取服务器请求实例。
+     * 
+     * @return \yii\web\Request
+     */
+    protected function getServerRequest()
+    {
+        $serverRequest = $this->module->serverRequest;
+        $serverRequest->parsers = ArrayHelper::merge([
+            'application/json' => 'yii\web\JsonParser',
+        ], $serverRequest->parsers);
+        
+        return $serverRequest;
     }
 }

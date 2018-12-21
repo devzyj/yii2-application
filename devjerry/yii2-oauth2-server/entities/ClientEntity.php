@@ -6,7 +6,7 @@
  */
 namespace devjerry\yii2\oauth2\server\entities;
 
-use devjerry\oauth2\server\interfaces\ClientEntityInterface;
+use devzyj\oauth2\server\interfaces\ClientEntityInterface;
 use devjerry\yii2\oauth2\server\models\OauthClient;
 use devjerry\yii2\oauth2\server\models\OauthClientScope;
 
@@ -14,6 +14,7 @@ use devjerry\yii2\oauth2\server\models\OauthClientScope;
  * ClientEntity class.
  * 
  * @property ScopeEntity[] $oauthScopes 客户端的权限
+ * @property ScopeEntity[] $defaultOauthScopes 客户端的默认权限
  * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
@@ -21,11 +22,25 @@ use devjerry\yii2\oauth2\server\models\OauthClientScope;
 class ClientEntity extends OauthClient implements ClientEntityInterface
 {
     /**
+     * 获取客户端的权限。
+     * 
      * @return \yii\db\ActiveQuery
      */
     public function getOauthScopes()
     {
-        return $this->hasMany(ScopeEntity::className(), ['id' => 'scope_id'])->viaTable(OauthClientScope::tableName(), ['client_id' => 'id']);
+        return $this->hasMany(ScopeEntity::class, ['id' => 'scope_id'])->viaTable(OauthClientScope::tableName(), ['client_id' => 'id']);
+    }
+
+    /**
+     * 获取客户端的默认权限。
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDefaultOauthScopes()
+    {
+        return $this->hasMany(ScopeEntity::class, ['id' => 'scope_id'])->viaTable(OauthClientScope::tableName(), ['client_id' => 'id'], function ($query) {
+            $query->andWhere(['is_default'=>OauthClientScope::IS_DEFAULT_YES]);
+        });
     }
     
     /******************************** ClientEntityInterface ********************************/
@@ -36,6 +51,14 @@ class ClientEntity extends OauthClient implements ClientEntityInterface
     {
         return $this->identifier;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRedirectUri()
+    {
+        return parent::getRedirectUri();
+    }
     
     /**
      * {@inheritdoc}
@@ -45,14 +68,6 @@ class ClientEntity extends OauthClient implements ClientEntityInterface
         return parent::getGrantTypes();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getRedirectUri()
-    {
-        return [];
-    }
-    
     /**
      * {@inheritdoc}
      */
@@ -82,6 +97,6 @@ class ClientEntity extends OauthClient implements ClientEntityInterface
      */
     public function getDefaultScopeEntities()
     {
-        return $this->oauthScopes;
+        return $this->defaultOauthScopes;
     }
 }

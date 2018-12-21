@@ -13,12 +13,12 @@ use yii\web\BadRequestHttpException;
 use yii\web\UnauthorizedHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\helpers\ArrayHelper;
-use devjerry\oauth2\server\interfaces\AccessTokenEntityInterface;
-use devjerry\oauth2\server\interfaces\ClientEntityInterface;
-use devjerry\oauth2\server\interfaces\RefreshTokenEntityInterface;
-use devjerry\oauth2\server\interfaces\ScopeEntityInterface;
-use devjerry\oauth2\server\interfaces\UserEntityInterface;
-use devjerry\oauth2\server\exceptions\UniqueIdentifierException;
+use devzyj\oauth2\server\interfaces\AccessTokenEntityInterface;
+use devzyj\oauth2\server\interfaces\ClientEntityInterface;
+use devzyj\oauth2\server\interfaces\RefreshTokenEntityInterface;
+use devzyj\oauth2\server\interfaces\ScopeEntityInterface;
+use devzyj\oauth2\server\interfaces\UserEntityInterface;
+use devzyj\oauth2\server\exceptions\UniqueIdentifierException;
 
 /**
  * GrantAction class.

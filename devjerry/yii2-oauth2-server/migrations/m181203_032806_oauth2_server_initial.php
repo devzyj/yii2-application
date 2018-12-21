@@ -9,6 +9,8 @@ use yii\db\Migration;
 
 /**
  * Class m181203_032806_oauth2_server_initial
+ * 
+ * php yii migrate --migrationPath=@devjerry/yii2-oauth2-server/migrations
  */
 class m181203_032806_oauth2_server_initial extends Migration
 {
@@ -72,8 +74,9 @@ class m181203_032806_oauth2_server_initial extends Migration
 
         // oauth_client_scope
         $this->createTable($tables['oauth_client_scope'], [
-            'client_id' => $this->integer(10)->unsigned()->comment('客户端 ID'),
-            'scope_id' => $this->integer(10)->unsigned()->comment('权限 ID'),
+            'client_id' => $this->integer(10)->unsigned()->notNull()->comment('客户端 ID'),
+            'scope_id' => $this->integer(10)->unsigned()->notNull()->comment('权限 ID'),
+            'is_default' => $this->smallInteger(1)->unsigned()->notNull()->defaultValue(0)->comment('是否默认（0=否；1=是）'),
         ], "COMMENT='OAuth - 客户端与权限关联表'");
         $this->addPrimaryKey('PK_client_id_scope_id', $tables['oauth_client_scope'], ['client_id', 'scope_id']);
         
@@ -121,6 +124,7 @@ class m181203_032806_oauth2_server_initial extends Migration
         $this->insert($this->tables['oauth_client_scope'], [
             'client_id' => $clientId,
             'scope_id' => $scopeId,
+            'is_default' => 1,
         ]);
         $scopeId = $this->db->getLastInsertID();
 

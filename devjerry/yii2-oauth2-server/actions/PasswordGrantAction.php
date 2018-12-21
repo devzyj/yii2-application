@@ -9,7 +9,7 @@ namespace devjerry\yii2\oauth2\server\actions;
 use Yii;
 use yii\web\BadRequestHttpException;
 use yii\web\UnauthorizedHttpException;
-use devjerry\oauth2\server\interfaces\UserEntityInterface;
+use devzyj\oauth2\server\interfaces\UserEntityInterface;
 
 /**
  * PasswordGrantAction class.

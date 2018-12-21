@@ -7,9 +7,9 @@
 namespace devjerry\yii2\oauth2\server\repositories;
 
 use Yii;
-use devjerry\oauth2\server\interfaces\AccessTokenRepositoryInterface;
-use devjerry\oauth2\server\interfaces\AccessTokenEntityInterface;
-use devjerry\oauth2\server\traits\AccessTokenRepositoryTrait;
+use devzyj\oauth2\server\interfaces\AccessTokenRepositoryInterface;
+use devzyj\oauth2\server\interfaces\AccessTokenEntityInterface;
+use devzyj\oauth2\server\traits\AccessTokenRepositoryTrait;
 use devjerry\yii2\oauth2\server\entities\AccessTokenEntity;
 
 /**
