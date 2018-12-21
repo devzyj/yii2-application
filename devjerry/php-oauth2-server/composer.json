@@ -1,0 +1,29 @@
+{
+    "name": "devzyj/php-oauth2-server",
+    "description": "PHP OAuth2 Server",
+    "keywords": ["oauth", "oauth2"],
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "Jerry Zhang",
+            "email": "zhangyanjiong@163.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.0",
+        "lcobucci/jwt": "^3.2.5",
+        "defuse/php-encryption": "^2.1.0"
+    },
+    "require-dev": {
+    },
+    "autoload": {
+        "psr-4": {
+            "devzyj\\oauth2\\server\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "devzyj\\oauth2\\server\\tests\\": "tests/"
+        }
+    }
+}

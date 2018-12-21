@@ -26,7 +26,7 @@ use devjerry\oauth2\server\exceptions\BadRequestException;
  *         'ascii' => 'def0000086937b.....', // 使用 `vendor/bin/generate-defuse-key` 生成的字符串。
  *         //'path' => '/path/to/asciiFile', // 保存了 `vendor/bin/generate-defuse-key` 生成的字符串的文件路径。
  *         //'password' => 'string key', // 字符串密钥。
- *     ]
+ *     ],
  *     //'enableCodeChallenge' => true,
  *     //'defaultCodeChallengeMethod' => 'plain',
  * ]);

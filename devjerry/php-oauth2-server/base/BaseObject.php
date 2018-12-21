@@ -23,24 +23,29 @@ class BaseObject
      */
     public function __construct($config = [])
     {
-        $this->configure($config);
+        if (!empty($config)) {
+            self::configure($this, $config);
+        }
+        
         $this->init();
     }
     
     /**
      * 配置对像。
      * 
-     * @param array $config 配置对象属性的 `键->值` 对。
+     * @param object $object 配置对象。
+     * @param array $properties 属性的 `键->值` 对。
+     * @return object 配置完成的对像。
      */
-    public function configure($config = [])
+    public static function configure($object, $properties)
     {
-        if (!empty($config)) {
-            foreach ($config as $name => $value) {
-                $this->$name = $value;
-            }
+        foreach ($properties as $name => $value) {
+            $object->{$name} = $value;
         }
+        
+        return $object;
     }
-
+    
     /**
      * 初始化对像。
      */
@@ -62,9 +67,9 @@ class BaseObject
             return $this->$getter();
         } elseif (method_exists($this, 'set' . $name)) {
             throw new \BadMethodCallException('Getting write-only property: ' . get_class($this) . '::' . $name);
+        } else {
+            throw new \BadMethodCallException('Getting unknown property: ' . get_class($this) . '::' . $name);
         }
-
-        throw new \BadMethodCallException('Getting unknown property: ' . get_class($this) . '::' . $name);
     }
 
     /**
@@ -82,9 +87,9 @@ class BaseObject
             $this->$setter($value);
         } elseif (method_exists($this, 'get' . $name)) {
             throw new \BadMethodCallException('Setting read-only property: ' . get_class($this) . '::' . $name);
+        } else {
+            throw new \BadMethodCallException('Setting unknown property: ' . get_class($this) . '::' . $name);
         }
-        
-        throw new \BadMethodCallException('Setting unknown property: ' . get_class($this) . '::' . $name);
     }
 
     /**
