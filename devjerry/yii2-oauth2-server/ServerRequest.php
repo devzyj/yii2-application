@@ -4,22 +4,22 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace devjerry\yii2\oauth2\server\behaviors;
+namespace devjerry\yii2\oauth2\server;
 
 /**
- * ServerRequestBehavior 实现了 [[devzyj\oauth2\server\interfacesServerRequestInterface]] 中的方法。
+ * ServerRequest 实现了 [[devzyj\oauth2\server\interfaces\ServerRequestInterface]] 中的方法。
  * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
-class ServerRequestBehavior extends \yii\base\Behavior
+class ServerRequest extends \yii\web\Request
 {
     /**
      * {@inheritdoc}
      */
     public function getHeaders()
     {
-        return $this->owner->getHeaders()->toArray();
+        return parent::getHeaders()->toArray();
     }
     
     /**
@@ -27,7 +27,7 @@ class ServerRequestBehavior extends \yii\base\Behavior
      */
     public function getParsedBody()
     {
-        return $this->owner->getBodyParams();
+        return $this->getBodyParams();
     }
 
     /**

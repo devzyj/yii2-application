@@ -75,7 +75,9 @@ class TokenController extends \yii\web\Controller
         $authorizationServer = $this->createAuthorizationServer();
         
         // 添加授予类型。
-        $this->addGrantTypes($authorizationServer);
+        foreach ($this->module->grantTypes as $grantType) {
+            $authorizationServer->addGrantType(Yii::createObject($grantType));
+        }
         
         try {
             // 运行并获取授予的认证信息。
@@ -110,28 +112,13 @@ class TokenController extends \yii\web\Controller
     }
     
     /**
-     * 添加权限授予类型。
-     * 
-     * @param AuthorizationServer $authorizationServer
-     * @return AuthorizationServer
-     */
-    protected function addGrantTypes($authorizationServer)
-    {
-        foreach ($this->module->grantTypes as $grantType) {
-            $authorizationServer->addGrantType(Yii::createObject($grantType));
-        }
-        
-        return $authorizationServer;
-    }
-    
-    /**
      * 获取服务器请求实例。
      * 
      * @return \yii\web\Request
      */
     protected function getServerRequest()
     {
-        $serverRequest = $this->module->serverRequest;
+        $serverRequest = Yii::createObject($this->module->serverRequest);
         $serverRequest->parsers = ArrayHelper::merge([
             'application/json' => 'yii\web\JsonParser',
         ], $serverRequest->parsers);

@@ -58,6 +58,9 @@ $config = [
                 'passphrase' => '',
                 'publicKey' => '@common/oauth2/server/public.key',
             ],*/
+            'authorizationCodeCryptKey' => [
+                'password' => 'test',
+            ],
             'refreshTokenCryptKey' => [
                 //'ascii' => 'def000008f058ff223434851b1d087e64bc0ac984be363bf9bb719c9cc8962fe53b2b0e61728e0d121df64493bd9a3089d5be0785fb3383d561aa44312bb97f211987368',
                 //'path' => '@common/oauth2/server/refresh-token.txt',

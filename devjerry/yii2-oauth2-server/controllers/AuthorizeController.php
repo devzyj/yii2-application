@@ -8,9 +8,9 @@ namespace devjerry\yii2\oauth2\server\controllers;
 
 use Yii;
 use yii\web\HttpException;
-use yii\web\BadRequestHttpException;
 use devzyj\oauth2\server\AuthorizationServer;
 use devzyj\oauth2\server\exceptions\OAuthServerException;
+use devjerry\yii2\oauth2\server\entities\UserEntity;
 
 /**
  * AuthorizeController class.
@@ -26,31 +26,6 @@ class AuthorizeController extends \yii\web\Controller
     public $module;
     
     /**
-     * {@inheritdoc}
-     */
-    public function actions()
-    {
-        /* @var $module \devjerry\yii2\oauth2\server\Module */
-        $module = $this->module;
-        
-        return [
-            // code
-            'code' => [
-                'class' => 'devjerry\yii2\oauth2\server\actions\CodeAuthorizeAction',
-                'accessTokenCryptKey' => $module->accessTokenCryptKey,
-                'refreshTokenCryptKey' => $module->refreshTokenCryptKey,
-            ],
-            // token
-            'token' => [
-                'class' => 'devjerry\yii2\oauth2\server\actions\TokenAuthorizeAction',
-                'accessTokenCryptKey' => $module->accessTokenCryptKey,
-                'refreshTokenCryptKey' => $module->refreshTokenCryptKey,
-            ],
-        ];
-    }
-    
-    /**
-     * @return array
      * @todo 验证用户是否登录，并且引导用户登录。
      * @todo 引导登录后的用户去授权确认页面，并且确认授权。
      */
@@ -60,32 +35,31 @@ class AuthorizeController extends \yii\web\Controller
         $authorizationServer = $this->createAuthorizationServer();
 
         // 添加授权类型。
-        $this->addAuthorizeTypes($authorizationServer);
+        foreach ($this->module->authorizeTypes as $authorizeType) {
+            $authorizationServer->addAuthorizeType(Yii::createObject($authorizeType));
+        }
         
         try {
             // 获取并验证授权请求。
             $authorizeRequest = $authorizationServer->getAuthorizeRequest($this->getServerRequest());
             
             // 设置授权的用户。
-            $authorizeRequest->setUser(new UserEntity());
-            
-            // 设置同意授权。
+            $user = new UserEntity();
+            $user->id = 1;
+            $user->username = 'jerry';
+            $authorizeRequest->setUserEntity($user);
+
+            // 设置是否同意授权。
             $authorizeRequest->setIsApproved(true);
             
             // 运行并返回授权成功的回调地址。
-            $result = $authorizationServer->runAuthorizeTypes($authorizeRequest);
-            
-            // 根据授权类型，进行不同的处理。
-            if ($authorizeRequest->getAuthorizeType()->getIdentifier() === 'code') {
-                // 授权码模式，返回值为回调地址。
-                $this->redirect($result);
-            } else {
-                // 简单授权模式，返回值为认证信息。
-                return $result;
-            }
+            $redirectUri = $authorizationServer->runAuthorizeTypes($authorizeRequest);
         } catch (OAuthServerException $e) {
             throw new HttpException($e->getHttpStatusCode(), $e->getMessage(), $e->getCode(), $e);
         }
+        
+        // 重定向到回调地址。
+        $this->redirect($redirectUri);
     }
     
     /**
@@ -110,27 +84,12 @@ class AuthorizeController extends \yii\web\Controller
     }
     
     /**
-     * 添加授权类型。
-     * 
-     * @param AuthorizationServer $authorizationServer
-     * @return AuthorizationServer
-     */
-    protected function addAuthorizeTypes($authorizationServer)
-    {
-        foreach ($this->module->authorizeTypes as $authorizeType) {
-            $authorizationServer->addAuthorizeType(Yii::createObject($authorizeType));
-        }
-        
-        return $authorizationServer;
-    }
-    
-    /**
      * 获取服务器请求实例。
      * 
      * @return \yii\web\Request
      */
     protected function getServerRequest()
     {
-        return $this->module->serverRequest;
+        return Yii::createObject($this->module->serverRequest);
     }
 }

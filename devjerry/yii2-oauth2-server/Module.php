@@ -8,12 +8,14 @@ namespace devjerry\yii2\oauth2\server;
 
 use Yii;
 use yii\web\Request;
+use yii\web\User;
 use devzyj\oauth2\server\authorizes\CodeAuthorize;
 use devzyj\oauth2\server\authorizes\ImplicitAuthorize;
 use devzyj\oauth2\server\grants\AuthorizationCodeGrant;
 use devzyj\oauth2\server\grants\ClientCredentialsGrant;
 use devzyj\oauth2\server\grants\PasswordGrant;
 use devzyj\oauth2\server\grants\RefreshTokenGrant;
+use devjerry\yii2\oauth2\server\ServerRequest;
 use devjerry\yii2\oauth2\server\repositories\AccessTokenRepository;
 use devjerry\yii2\oauth2\server\repositories\AuthorizationCodeRepository;
 use devjerry\yii2\oauth2\server\repositories\ClientRepository;
@@ -56,6 +58,12 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
         'password' => PasswordGrant::class,
         'refreshToken' => RefreshTokenGrant::class,
     ];
+
+    /**
+     * @var string|array|callable 服务器请求。
+     * @see Yii::createObject()
+     */
+    public $serverRequest = ServerRequest::class;
     
     /**
      * @var string|array|callable 访问令牌存储库。
@@ -107,6 +115,11 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
      * @var string|array 访问令牌密钥。
      */
     public $accessTokenCryptKey;
+
+    /**
+     * @var string 访问令牌在查询参数中的名称。
+     */
+    public $accessTokenQueryParam = 'access-token';
     
     /**
      * @var integer 授权码的持续时间，默认十分钟。
@@ -129,12 +142,6 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
     public $refreshTokenCryptKey;
 
     /**
-     * @var Request|string|array 服务器请求。字符串表示应用的组件ID。数组表示组件的配置。
-     * 如果没有设置，将使用 `Yii::$app->getRequest()`。
-     */
-    public $serverRequest;
-
-    /**
      * {@inheritdoc}
      */
     public function init()
@@ -142,7 +149,7 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
         parent::init();
         
         // 服务器请求实例。
-        if ($this->serverRequest === null) {
+        /*if ($this->serverRequest === null) {
             $this->serverRequest = Yii::$app->getRequest();
         } elseif (is_string($this->serverRequest)) {
             $this->serverRequest = Yii::$app->get($this->serverRequest);
@@ -151,7 +158,7 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
         }
         
         // 添加服务器请求行为。
-        $this->serverRequest->attachBehavior('OAuthServerRequestBehavior', ServerRequestBehavior::class);
+        $this->serverRequest->attachBehavior('OAuthServerRequestBehavior', ServerRequestBehavior::class);*/
     }
     
     /**
