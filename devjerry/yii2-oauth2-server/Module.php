@@ -7,8 +7,9 @@
 namespace devjerry\yii2\oauth2\server;
 
 use Yii;
-use yii\web\Request;
-use yii\web\User;
+use yii\base\InvalidConfigException;
+use devzyj\oauth2\server\AuthorizationServer;
+use devzyj\oauth2\server\ResourceServer;
 use devzyj\oauth2\server\authorizes\CodeAuthorize;
 use devzyj\oauth2\server\authorizes\ImplicitAuthorize;
 use devzyj\oauth2\server\grants\AuthorizationCodeGrant;
@@ -21,8 +22,6 @@ use devjerry\yii2\oauth2\server\repositories\AuthorizationCodeRepository;
 use devjerry\yii2\oauth2\server\repositories\ClientRepository;
 use devjerry\yii2\oauth2\server\repositories\RefreshTokenRepository;
 use devjerry\yii2\oauth2\server\repositories\ScopeRepository;
-use devjerry\yii2\oauth2\server\repositories\UserRepository;
-use devjerry\yii2\oauth2\server\behaviors\ServerRequestBehavior;
 
 /**
  * OAuth2 Server Module.
@@ -31,7 +30,10 @@ use devjerry\yii2\oauth2\server\behaviors\ServerRequestBehavior;
  * return [
  *     'bootstrap' => ['oauth2'],
  *     'modules' => [
- *         'oauth2' => ['class' => 'devjerry\yii2\oauth2\server\Module'],
+ *         'oauth2' => [
+ *             'class' => 'devjerry\yii2\oauth2\server\Module',
+ *             'userRepositoryClass' => 'app\models\UserRepository',
+ *         ],
  *     ],
  * ]
  * ```
@@ -42,9 +44,21 @@ use devjerry\yii2\oauth2\server\behaviors\ServerRequestBehavior;
 class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
 {
     /**
+     * @var string|array|callable 授权服务器。
+     * @see Yii::createObject()
+     */
+    public $authorizationServerClass = AuthorizationServer::class;
+
+    /**
+     * @var string|array|callable 验证服务器。
+     * @see Yii::createObject()
+     */
+    public $resourceServerClass = ResourceServer::class;
+    
+    /**
      * @var array 授权类型。
      */
-    public $authorizeTypes = [
+    public $authorizeTypeClasses = [
         'code' => CodeAuthorize::class,
         'implicit' => ImplicitAuthorize::class,
     ];
@@ -52,7 +66,7 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
     /**
      * @var array 权限授予类型。
      */
-    public $grantTypes = [
+    public $grantTypeClasses = [
         'authorizationCode' => AuthorizationCodeGrant::class,
         'clientCredentials' => ClientCredentialsGrant::class,
         'password' => PasswordGrant::class,
@@ -63,43 +77,43 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
      * @var string|array|callable 服务器请求。
      * @see Yii::createObject()
      */
-    public $serverRequest = ServerRequest::class;
+    public $serverRequestClass = ServerRequest::class;
     
     /**
      * @var string|array|callable 访问令牌存储库。
      * @see Yii::createObject()
      */
-    public $accessTokenRepository = AccessTokenRepository::class;
+    public $accessTokenRepositoryClass = AccessTokenRepository::class;
 
     /**
      * @var string|array|callable 授权码存储库。
      * @see Yii::createObject()
      */
-    public $authorizationCodeRepository = AuthorizationCodeRepository::class;
+    public $authorizationCodeRepositoryClass = AuthorizationCodeRepository::class;
 
     /**
      * @var string|array|callable 客户端存储库。
      * @see Yii::createObject()
      */
-    public $clientRepository = ClientRepository::class;
+    public $clientRepositoryClass = ClientRepository::class;
 
     /**
      * @var string|array|callable 更新令牌存储库。
      * @see Yii::createObject()
      */
-    public $refreshTokenRepository = RefreshTokenRepository::class;
+    public $refreshTokenRepositoryClass = RefreshTokenRepository::class;
 
     /**
      * @var string|array|callable 权限存储库。
      * @see Yii::createObject()
      */
-    public $scopeRepository = ScopeRepository::class;
+    public $scopeRepositoryClass = ScopeRepository::class;
 
     /**
      * @var string|array|callable 用户存储库。
      * @see Yii::createObject()
      */
-    public $userRepository = UserRepository::class;
+    public $userRepositoryClass;
     
     /**
      * @var array 默认权限。
@@ -140,7 +154,37 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
      * @var array 更新令牌密钥。
      */
     public $refreshTokenCryptKey;
+    
+    /**
+     * @var string 授权用户的应用组件ID。如果没有设置，则使用 `Yii::$app->getUser()`。
+     */
+    public $user;
+    
+    public $loginView;
+    public $authorizeView;
+    
+    public $loginUrl;
+    public $authorizeUrl;
 
+    /**
+     * @var callable 在验证访问令牌时，根据访问令牌实例，构造返回结果。
+     * 方法应该返回一个包函访问令牌内容的数组。
+     * 
+     * ```php
+     * function (AccessTokenEntityInterface $accessToken) {
+     *     return [
+     *         'access_token_id' => $accessToken->getIdentifier(),
+     *         'client_id' => $accessToken->getClientIdentifier(),
+     *         'user_id' => $accessToken->getUserIdentifier(),
+     *         'scopes' => $accessToken->getScopeIdentifiers(),
+     *     ];
+     * }
+     * ```
+     * 
+     * @see ResourceController::validateAccessTokenResult()
+     */
+    public $validateAccessTokenResult;
+    
     /**
      * {@inheritdoc}
      */
@@ -148,17 +192,9 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
     {
         parent::init();
         
-        // 服务器请求实例。
-        /*if ($this->serverRequest === null) {
-            $this->serverRequest = Yii::$app->getRequest();
-        } elseif (is_string($this->serverRequest)) {
-            $this->serverRequest = Yii::$app->get($this->serverRequest);
-        } elseif (is_array($this->serverRequest)) {
-            $this->serverRequest = Yii::createObject($this->serverRequest);
+        if ($this->userRepositoryClass === null) {
+            throw new InvalidConfigException('The `userRepositoryClass` property must be set.');
         }
-        
-        // 添加服务器请求行为。
-        $this->serverRequest->attachBehavior('OAuthServerRequestBehavior', ServerRequestBehavior::class);*/
     }
     
     /**

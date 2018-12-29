@@ -501,12 +501,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/devzyj/php-oauth2-server.git",
-                "reference": "0b33531ade3b861ceabed457e3fd36a197719758"
+                "reference": "223ba2698ea754e9e11dc3313cafdbee5bb90884"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/devzyj/php-oauth2-server/zipball/0b33531ade3b861ceabed457e3fd36a197719758",
-                "reference": "0b33531ade3b861ceabed457e3fd36a197719758",
+                "url": "https://api.github.com/repos/devzyj/php-oauth2-server/zipball/223ba2698ea754e9e11dc3313cafdbee5bb90884",
+                "reference": "223ba2698ea754e9e11dc3313cafdbee5bb90884",
                 "shasum": ""
             },
             "require": {
@@ -544,7 +544,7 @@
                 "source": "https://github.com/devzyj/php-oauth2-server/tree/master",
                 "issues": "https://github.com/devzyj/php-oauth2-server/issues"
             },
-            "time": "2018-12-21T10:53:33+00:00"
+            "time": "2018-12-27T03:18:54+00:00"
         },
         {
             "name": "devzyj/yii2-attribute-cache-behavior",
@@ -3805,20 +3805,21 @@
         },
         {
             "name": "webmozart/assert",
-            "version": "1.3.0",
+            "version": "1.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webmozart/assert.git",
-                "reference": "0df1908962e7a3071564e857d86874dad1ef204a"
+                "reference": "83e253c8e0be5b0257b881e1827274667c5c17a9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webmozart/assert/zipball/0df1908962e7a3071564e857d86874dad1ef204a",
-                "reference": "0df1908962e7a3071564e857d86874dad1ef204a",
+                "url": "https://api.github.com/repos/webmozart/assert/zipball/83e253c8e0be5b0257b881e1827274667c5c17a9",
+                "reference": "83e253c8e0be5b0257b881e1827274667c5c17a9",
                 "shasum": ""
             },
             "require": {
-                "php": "^5.3.3 || ^7.0"
+                "php": "^5.3.3 || ^7.0",
+                "symfony/polyfill-ctype": "^1.8"
             },
             "require-dev": {
                 "phpunit/phpunit": "^4.6",
@@ -3851,7 +3852,7 @@
                 "check",
                 "validate"
             ],
-            "time": "2018-01-29T19:49:41+00:00"
+            "time": "2018-12-25T11:19:39+00:00"
         },
         {
             "name": "yiisoft/yii2-debug",

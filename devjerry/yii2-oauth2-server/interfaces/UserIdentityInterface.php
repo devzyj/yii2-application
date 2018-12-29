@@ -6,6 +6,7 @@
  */
 namespace devjerry\yii2\oauth2\server\interfaces;
 
+use devzyj\oauth2\server\authorizes\AuthorizeRequestInterface;
 use devzyj\oauth2\server\interfaces\UserEntityInterface;
 
 /**
@@ -16,6 +17,20 @@ use devzyj\oauth2\server\interfaces\UserEntityInterface;
  */
 interface UserIdentityInterface
 {
+    /**
+     * 设置授权请求。
+     * 
+     * @param AuthorizeRequestInterface $authorizeRequest
+     */
+    public function setAuthorizeRequest(AuthorizeRequestInterface $authorizeRequest);
+    
+    /**
+     * 获取授权请求。
+     * 
+     * @return AuthorizeRequestInterface
+     */
+    public function getAuthorizeRequest();
+    
     /**
      * 获取授权用户实体对像。
      * 

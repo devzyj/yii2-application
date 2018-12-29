@@ -65,8 +65,10 @@ class ResourceController extends \yii\web\Controller
         $resourceServer = $this->createResourceServer();
         
         try {
-            $accessToken = $resourceServer->validateServerRequest($this->getServerRequest());
-            return $this->makeAccessTokenData($accessToken);
+            $serverRequest = Yii::createObject($this->module->serverRequest);
+            
+            $accessToken = $resourceServer->validateServerRequest($serverRequest);
+            return $this->validateAccessTokenResult($accessToken);
         } catch (OAuthServerException $e) {
             throw new HttpException($e->getHttpStatusCode(), $e->getMessage(), $e->getCode(), $e);
         }
@@ -85,24 +87,10 @@ class ResourceController extends \yii\web\Controller
 
         try {
             $accessToken = $resourceServer->validateAccessToken($accessToken);
-            return $this->makeAccessTokenData($accessToken);
+            return $this->validateAccessTokenResult($accessToken);
         } catch (OAuthServerException $e) {
             throw new HttpException($e->getHttpStatusCode(), $e->getMessage(), $e->getCode(), $e);
         }
-    }
-    
-    /**
-     * @param AccessTokenEntityInterface $accessToken 访问令牌实例。
-     * @return array 显示的访问令牌内容。
-     */
-    protected function makeAccessTokenData($accessToken)
-    {
-        return [
-            'access_token_id' => $accessToken->getIdentifier(),
-            'client_id' => $accessToken->getClientIdentifier(),
-            'user_id' => $accessToken->getUserIdentifier(),
-            'scopes' => $accessToken->getScopeIdentifiers(),
-        ];
     }
     
     /**
@@ -112,7 +100,8 @@ class ResourceController extends \yii\web\Controller
      */
     protected function createResourceServer()
     {
-        return new ResourceServer([
+        return Yii::createObject([
+            'class' => $this->module->resourceServerClass,
             'accessTokenRepository' => Yii::createObject($this->module->accessTokenRepository),
             'accessTokenCryptKey' => $this->module->accessTokenCryptKey,
             'accessTokenQueryParam' => $this->module->accessTokenQueryParam,
@@ -120,12 +109,20 @@ class ResourceController extends \yii\web\Controller
     }
     
     /**
-     * 获取服务器请求实例。
-     * 
-     * @return \yii\web\Request
+     * @param AccessTokenEntityInterface $accessToken 访问令牌实例。
+     * @return array 显示的访问令牌内容。
      */
-    protected function getServerRequest()
+    protected function validateAccessTokenResult($accessToken)
     {
-        return Yii::createObject($this->module->serverRequest);
+        if ($this->module->validateAccessTokenResult) {
+            return call_user_func($this->module->validateAccessTokenResult, $accessToken);
+        }
+        
+        return [
+            'access_token_id' => $accessToken->getIdentifier(),
+            'client_id' => $accessToken->getClientIdentifier(),
+            'user_id' => $accessToken->getUserIdentifier(),
+            'scopes' => $accessToken->getScopeIdentifiers(),
+        ];
     }
 }

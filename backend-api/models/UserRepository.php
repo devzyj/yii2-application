@@ -4,10 +4,9 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace devjerry\yii2\oauth2\server\repositories;
+namespace backendApi\models;
 
 use devzyj\oauth2\server\interfaces\UserRepositoryInterface;
-use devjerry\yii2\oauth2\server\entities\UserEntity;
 
 /**
  * UserRepository class.
