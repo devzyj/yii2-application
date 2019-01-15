@@ -52,6 +52,10 @@ $config = [
         ],
         'oauth2' => [
             'class' => 'devjerry\yii2\oauth2\server\Module',
+            'user' => [
+                'class' => 'yii\web\User',
+                'identityClass' => false,
+            ],
             'userRepositoryClass' => 'backendApi\models\UserRepository',
             'accessTokenCryptKey' => 'test', // 字符串签名加密。
             /*'accessTokenCryptKey' => [ // 私钥文件加密。

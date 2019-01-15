@@ -9,7 +9,7 @@ namespace devjerry\yii2\oauth2\server\controllers;
 use yii\filters\ContentNegotiator;
 use yii\filters\VerbFilter;
 use yii\web\Response;
-use devjerry\yii2\oauth2\server\actions\TokenIndexAction;
+use devjerry\yii2\oauth2\server\actions\TokenAction;
 
 /**
  * TokenController class.
@@ -51,7 +51,7 @@ class TokenController extends \yii\web\Controller
     {
         return [
             'index' => [
-                'class' => TokenIndexAction::class,
+                'class' => TokenAction::class,
             ],
         ];
     }

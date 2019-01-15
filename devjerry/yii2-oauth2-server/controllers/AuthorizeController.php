@@ -8,6 +8,12 @@ namespace devjerry\yii2\oauth2\server\controllers;
 
 use Yii;
 use yii\web\User;
+use devjerry\yii2\oauth2\server\actions\AuthorizeAction;
+use devjerry\yii2\oauth2\server\actions\LoginAction;
+use devjerry\yii2\oauth2\server\actions\AuthorizationAction;
+
+
+
 use yii\web\HttpException;
 use yii\base\InvalidConfigException;
 use devzyj\oauth2\server\AuthorizationServer;
@@ -24,6 +30,51 @@ use devjerry\yii2\oauth2\server\interfaces\UserIdentityInterface;
  */
 class AuthorizeController extends \yii\web\Controller
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function actions()
+    {
+        return [
+            'index' => [
+                'class' => AuthorizeAction::class,
+                'user' => $this->getUser(),
+            ],
+            'login' => [
+                'class' => LoginAction::class,
+                'user' => $this->getUser(),
+            ],
+            'authorization' => [
+                'class' => AuthorizationAction::class,
+                'user' => $this->getUser(),
+            ],
+        ];
+    }
+    
+    /**
+     * 获取授权用户。
+     * 
+     * @return User
+     */
+    protected function getUser()
+    {
+        /* @var $module \devjerry\yii2\oauth2\server\Module */
+        $module = $this->module;
+        if ($module->user === null) {
+            return Yii::$app->getUser();
+        } elseif (is_string($module->user)) {
+            return Yii::$app->get($module->user);
+        }
+        
+        return Yii::createObject($module->user);
+    }
+    
+    
+    
+    
+    
+    
+    
     const AUTHORIZE_REQUEST_NAME = 'OAUTH2_AUTHORIZE_REQUEST';
     
     /**
@@ -35,13 +86,13 @@ class AuthorizeController extends \yii\web\Controller
      * @todo 验证用户是否登录，并且引导用户登录。
      * @todo 引导登录后的用户去授权确认页面，并且确认授权。
      */
-    public function actionIndex()
+    public function actionIndex2()
     {
         // 创建授权服务器实例。
         $authorizationServer = $this->createAuthorizationServer();
 
         // 添加授权类型。
-        foreach ($this->module->authorizeTypes as $authorizeType) {
+        foreach ($this->module->authorizeTypeClasses as $authorizeType) {
             $authorizationServer->addAuthorizeType(Yii::createObject($authorizeType));
         }
         
@@ -149,10 +200,10 @@ class AuthorizeController extends \yii\web\Controller
     {
         // 创建并返回授权服务器实例。
         return new AuthorizationServer([
-            'accessTokenRepository' => Yii::createObject($this->module->accessTokenRepository),
-            'authorizationCodeRepository' => Yii::createObject($this->module->authorizationCodeRepository),
-            'clientRepository' => Yii::createObject($this->module->clientRepository),
-            'scopeRepository' => Yii::createObject($this->module->scopeRepository),
+            'accessTokenRepository' => Yii::createObject($this->module->accessTokenRepositoryClass),
+            'authorizationCodeRepository' => Yii::createObject($this->module->authorizationCodeRepositoryClass),
+            'clientRepository' => Yii::createObject($this->module->clientRepositoryClass),
+            'scopeRepository' => Yii::createObject($this->module->scopeRepositoryClass),
             'defaultScopes' => $this->module->defaultScopes,
             'accessTokenDuration' => $this->module->accessTokenDuration,
             'accessTokenCryptKey' => $this->module->accessTokenCryptKey,
@@ -209,29 +260,5 @@ class AuthorizeController extends \yii\web\Controller
         } elseif ($sessionAuthorizeRequest->getState()) {
             
         }
-    }
-    
-    /**
-     * 获取登录，确认授权后的回调地址。
-     * 
-     * @return string
-     */
-    protected function getReturnUrl()
-    {
-        return Yii::$app->getRequest()->getUrl();
-    }
-    
-    /**
-     * 获取授权用户。
-     * 
-     * @return User
-     */
-    protected function getUser()
-    {
-        if (!$this->module->user instanceof User) {
-            throw new InvalidConfigException('The `user` property must be set.');
-        }
-        
-        return $this->module->user;
     }
 }

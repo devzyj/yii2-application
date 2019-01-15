@@ -156,15 +156,19 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
     public $refreshTokenCryptKey;
     
     /**
-     * @var string 授权用户的应用组件ID。如果没有设置，则使用 `Yii::$app->getUser()`。
+     * @var string|array 授权用户的应用组件ID。如果没有设置，则使用 `Yii::$app->getUser()`。
      */
     public $user;
     
-    public $loginView;
-    public $authorizeView;
-    
+    /**
+     * @var string|array 登录地址。
+     */
     public $loginUrl;
-    public $authorizeUrl;
+
+    /**
+     * @var string|array 授权地址。
+     */
+    public $authorizationUrl;
 
     /**
      * @var callable 在验证访问令牌时，根据访问令牌实例，构造返回结果。
@@ -192,8 +196,12 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
     {
         parent::init();
         
-        if ($this->userRepositoryClass === null) {
-            throw new InvalidConfigException('The `userRepositoryClass` property must be set.');
+        if ($this->loginUrl === null) {
+            $this->loginUrl = ['/' . $this->uniqueId . '/login'];
+        }
+
+        if ($this->authorizationUrl === null) {
+            $this->authorizationUrl = ['/' . $this->uniqueId . '/authorization'];
         }
     }
     
@@ -205,6 +213,8 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
         if ($app instanceof \yii\web\Application) {
             $app->getUrlManager()->addRules([
                 "<module:({$this->uniqueId})>/authorize" => "<module>/authorize/index",
+                "<module:({$this->uniqueId})>/login" => "<module>/authorize/login",
+                "<module:({$this->uniqueId})>/authorization" => "<module>/authorize/authorization",
                 "<module:({$this->uniqueId})>/token" => "<module>/token/index",
                 "<module:({$this->uniqueId})>/resource" => "<module>/resource/index",
             ], false);

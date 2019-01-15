@@ -65,7 +65,7 @@ class ResourceController extends \yii\web\Controller
         $resourceServer = $this->createResourceServer();
         
         try {
-            $serverRequest = Yii::createObject($this->module->serverRequest);
+            $serverRequest = Yii::createObject($this->module->serverRequestClass);
             
             $accessToken = $resourceServer->validateServerRequest($serverRequest);
             return $this->validateAccessTokenResult($accessToken);
@@ -102,7 +102,7 @@ class ResourceController extends \yii\web\Controller
     {
         return Yii::createObject([
             'class' => $this->module->resourceServerClass,
-            'accessTokenRepository' => Yii::createObject($this->module->accessTokenRepository),
+            'accessTokenRepository' => Yii::createObject($this->module->accessTokenRepositoryClass),
             'accessTokenCryptKey' => $this->module->accessTokenCryptKey,
             'accessTokenQueryParam' => $this->module->accessTokenQueryParam,
         ]);

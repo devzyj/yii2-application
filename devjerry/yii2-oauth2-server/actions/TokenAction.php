@@ -13,12 +13,12 @@ use devzyj\oauth2\server\AuthorizationServer;
 use devzyj\oauth2\server\exceptions\OAuthServerException;
 
 /**
- * TokenIndexAction class.
+ * TokenAction class.
  * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
-class TokenIndexAction extends \yii\base\Action
+class TokenAction extends \yii\base\Action
 {
     /**
      * @return array
