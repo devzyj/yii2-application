@@ -6,9 +6,6 @@
  */
 namespace devjerry\yii2\oauth2\server\actions;
 
-use yii\base\InvalidConfigException;
-use yii\web\User;
-
 /**
  * AuthorizationAction class.
  * 
@@ -17,23 +14,6 @@ use yii\web\User;
  */
 class AuthorizationAction extends \yii\base\Action
 {
-    /**
-     * @var User 授权用户。
-     */
-    public $user;
-    
-    /**
-     * {@inheritdoc}
-     */
-    public function init()
-    {
-        parent::init();
-        
-        if ($this->user === null) {
-            throw new InvalidConfigException('The `user` property must be set.');
-        }
-    }
-    
     /**
      * 用户确认授权。
      */

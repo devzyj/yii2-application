@@ -42,6 +42,10 @@ $config = [
                 '/' => 'site/index'
             ],
         ],
+        'authorizeUser' => [
+            'class' => 'yii\web\User',
+            'identityClass' => 'devjerry\yii2\oauth2\server\models\AuthorizationIdentity',
+        ],
     ],
     'modules' => [
         'oauth' => [
@@ -52,10 +56,11 @@ $config = [
         ],
         'oauth2' => [
             'class' => 'devjerry\yii2\oauth2\server\Module',
-            'user' => [
+            'user' => 'authorizeUser',
+            /*'user' => [
                 'class' => 'yii\web\User',
-                'identityClass' => false,
-            ],
+                'identityClass' => 'devjerry\yii2\oauth2\server\models\AuthorizationIdentity',
+            ],*/
             'userRepositoryClass' => 'backendApi\models\UserRepository',
             'accessTokenCryptKey' => 'test', // 字符串签名加密。
             /*'accessTokenCryptKey' => [ // 私钥文件加密。
@@ -71,6 +76,7 @@ $config = [
                 //'path' => '@common/oauth2/server/refresh-token.txt',
                 'password' => 'test',
             ],
+            'defaultScopes' => ['basic', 'basic3'],
         ],
     ]
 ];

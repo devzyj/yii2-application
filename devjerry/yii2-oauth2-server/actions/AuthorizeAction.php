@@ -7,11 +7,11 @@
 namespace devjerry\yii2\oauth2\server\actions;
 
 use Yii;
-use yii\base\InvalidConfigException;
-use yii\web\User;
 use yii\web\HttpException;
-use devzyj\oauth2\server\AuthorizationServer;
+use yii\base\InvalidConfigException;
 use devzyj\oauth2\server\exceptions\OAuthServerException;
+use devjerry\yii2\oauth2\server\interfaces\OAuthIdentityInterface;
+use devzyj\oauth2\server\AuthorizationServer;
 
 /**
  * AuthorizeAction class.
@@ -22,34 +22,96 @@ use devzyj\oauth2\server\exceptions\OAuthServerException;
 class AuthorizeAction extends \yii\base\Action
 {
     /**
-     * @var User 授权用户。
+     * 用户授权。
      */
-    public $user;
-    
-    /**
-     * {@inheritdoc}
-     */
-    public function init()
+    public function run()
     {
-        parent::init();
+        // 创建授权服务器实例。
+        $authorizationServer = $this->getAuthorizationServer();
+
+        /* @var $module \devjerry\yii2\oauth2\server\Module */
+        $module = $this->controller->module;
         
-        if ($this->user === null) {
-            throw new InvalidConfigException('The `user` property must be set.');
+        // 服务器请求实例。
+        $serverRequest = Yii::createObject($module->serverRequestClass);
+        
+        try {
+            // 获取并验证授权请求。
+            $authorizeRequest = $authorizationServer->getAuthorizeRequest($serverRequest);
+            
+            // 获取授权用户。
+            $user = $module->getUser();
+            //$user->logout();
+            
+            // 判断用户是否登录。
+            if ($user->getIsGuest()) {
+                // 保存授权请求对像。
+                $module->setAuthorizeRequest($authorizeRequest);
+                
+                // 设置回调地址。
+                $user->setReturnUrl(Yii::$app->getRequest()->getUrl());
+
+                // 用户未登录，重定向到登录页面。
+                return $this->controller->redirect($module->loginUrl);
+            }
+            
+            // 已登录的授权用户。
+            $userIdentity = $user->getIdentity();
+            if (!$userIdentity instanceof OAuthIdentityInterface) {
+                throw new InvalidConfigException('The `user` does not implement OAuthIdentityInterface.');
+            }
+
+            // 判断用户是否已确认授权。
+            $isApproved = $userIdentity->getOAuthIsApproved();
+            if ($isApproved === null) {
+                // 保存授权请求对像。
+                $module->setAuthorizeRequest($authorizeRequest);
+                
+                // 设置回调地址。
+                $user->setReturnUrl(Yii::$app->getRequest()->getUrl());
+
+                // 用户未确认是否授权，重定向到授权页面。
+                return $this->controller->redirect($module->authorizationUrl);
+            }
+
+            // 设置用户是否同意授权的状态为 `null`。
+            $userIdentity->removeOAuthIsApproved();
+            
+            // 设置运行授权时的参数。
+            $authorizeRequest->setUserEntity($userIdentity->getOAuthUserEntity());
+            $authorizeRequest->setIsApproved($isApproved);
+            $scopeEntities = $userIdentity->getOAuthScopeEntities();
+            if ($scopeEntities !== null) {
+                $authorizeRequest->setScopeEntities($scopeEntities);
+            }
+            
+            // 运行并返回授权成功的回调地址。
+            $redirectUri = $authorizationServer->runAuthorizeTypes($authorizeRequest);
+
+            // 移除保存的授权请求对像。
+            $module->removeAuthorizeRequest();
+            
+            // 重定向到授权成功的回调地址。
+            return $this->controller->redirect($redirectUri);
+        } catch (OAuthServerException $e) {
+            // 移除保存的授权请求对像。
+            $module->removeAuthorizeRequest();
+            
+            throw new HttpException($e->getHttpStatusCode(), $e->getMessage(), $e->getCode(), $e);
         }
     }
     
     /**
-     * @return array
+     * 获取授权服务器实例。
+     * 
+     * @return AuthorizationServer
      */
-    public function run()
+    protected function getAuthorizationServer()
     {
-        $controller = $this->controller;
-        
         /* @var $module \devjerry\yii2\oauth2\server\Module */
-        $module = $controller->module;
+        $module = $this->controller->module;
         
-        // 创建授权服务器实例。
-        /* @var $authorizationServer AuthorizationServer */
+        // 实例化对像。
         $authorizationServer = Yii::createObject([
             'class' => $module->authorizationServerClass,
             'accessTokenRepository' => Yii::createObject($module->accessTokenRepositoryClass),
@@ -63,42 +125,13 @@ class AuthorizeAction extends \yii\base\Action
             'authorizationCodeDuration' => $module->authorizationCodeDuration,
             'authorizationCodeCryptKey' => $module->authorizationCodeCryptKey,
         ]);
-
+        
         // 添加授权类型。
         foreach ($module->authorizeTypeClasses as $authorizeTypeClass) {
             $authorizationServer->addAuthorizeType(Yii::createObject($authorizeTypeClass));
         }
         
-        try {
-            // 服务器请求实例。
-            $serverRequest = Yii::createObject($module->serverRequestClass);
-            
-            // 获取并验证授权请求。
-            $authorizeRequest = $authorizationServer->getAuthorizeRequest($serverRequest);
-            
-            // 获取授权用户。
-            $user = $this->user;
-            if ($user->getIsGuest()) {
-                // 设置回调地址。
-                $user->setReturnUrl(Yii::$app->getRequest()->getUrl());
-            
-                // 重定向到登录页面。
-                $redirectUri = $module->loginUrl;
-            } elseif ($authorizeRequest->getIsApproved() === null) {
-                // 设置回调地址。
-                $user->setReturnUrl(Yii::$app->getRequest()->getUrl());
-                
-                // 重定向到授权页面。
-                $redirectUri = $module->authorizationUrl;
-            } else {
-                // 运行并返回授权成功的回调地址。
-                $redirectUri = $authorizationServer->runAuthorizeTypes($authorizeRequest);
-            }
-        } catch (OAuthServerException $e) {
-            throw new HttpException($e->getHttpStatusCode(), $e->getMessage(), $e->getCode(), $e);
-        }
-        
-        // 重定向页面。
-        $controller->redirect($redirectUri);
+        // 返回对像。
+        return $authorizationServer;
     }
 }

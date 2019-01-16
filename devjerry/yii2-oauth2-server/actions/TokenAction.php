@@ -25,11 +25,37 @@ class TokenAction extends \yii\base\Action
      */
     public function run()
     {
+        // 创建授权服务器实例。
+        $authorizationServer = $this->getAuthorizationServer();
+
         /* @var $module \devjerry\yii2\oauth2\server\Module */
         $module = $this->controller->module;
         
-        // 创建授权服务器实例。
-        /* @var $authorizationServer AuthorizationServer */
+        // 服务器请求实例。
+        $serverRequest = Yii::createObject($module->serverRequestClass);
+        $serverRequest->parsers = ArrayHelper::merge([
+            'application/json' => 'yii\web\JsonParser',
+        ], $serverRequest->parsers);
+        
+        try {
+            // 运行并获取授予的认证信息。
+            return $authorizationServer->runGrantTypes($serverRequest);
+        } catch (OAuthServerException $e) {
+            throw new HttpException($e->getHttpStatusCode(), $e->getMessage(), $e->getCode(), $e);
+        }
+    }
+    
+    /**
+     * 获取授权服务器实例。
+     * 
+     * @return AuthorizationServer
+     */
+    protected function getAuthorizationServer()
+    {
+        /* @var $module \devjerry\yii2\oauth2\server\Module */
+        $module = $this->controller->module;
+        
+        // 实例化对像。
         $authorizationServer = Yii::createObject([
             'class' => $module->authorizationServerClass,
             'accessTokenRepository' => Yii::createObject($module->accessTokenRepositoryClass),
@@ -45,23 +71,13 @@ class TokenAction extends \yii\base\Action
             'refreshTokenDuration' => $module->refreshTokenDuration,
             'refreshTokenCryptKey' => $module->refreshTokenCryptKey,
         ]);
-        
+
         // 添加授予类型。
         foreach ($module->grantTypeClasses as $grantTypeClass) {
             $authorizationServer->addGrantType(Yii::createObject($grantTypeClass));
         }
         
-        try {
-            // 服务器请求实例。
-            $serverRequest = Yii::createObject($module->serverRequestClass);
-            $serverRequest->parsers = ArrayHelper::merge([
-                'application/json' => 'yii\web\JsonParser',
-            ], $serverRequest->parsers);
-            
-            // 运行并获取授予的认证信息。
-            return $authorizationServer->runGrantTypes($serverRequest);
-        } catch (OAuthServerException $e) {
-            throw new HttpException($e->getHttpStatusCode(), $e->getMessage(), $e->getCode(), $e);
-        }
+        // 返回对像。
+        return $authorizationServer;
     }
 }
