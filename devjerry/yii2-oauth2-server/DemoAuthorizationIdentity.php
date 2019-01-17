@@ -4,19 +4,20 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace devjerry\yii2\oauth2\server\models;
+namespace devjerry\yii2\oauth2\server;
 
 use yii\base\BaseObject;
 use yii\web\IdentityInterface;
 use devjerry\yii2\oauth2\server\interfaces\OAuthIdentityInterface;
+use devjerry\yii2\oauth2\server\entities\ScopeEntity;
 
 /**
- * AuthorizationIdentity class.
+ * DemoAuthorizationIdentity class.
  * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
-class AuthorizationIdentity extends BaseObject implements IdentityInterface, OAuthIdentityInterface
+class DemoAuthorizationIdentity extends BaseObject implements IdentityInterface, OAuthIdentityInterface
 {
     public $id;
     public $username;
@@ -98,7 +99,8 @@ class AuthorizationIdentity extends BaseObject implements IdentityInterface, OAu
     {
         return $this->password === $password;
     }
-    
+
+    /***************************** OAuthIdentityInterface *****************************/
     /**
      * {@inheritdoc}
      */
@@ -106,7 +108,7 @@ class AuthorizationIdentity extends BaseObject implements IdentityInterface, OAu
     {
         return $this;
     }
-
+    
     /**
      * {@inheritdoc}
      */
@@ -114,18 +116,13 @@ class AuthorizationIdentity extends BaseObject implements IdentityInterface, OAu
     {
         return $this->isApproved;
     }
-    
-    public function setOAuthIsApproved($value)
-    {
-        
-    }
 
     /**
      * {@inheritdoc}
      */
-    public function removeOAuthIsApproved()
+    public function setOAuthIsApproved($value)
     {
-        $this->isApproved = null;
+        $this->isApproved = $value;
     }
 
     /**
@@ -134,7 +131,7 @@ class AuthorizationIdentity extends BaseObject implements IdentityInterface, OAu
     public function getOAuthScopeEntities()
     {
         if ($this->scopes !== null) {
-            return OauthScope::findAll(['identifier' => $this->scopes]);
+            return ScopeEntity::findAll(['identifier' => $this->scopes]);
         }
     }
     

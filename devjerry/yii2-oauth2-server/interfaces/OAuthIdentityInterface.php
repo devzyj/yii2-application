@@ -18,13 +18,6 @@ use devzyj\oauth2\server\interfaces\ScopeEntityInterface;
 interface OAuthIdentityInterface
 {
     /**
-     * 获取授权用户实体对像。
-     * 
-     * @return UserEntityInterface
-     */
-    public function getOAuthUserEntity();
-    
-    /**
      * 获取用户是否同意授权。
      * 
      * @return boolean|null 返回 `null` 表示未进行同意或拒绝授权的操作。
@@ -32,14 +25,23 @@ interface OAuthIdentityInterface
     public function getOAuthIsApproved();
     
     /**
-     * 设置用户是否同意授权状态为 `null`。
+     * 设置用户是否同意授权。
+     * 
+     * @param boolean|null $value
      */
-    public function removeOAuthIsApproved();
+    public function setOAuthIsApproved($value);
+    
+    /**
+     * 获取授权用户实体对像。
+     * 
+     * @return UserEntityInterface
+     */
+    public function getOAuthUserEntity();
     
     /**
      * 获取同意授权的权限实体列表。
      * 
-     * @return ScopeEntityInterface[]|null 返回 `null` 表示请求中的权限。
+     * @return ScopeEntityInterface[]|null 返回 `null` 表示请求的全部权限。
      */
     public function getOAuthScopeEntities();
 }

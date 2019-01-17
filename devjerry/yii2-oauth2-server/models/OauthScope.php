@@ -13,6 +13,7 @@ use Yii;
  *
  * @property int $id ID
  * @property string $identifier 标识
+ * @property string $name 名称
  *
  * @property OauthClientScope[] $oauthClientScopes 客户端与权限的关联关系
  * @property OauthClient[] $oauthClients 客户端
@@ -36,8 +37,9 @@ class OauthScope extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['identifier'], 'required'],
-            [['identifier'], 'string', 'max' => 20],
+            [['identifier', 'name'], 'required'],
+            [['identifier'], 'string', 'max' => 255],
+            [['name'], 'string', 'max' => 50],
             [['identifier'], 'unique'],
         ];
     }
@@ -50,6 +52,7 @@ class OauthScope extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'identifier' => 'Identifier',
+            'name' => 'Name',
         ];
     }
 

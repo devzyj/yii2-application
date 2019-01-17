@@ -39,12 +39,12 @@ $config = [
             'enableStrictParsing' => true,
             'showScriptName' => false,
             'rules' => [
-                '/' => 'site/index'
+                '/' => 'site/index',
             ],
         ],
         'authorizeUser' => [
             'class' => 'yii\web\User',
-            'identityClass' => 'devjerry\yii2\oauth2\server\models\AuthorizationIdentity',
+            'identityClass' => 'devjerry\yii2\oauth2\server\DemoAuthorizationIdentity',
         ],
     ],
     'modules' => [
@@ -57,6 +57,8 @@ $config = [
         'oauth2' => [
             'class' => 'devjerry\yii2\oauth2\server\Module',
             'user' => 'authorizeUser',
+            'loginFormClass' => 'devjerry\yii2\oauth2\server\DemoLoginForm',
+            'authorizationFormClass' => 'devjerry\yii2\oauth2\server\DemoAuthorizationForm',
             /*'user' => [
                 'class' => 'yii\web\User',
                 'identityClass' => 'devjerry\yii2\oauth2\server\models\AuthorizationIdentity',

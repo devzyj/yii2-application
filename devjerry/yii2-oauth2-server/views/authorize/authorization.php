@@ -1,16 +1,18 @@
 <?php
 /* @var $this \yii\web\View */
-/* @var $form yii\bootstrap\ActiveForm */
-/* @var $model devjerry\yii2\oauth2\server\DemoLoginForm */
-/* @var $clientEntity devjerry\yii2\oauth2\server\entities\ClientEntity  */
-/* @var $scopeEntities devjerry\yii2\oauth2\server\entities\ScopeEntity[]  */
+/* @var $form \yii\bootstrap\ActiveForm */
+/* @var $user \yii\web\User */
+/* @var $model \devjerry\yii2\oauth2\server\DemoAuthorizationForm */
+/* @var $clientEntity \devjerry\yii2\oauth2\server\entities\ClientEntity  */
+/* @var $scopeEntities \devjerry\yii2\oauth2\server\entities\ScopeEntity[]  */
 
-use yii\helpers\Html;
+use yii\bootstrap\Html;
 use yii\bootstrap\ActiveForm;
+use yii\bootstrap\Tabs;
 use devjerry\yii2\oauth2\server\assets\AppAsset;
 
 AppAsset::register($this);
-$this->title = 'OAuth2 Login Authorization';
+$this->title = 'OAuth2 Authorization';
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -40,17 +42,41 @@ $this->title = 'OAuth2 Login Authorization';
                     'labelOptions' => ['class' => 'col-lg-1 control-label'],
                 ],
             ]); ?>
-        
-                <?= $form->field($model, 'username')->textInput(['autofocus' => true]) ?>
-        
-                <?= $form->field($model, 'password')->passwordInput() ?>
+            
+                <?php 
+                    $user->getIdentity();
+                    $authorizationContent[] = 'asdasdasd';
+                    $loginContent[] = $form->field($model, 'username')->textInput(['autofocus' => true]);
+                    $loginContent[] = $form->field($model, 'password')->passwordInput();
+                ?>
+            
+                <?= Tabs::widget([
+                    'items' => [
+                        [
+                            'label' => 'Authorization',
+                            'content' => implode('', $authorizationContent),
+                            'active' => true,
+                            'linkOptions' => ['data-authorization-mode' => $model::MODE_USER],
+                        ],
+                        [
+                            'label' => 'Login',
+                            'content' => implode('', $loginContent),
+                            'linkOptions' => ['data-authorization-mode' => $model::MODE_LOGIN],
+                        ],
+                    ],
+                    'clientEvents' => [
+                        'shown.bs.tab' => 'function (e) {
+                            console.log(e.target);
+                        }',
+                    ],
+                ]); ?>
         
                 <div class="form-group">
                     <div class="col-lg-offset-1 col-lg-11">
-                        <?= Html::submitButton('Login Authorization', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
+                        <?= Html::submitButton('Authorization', ['class' => 'btn btn-primary', 'name' => 'authorization-button']) ?>
                     </div>
                 </div>
-                
+        
                 <?php 
                     $items = [];
                     foreach ($scopeEntities as $scope) {

@@ -11,6 +11,12 @@ use yii\helpers\ArrayHelper;
 use yii\web\HttpException;
 use devzyj\oauth2\server\AuthorizationServer;
 use devzyj\oauth2\server\exceptions\OAuthServerException;
+use devjerry\yii2\oauth2\server\ServerRequest;
+use devjerry\yii2\oauth2\server\repositories\AccessTokenRepository;
+use devjerry\yii2\oauth2\server\repositories\AuthorizationCodeRepository;
+use devjerry\yii2\oauth2\server\repositories\ClientRepository;
+use devjerry\yii2\oauth2\server\repositories\RefreshTokenRepository;
+use devjerry\yii2\oauth2\server\repositories\ScopeRepository;
 
 /**
  * TokenAction class.
@@ -32,7 +38,7 @@ class TokenAction extends \yii\base\Action
         $module = $this->controller->module;
         
         // 服务器请求实例。
-        $serverRequest = Yii::createObject($module->serverRequestClass);
+        $serverRequest = Yii::createObject(ServerRequest::class);
         $serverRequest->parsers = ArrayHelper::merge([
             'application/json' => 'yii\web\JsonParser',
         ], $serverRequest->parsers);
@@ -57,12 +63,12 @@ class TokenAction extends \yii\base\Action
         
         // 实例化对像。
         $authorizationServer = Yii::createObject([
-            'class' => $module->authorizationServerClass,
-            'accessTokenRepository' => Yii::createObject($module->accessTokenRepositoryClass),
-            'authorizationCodeRepository' => Yii::createObject($module->authorizationCodeRepositoryClass),
-            'clientRepository' => Yii::createObject($module->clientRepositoryClass),
-            'refreshTokenRepository' => Yii::createObject($module->refreshTokenRepositoryClass),
-            'scopeRepository' => Yii::createObject($module->scopeRepositoryClass),
+            'class' => AuthorizationServer::class,
+            'accessTokenRepository' => Yii::createObject(AccessTokenRepository::class),
+            'authorizationCodeRepository' => Yii::createObject(AuthorizationCodeRepository::class),
+            'clientRepository' => Yii::createObject(ClientRepository::class),
+            'refreshTokenRepository' => Yii::createObject(RefreshTokenRepository::class),
+            'scopeRepository' => Yii::createObject(ScopeRepository::class),
             'userRepository' => Yii::createObject($module->userRepositoryClass),
             'defaultScopes' => $module->defaultScopes,
             'accessTokenDuration' => $module->accessTokenDuration,

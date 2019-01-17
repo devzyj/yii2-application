@@ -6,7 +6,6 @@
  */
 namespace devjerry\yii2\oauth2\server\controllers;
 
-use Yii;
 use devjerry\yii2\oauth2\server\actions\AuthorizeAction;
 use devjerry\yii2\oauth2\server\actions\LoginAction;
 use devjerry\yii2\oauth2\server\actions\AuthorizationAction;
@@ -24,15 +23,20 @@ class AuthorizeController extends \yii\web\Controller
      */
     public function actions()
     {
+        /* @var $module \devjerry\yii2\oauth2\server\Module */
+        $module = $this->module;
+        
         return [
             'index' => [
                 'class' => AuthorizeAction::class,
             ],
             'login' => [
                 'class' => LoginAction::class,
+                'modelClass' => $module->loginFormClass,
             ],
             'authorization' => [
                 'class' => AuthorizationAction::class,
+                'modelClass' => $module->authorizationFormClass,
             ],
         ];
     }

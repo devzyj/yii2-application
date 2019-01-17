@@ -69,7 +69,8 @@ class m181203_032806_oauth2_server_initial extends Migration
         // oauth_scope
         $this->createTable($tables['oauth_scope'], [
             'id' => $this->primaryKey(10)->unsigned()->comment('ID'),
-            'identifier' => $this->string(20)->notNull()->unique()->comment('标识'),
+            'identifier' => $this->string(255)->notNull()->unique()->comment('标识'),
+            'name' => $this->string(50)->notNull()->comment('名称'),
         ], "COMMENT='OAuth - 权限表'");
 
         // oauth_client_scope
@@ -108,7 +109,7 @@ class m181203_032806_oauth2_server_initial extends Migration
             'identifier' => 'f4c22926e400ebca',
             'secret' => '692569f364854bc130687297c770c2c0',
             'grant_types' => 'authorization_code implicit password client_credentials refresh_token',
-            'redirect_uri' => 'http://api.backend.application.yii2.devzyj.zyj',
+            'redirect_uri' => 'http://backend.application.yii2.devzyj.zyj/test/oauth-callback',
             'access_token_duration' => 10800, // 3 hours
             'refresh_token_duration' => 2592000, // 30 days
         ]);
@@ -117,6 +118,7 @@ class m181203_032806_oauth2_server_initial extends Migration
         // oauth_scope
         $this->insert($this->tables['oauth_scope'], [
             'identifier' => 'basic',
+            'name' => '基础权限',
         ]);
         $scopeId = $this->db->getLastInsertID();
 
@@ -131,6 +133,7 @@ class m181203_032806_oauth2_server_initial extends Migration
         // oauth_scope
         $this->insert($this->tables['oauth_scope'], [
             'identifier' => 'basic2',
+            'name' => '基础权限2',
         ]);
         $scopeId = $this->db->getLastInsertID();
         
@@ -144,6 +147,7 @@ class m181203_032806_oauth2_server_initial extends Migration
         // oauth_scope
         $this->insert($this->tables['oauth_scope'], [
             'identifier' => 'basic3',
+            'name' => '基础权限3',
         ]);
         $scopeId = $this->db->getLastInsertID();
         

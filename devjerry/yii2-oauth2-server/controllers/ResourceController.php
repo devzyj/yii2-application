@@ -13,6 +13,8 @@ use yii\web\HttpException;
 use devzyj\oauth2\server\ResourceServer;
 use devzyj\oauth2\server\interfaces\AccessTokenEntityInterface;
 use devzyj\oauth2\server\exceptions\OAuthServerException;
+use devjerry\yii2\oauth2\server\ServerRequest;
+use devjerry\yii2\oauth2\server\repositories\AccessTokenRepository;
 
 /**
  * ResourceController class.
@@ -65,7 +67,7 @@ class ResourceController extends \yii\web\Controller
         $resourceServer = $this->createResourceServer();
         
         try {
-            $serverRequest = Yii::createObject($this->module->serverRequestClass);
+            $serverRequest = Yii::createObject(ServerRequest::class);
             
             $accessToken = $resourceServer->validateServerRequest($serverRequest);
             return $this->validateAccessTokenResult($accessToken);
@@ -101,8 +103,8 @@ class ResourceController extends \yii\web\Controller
     protected function createResourceServer()
     {
         return Yii::createObject([
-            'class' => $this->module->resourceServerClass,
-            'accessTokenRepository' => Yii::createObject($this->module->accessTokenRepositoryClass),
+            'class' => ResourceServer::class,
+            'accessTokenRepository' => Yii::createObject(AccessTokenRepository::class),
             'accessTokenCryptKey' => $this->module->accessTokenCryptKey,
             'accessTokenQueryParam' => $this->module->accessTokenQueryParam,
         ]);
