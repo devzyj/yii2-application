@@ -7,11 +7,8 @@
 namespace devjerry\yii2\oauth2\server;
 
 use Yii;
-use yii\db\Connection;
-use yii\web\User;
 use devzyj\oauth2\server\authorizes\CodeAuthorize;
 use devzyj\oauth2\server\authorizes\ImplicitAuthorize;
-use devzyj\oauth2\server\authorizes\AuthorizeRequestInterface;
 use devzyj\oauth2\server\grants\AuthorizationCodeGrant;
 use devzyj\oauth2\server\grants\ClientCredentialsGrant;
 use devzyj\oauth2\server\grants\PasswordGrant;
@@ -36,11 +33,12 @@ use devjerry\yii2\oauth2\server\interfaces\AuthorizationFormInterface;
  * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
+ * @todo 修正授权页面显示的权限列表，不能自适应当前用户的有效权限的问题。
  */
 class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
 {
     /**
-     * @var array 授权类型。
+     * @var array 授权类型类名。
      */
     public $authorizeTypeClasses = [
         CodeAuthorize::class,
@@ -48,7 +46,7 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
     ];
     
     /**
-     * @var array 权限授予类型。
+     * @var array 权限授予类型类名。
      */
     public $grantTypeClasses = [
         AuthorizationCodeGrant::class,
@@ -59,7 +57,6 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
 
     /**
      * @var string|array|callable 用户存储库。
-     * @see Yii::createObject()
      */
     public $userRepositoryClass;
 
@@ -84,11 +81,6 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
     public $accessTokenCryptKey;
 
     /**
-     * @var string 验证访问令牌时，在查询参数中的名称。
-     */
-    public $accessTokenQueryParam = 'access-token';
-    
-    /**
      * @var integer 授权码的持续时间，默认十分钟。
      */
     public $authorizationCodeDuration = 600;
@@ -109,11 +101,6 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
     public $refreshTokenCryptKey;
 
     /**
-     * @var Connection|array|string 数据库连接对象，或数据库连接的应用程序组件ID。如果没有设置，则使用 `Yii::$app->getDb()`。
-     */
-    //public $db;
-    
-    /**
      * @var string|array 授权用户的应用组件ID或配置。如果没有设置，则使用 `Yii::$app->getUser()`。
      */
     public $user;
@@ -124,20 +111,45 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
     public $loginUrl;
 
     /**
-     * @var string|array 授权地址。如果没有设置，则使用 ['/MODULE_ID/authorization']。
-     */
-    public $authorizationUrl;
-
-    /**
      * @var OAuthLoginFormInterface 登录页面表单模型类名。
      */
     public $loginFormClass;
     
     /**
-     * @var AuthorizationFormInterface 授权页面表单模型类名。
+     * @var string 登录页面视图文件。
+     */
+    public $loginActionView;
+
+    /**
+     * @var string 登录页面布局文件。
+     */
+    public $loginActionLayout;
+    
+    /**
+     * @var string|array 确认授权地址。如果没有设置，则使用 ['/MODULE_ID/authorization']。
+     */
+    public $authorizationUrl;
+
+    /**
+     * @var AuthorizationFormInterface 确认授权页面表单模型类名。
      */
     public $authorizationFormClass;
+    
+    /**
+     * @var string 确认授权页面视图文件。
+     */
+    public $authorizationActionView;
 
+    /**
+     * @var string 确认授权页面布局文件。
+     */
+    public $authorizationActionLayout;
+    
+    /**
+     * @var string 验证访问令牌时，在查询参数中的名称。
+     */
+    public $validateAccessTokenQueryParam;
+    
     /**
      * @var callable 在验证访问令牌时，根据访问令牌实例，构造返回结果。
      * 方法应该返回一个包函访问令牌内容的数组。
@@ -156,6 +168,11 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
      * @see ResourceController::validateAccessTokenResult()
      */
     public $validateAccessTokenResult;
+
+    /**
+     * @var string|array 数据库连接的应用组件ID或配置。如果没有设置，则使用 `Yii::$app->getDb()`。
+     */
+    //public $db;
     
     /**
      * {@inheritdoc}
@@ -193,63 +210,4 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
             Yii::$container->set($class, $definition);
         }
     }
-    
-    /**
-     * 获取授权用户。
-     * 
-     * @return User
-     */
-    public function getUser()
-    {
-        if ($this->user === null) {
-            return Yii::$app->getUser();
-        } elseif (is_string($this->user)) {
-            return Yii::$app->get($this->user);
-        }
-        
-        return Yii::createObject($this->user);
-    }
-
-    
-    
-    
-    //const AUTHORIZE_REQUEST_KEY = 'OAUTH2_AUTHORIZE_REQUEST';
-    
-    /**
-     * 获取保存授权请求的名称。
-     
-    protected function getAuthorizeRequestName()
-    {
-        return strtr($this->uniqueId, ['/' => '_']) . '_OAUTH2_AUTHORIZE_REQUEST';
-    }*/
-    
-    /**
-     * 获取授权请求。
-     * 
-     * @return AuthorizeRequestInterface
-     
-    public function getAuthorizeRequest()
-    {
-        return Yii::$app->getSession()->get($this->getAuthorizeRequestName());
-    }*/
-    
-    /**
-     * 设置授权请求。
-     * 
-     * @param AuthorizeRequestInterface $authorizeRequest
-     
-    public function setAuthorizeRequest(AuthorizeRequestInterface $authorizeRequest)
-    {
-        Yii::$app->getSession()->set($this->getAuthorizeRequestName(), $authorizeRequest);
-    }*/
-    
-    /**
-     * 移除授权请求。
-     * 
-     * @return AuthorizeRequestInterface
-     
-    public function removeAuthorizeRequest()
-    {
-        return Yii::$app->getSession()->remove($this->getAuthorizeRequestName());
-    }*/
 }

@@ -1,18 +1,19 @@
 <?php
 /* @var $this \yii\web\View */
 /* @var $form \yii\bootstrap\ActiveForm */
-/* @var $user \yii\web\User */
-/* @var $model \devjerry\yii2\oauth2\server\DemoAuthorizationForm */
+/* @var $model \devjerry\yii2\oauth2\server\demos\DemoAuthorizationForm */
 /* @var $clientEntity \devjerry\yii2\oauth2\server\entities\ClientEntity  */
 /* @var $scopeEntities \devjerry\yii2\oauth2\server\entities\ScopeEntity[]  */
+/* @var $user \yii\web\User */
+/* @var $loginUrl string */
 
 use yii\bootstrap\Html;
 use yii\bootstrap\ActiveForm;
 use yii\bootstrap\Tabs;
-use devjerry\yii2\oauth2\server\assets\AppAsset;
+use devjerry\yii2\oauth2\server\demos\DemoAsset;
 
-AppAsset::register($this);
-$this->title = 'OAuth2 Authorization';
+DemoAsset::register($this);
+$this->title = 'OAuth2 Authorization Demo';
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -32,7 +33,7 @@ $this->title = 'OAuth2 Authorization';
         <div class="site-login">
             <h2><?= Html::encode($this->title) ?></h2>
             
-            <p>Client: <?= Html::encode($clientEntity->getIdentifier()) ?></p>
+            <p>Client: <?= Html::encode($clientEntity->getIdentifier()) ?> | <?= Html::a('Login Page', $loginUrl) ?></p>
             
             <?php $form = ActiveForm::begin([
                 'id' => 'login-form',
@@ -41,39 +42,51 @@ $this->title = 'OAuth2 Authorization';
                     'template' => "{label}\n<div class=\"col-lg-3\">{input}</div>\n<div class=\"col-lg-8\">{error}</div>",
                     'labelOptions' => ['class' => 'col-lg-1 control-label'],
                 ],
+                'enableAjaxValidation' => false,
             ]); ?>
-            
+                
                 <?php 
-                    $user->getIdentity();
-                    $authorizationContent[] = 'asdasdasd';
-                    $loginContent[] = $form->field($model, 'username')->textInput(['autofocus' => true]);
-                    $loginContent[] = $form->field($model, 'password')->passwordInput();
+                    if ($model->mode === null) {
+                        $model->mode = $user->getIsGuest() ? $model::AUTHORIZATION_MODE_CHANGE : $model::AUTHORIZATION_MODE_LOGGED;
+                    }
+                    
+                    echo Html::activeHiddenInput($model, 'mode');
                 ?>
             
-                <?= Tabs::widget([
-                    'items' => [
-                        [
+                <?php 
+                    $loginContent[] = $form->field($model, 'username')->textInput(['autofocus' => true]);
+                    $loginContent[] = $form->field($model, 'password')->passwordInput();
+                    $items[] = [
+                        'label' => $user->getIsGuest() ? 'Login' : 'Change User',
+                        'content' => Html::tag('p', implode('', $loginContent)),
+                        'linkOptions' => ['data-authorization-mode' => $model::AUTHORIZATION_MODE_CHANGE],
+                        'active' => $model->mode === $model::AUTHORIZATION_MODE_CHANGE ? true : false,
+                    ];
+                    
+                    if (!$user->getIsGuest()) {
+                        $userIdentity = $user->getIdentity();
+                        $authorizationContent[] = Html::staticControl('User ID: ' . $userIdentity->getId());
+                        $items[] = [
                             'label' => 'Authorization',
-                            'content' => implode('', $authorizationContent),
-                            'active' => true,
-                            'linkOptions' => ['data-authorization-mode' => $model::MODE_USER],
+                            'content' => Html::tag('p', implode('', $authorizationContent)),
+                            'linkOptions' => ['data-authorization-mode' => $model::AUTHORIZATION_MODE_LOGGED],
+                            'active' => $model->mode === $model::AUTHORIZATION_MODE_LOGGED ? true : false,
+                        ];
+                    }
+                    
+                    echo Tabs::widget([
+                        'items' => $items,
+                        'clientEvents' => [
+                            'shown.bs.tab' => 'function (e) {
+                                $("#' . Html::getInputId($model, 'mode') . '").val($(e.target).data("authorizationMode"));
+                            }',
                         ],
-                        [
-                            'label' => 'Login',
-                            'content' => implode('', $loginContent),
-                            'linkOptions' => ['data-authorization-mode' => $model::MODE_LOGIN],
-                        ],
-                    ],
-                    'clientEvents' => [
-                        'shown.bs.tab' => 'function (e) {
-                            console.log(e.target);
-                        }',
-                    ],
-                ]); ?>
-        
+                    ]);
+                ?>
+            
                 <div class="form-group">
                     <div class="col-lg-offset-1 col-lg-11">
-                        <?= Html::submitButton('Authorization', ['class' => 'btn btn-primary', 'name' => 'authorization-button']) ?>
+                        <?= Html::submitButton('Authorization', ['class' => 'btn btn-primary', 'id' => 'authorization-button']) ?>
                     </div>
                 </div>
         
@@ -82,15 +95,22 @@ $this->title = 'OAuth2 Authorization';
                     foreach ($scopeEntities as $scope) {
                         $items[$scope->getIdentifier()] = $scope->name;
                     }
+
+                    if ($model->scopes === null) {
+                        $model->scopes = array_keys($items);
+                    }
                     
                     echo $form->field($model, 'scopes')->checkboxList($items);
                 ?>
                 
-                <div style='color:red;'>
+                <div style='color:red; display:none;'>
                     <?= $form->errorSummary($model) ?>
                 </div>
                 
             <?php ActiveForm::end(); ?>
+            
+            <?= $this->render('_footer') ?>
+            
         </div>
     </div>
 </div>

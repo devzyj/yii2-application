@@ -8,8 +8,9 @@ namespace devjerry\yii2\oauth2\server\actions;
 
 use Yii;
 use yii\base\InvalidConfigException;
-use yii\web\HttpException;
 use yii\helpers\Url;
+use yii\web\User;
+use yii\web\HttpException;
 use devzyj\oauth2\server\AuthorizationServer;
 use devzyj\oauth2\server\authorizes\AuthorizeRequestInterface;
 use devzyj\oauth2\server\interfaces\ScopeEntityInterface;
@@ -30,6 +31,74 @@ use devjerry\yii2\oauth2\server\interfaces\OAuthIdentityInterface;
 class AuthorizeAction extends \yii\base\Action
 {
     /**
+     * @var array 授权类型类名。
+     */
+    public $authorizeTypeClasses;
+
+    /**
+     * @var string|array|callable 用户存储库。
+     */
+    public $userRepositoryClass;
+    
+    /**
+     * @var array 默认权限。
+    */
+    public $defaultScopes;
+    
+    /**
+     * @var integer 访问令牌的持续时间。
+    */
+    public $accessTokenDuration;
+    
+    /**
+     * @var string|array 访问令牌密钥。
+     */
+    public $accessTokenCryptKey;
+    
+    /**
+     * @var integer 授权码的持续时间。
+     */
+    public $authorizationCodeDuration;
+    
+    /**
+     * @var array 授权码密钥。
+     */
+    public $authorizationCodeCryptKey;
+    
+    /**
+     * @var string|array 授权用户的应用组件ID或配置。如果没有设置，则使用 `Yii::$app->getUser()`。
+     */
+    public $user;
+    
+    /**
+     * @var string|array 登录地址。
+     */
+    public $loginUrl;
+    
+    /**
+     * @var string|array 授权地址。
+     */
+    public $authorizationUrl;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function init()
+    {
+        parent::init();
+    
+        if ($this->authorizeTypeClasses === null) {
+            throw new InvalidConfigException('The `authorizeTypeClasses` property must be set.');
+        } elseif ($this->userRepositoryClass === null) {
+            throw new InvalidConfigException('The `userRepositoryClass` property must be set.');
+        } elseif ($this->loginUrl === null) {
+            throw new InvalidConfigException('The `loginUrl` property must be set.');
+        } elseif ($this->authorizationUrl === null) {
+            throw new InvalidConfigException('The `authorizationUrl` property must be set.');
+        }
+    }
+    
+    /**
      * 用户请求授权。
      */
     public function run()
@@ -44,11 +113,8 @@ class AuthorizeAction extends \yii\base\Action
             // 获取并验证授权请求。
             $authorizeRequest = $authorizationServer->getAuthorizeRequest($serverRequest);
 
-            /* @var $module \devjerry\yii2\oauth2\server\Module */
-            $module = $this->controller->module;
-            
             // 获取授权用户。
-            $user = $module->getUser();
+            $user = $this->getUser();
             
             // 判断用户是否登录。
             if ($user->getIsGuest()) {
@@ -69,8 +135,8 @@ class AuthorizeAction extends \yii\base\Action
                 return $this->controller->redirect($this->makeAuthorizationUrl($authorizeRequest));
             }
 
-            // 设置用户是否同意授权的状态为 `null`，保证每次都需要用户确认。
-            $userIdentity->setOAuthIsApproved(null);
+            // 释放用户是否同意授权状态。保证每次都需要用户确认。
+            $userIdentity->unsetOAuthIsApproved();
             
             // 设置运行授权时的参数。
             $authorizeRequest->setUserEntity($userIdentity->getOAuthUserEntity());
@@ -78,6 +144,7 @@ class AuthorizeAction extends \yii\base\Action
             $scopeEntities = $userIdentity->getOAuthScopeEntities();
             if ($scopeEntities !== null) {
                 $authorizeRequest->setScopeEntities($scopeEntities);
+                $userIdentity->unsetOAuthScopeEntities();
             }
             
             // 运行并返回授权成功的回调地址。
@@ -97,9 +164,6 @@ class AuthorizeAction extends \yii\base\Action
      */
     protected function getAuthorizationServer()
     {
-        /* @var $module \devjerry\yii2\oauth2\server\Module */
-        $module = $this->controller->module;
-        
         // 实例化对像。
         $authorizationServer = Yii::createObject([
             'class' => AuthorizationServer::class,
@@ -107,21 +171,37 @@ class AuthorizeAction extends \yii\base\Action
             'authorizationCodeRepository' => Yii::createObject(AuthorizationCodeRepository::class),
             'clientRepository' => Yii::createObject(ClientRepository::class),
             'scopeRepository' => Yii::createObject(ScopeRepository::class),
-            'userRepository' => Yii::createObject($module->userRepositoryClass),
-            'defaultScopes' => $module->defaultScopes,
-            'accessTokenDuration' => $module->accessTokenDuration,
-            'accessTokenCryptKey' => $module->accessTokenCryptKey,
-            'authorizationCodeDuration' => $module->authorizationCodeDuration,
-            'authorizationCodeCryptKey' => $module->authorizationCodeCryptKey,
+            'userRepository' => Yii::createObject($this->userRepositoryClass),
+            'defaultScopes' => $this->defaultScopes,
+            'accessTokenDuration' => $this->accessTokenDuration,
+            'accessTokenCryptKey' => $this->accessTokenCryptKey,
+            'authorizationCodeDuration' => $this->authorizationCodeDuration,
+            'authorizationCodeCryptKey' => $this->authorizationCodeCryptKey,
         ]);
         
         // 添加授权类型。
-        foreach ($module->authorizeTypeClasses as $authorizeTypeClass) {
+        foreach ($this->authorizeTypeClasses as $authorizeTypeClass) {
             $authorizationServer->addAuthorizeType(Yii::createObject($authorizeTypeClass));
         }
         
         // 返回对像。
         return $authorizationServer;
+    }
+    
+    /**
+     * 获取授权用户。
+     * 
+     * @return User
+     */
+    public function getUser()
+    {
+        if ($this->user === null) {
+            return Yii::$app->getUser();
+        } elseif (is_string($this->user)) {
+            return Yii::$app->get($this->user);
+        }
+        
+        return Yii::createObject($this->user);
     }
     
     /**
@@ -132,9 +212,7 @@ class AuthorizeAction extends \yii\base\Action
      */
     protected function makeLoginUrl(AuthorizeRequestInterface $authorizeRequest)
     {
-        /* @var $module \devjerry\yii2\oauth2\server\Module */
-        $module = $this->controller->module;
-        return $this->makeUrl($module->loginUrl, $authorizeRequest);
+        return $this->makeUrl($this->loginUrl, $authorizeRequest);
     }
     
     /**
@@ -145,9 +223,7 @@ class AuthorizeAction extends \yii\base\Action
      */
     protected function makeAuthorizationUrl(AuthorizeRequestInterface $authorizeRequest)
     {
-        /* @var $module \devjerry\yii2\oauth2\server\Module */
-        $module = $this->controller->module;
-        return $this->makeUrl($module->authorizationUrl, $authorizeRequest);
+        return $this->makeUrl($this->authorizationUrl, $authorizeRequest);
     }
 
     /**
@@ -169,7 +245,6 @@ class AuthorizeAction extends \yii\base\Action
         }
         
         $params['return_url'] = Yii::$app->getRequest()->getAbsoluteUrl();
-        $params['referrer_url'] = Yii::$app->getRequest()->getReferrer();
 
         $url = Url::to($url);
         if (strpos($url, '?') === false) {

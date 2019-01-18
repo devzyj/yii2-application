@@ -10,10 +10,16 @@ use devzyj\oauth2\server\interfaces\ScopeRepositoryInterface;
 use devzyj\oauth2\server\interfaces\ScopeEntityInterface;
 use devzyj\oauth2\server\interfaces\ClientEntityInterface;
 use devzyj\oauth2\server\interfaces\UserEntityInterface;
+use devjerry\yii2\oauth2\server\interfaces\OAuthClientEntityInterface;
+use devjerry\yii2\oauth2\server\interfaces\OAuthUserEntityInterface;
 use devjerry\yii2\oauth2\server\entities\ScopeEntity;
 
 /**
  * ScopeRepository class.
+ * 
+ * 使用类必须实现以下条件：
+ * 1. `ClientEntity` 必须实现 [[OAuthClientEntityInterface]] 接口。
+ * 2. `UserEntity` 必须实现 [[OAuthUserEntityInterface]] 接口。
  * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
@@ -58,10 +64,10 @@ class ScopeRepository implements ScopeRepositoryInterface
      * 确认客户端的权限。
      * 
      * @param ScopeEntityInterface[] $scopes 请求的权限列表。 
-     * @param ClientEntityInterface $client 客户端。
+     * @param OAuthClientEntityInterface $client 客户端。
      * @return ScopeEntityInterface[] 有效的权限列表。
      */
-    protected function ensureClientCredentials(array $scopes, ClientEntityInterface $client)
+    protected function ensureClientCredentials(array $scopes, OAuthClientEntityInterface $client)
     {
         $clientScopes = $client->getScopeEntities();
         if (!is_array($clientScopes)) {
@@ -75,11 +81,11 @@ class ScopeRepository implements ScopeRepositoryInterface
      * 确认用户的权限。
      * 
      * @param ScopeEntityInterface[] $scopes 请求的权限列表。 
-     * @param ClientEntityInterface $client 客户端。
-     * @param UserEntityInterface $user 用户。
+     * @param OAuthClientEntityInterface $client 客户端。
+     * @param OAuthUserEntityInterface $user 用户。
      * @return ScopeEntityInterface[] 有效的权限列表。
      */
-    protected function ensureUserCredentials(array $scopes, ClientEntityInterface $client, UserEntityInterface $user)
+    protected function ensureUserCredentials(array $scopes, OAuthClientEntityInterface $client, OAuthUserEntityInterface $user)
     {
         $userScopes = $user->getScopeEntities();
         if (!is_array($userScopes)) {

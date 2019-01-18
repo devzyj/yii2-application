@@ -17,13 +17,6 @@ use yii\web\User;
 interface OAuthAuthorizationFormInterface
 {
     /**
-     * 设置默认权限。
-     * 
-     * @param string[] $scopes
-     */
-    public function setDefaultScopes(array $scopes);
-    
-    /**
      * 用户授权。
      * 
      * @param User $user

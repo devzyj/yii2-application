@@ -44,7 +44,7 @@ $config = [
         ],
         'authorizeUser' => [
             'class' => 'yii\web\User',
-            'identityClass' => 'devjerry\yii2\oauth2\server\DemoAuthorizationIdentity',
+            'identityClass' => 'devjerry\yii2\oauth2\server\demos\DemoUserIdentity',
         ],
     ],
     'modules' => [
@@ -56,14 +56,14 @@ $config = [
         ],
         'oauth2' => [
             'class' => 'devjerry\yii2\oauth2\server\Module',
-            'user' => 'authorizeUser',
-            'loginFormClass' => 'devjerry\yii2\oauth2\server\DemoLoginForm',
-            'authorizationFormClass' => 'devjerry\yii2\oauth2\server\DemoAuthorizationForm',
-            /*'user' => [
+            'loginFormClass' => 'devjerry\yii2\oauth2\server\demos\DemoLoginForm',
+            'authorizationFormClass' => 'devjerry\yii2\oauth2\server\demos\DemoAuthorizationForm',
+            //'user' => 'authorizeUser',
+            'user' => [
                 'class' => 'yii\web\User',
-                'identityClass' => 'devjerry\yii2\oauth2\server\models\AuthorizationIdentity',
-            ],*/
-            'userRepositoryClass' => 'backendApi\models\UserRepository',
+                'identityClass' => 'devjerry\yii2\oauth2\server\demos\DemoUserIdentity',
+            ],
+            'userRepositoryClass' => 'devjerry\yii2\oauth2\server\demos\DemoUserRepository',
             'accessTokenCryptKey' => 'test', // 字符串签名加密。
             /*'accessTokenCryptKey' => [ // 私钥文件加密。
                 'privateKey' => '@common/oauth2/server/private.key',
@@ -79,6 +79,7 @@ $config = [
                 'password' => 'test',
             ],
             'defaultScopes' => ['basic', 'basic3'],
+            'validateAccessTokenQueryParam' => 'access-token'
         ],
     ]
 ];

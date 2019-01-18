@@ -49,9 +49,20 @@ class TokenController extends \yii\web\Controller
      */
     public function actions()
     {
+        /* @var $module \devjerry\yii2\oauth2\server\Module */
+        $module = $this->module;
+        
         return [
             'index' => [
                 'class' => TokenAction::class,
+                'grantTypeClasses' => $module->grantTypeClasses,
+                'userRepositoryClass' => $module->userRepositoryClass,
+                'defaultScopes' => $module->defaultScopes,
+                'accessTokenDuration' => $module->accessTokenDuration,
+                'accessTokenCryptKey' => $module->accessTokenCryptKey,
+                'authorizationCodeCryptKey' => $module->authorizationCodeCryptKey,
+                'refreshTokenDuration' => $module->refreshTokenDuration,
+                'refreshTokenCryptKey' => $module->refreshTokenCryptKey,
             ],
         ];
     }

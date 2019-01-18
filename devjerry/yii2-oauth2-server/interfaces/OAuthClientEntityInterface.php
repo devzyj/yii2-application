@@ -6,21 +6,18 @@
  */
 namespace devjerry\yii2\oauth2\server\interfaces;
 
-use yii\web\User;
-
 /**
- * OAuthLoginFormInterface class.
- * 
+ * 客户端实体接口。
+ *
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
-interface OAuthLoginFormInterface
+interface OAuthClientEntityInterface
 {
     /**
-     * 用户登录。
-     * 
-     * @param User $user
-     * @return boolean
+     * 获取客户端的全部权限。
+     *
+     * @return \devzyj\oauth2\server\interfaces\ScopeEntityInterface[]
      */
-    public function login(User $user);
+    public function getScopeEntities();
 }

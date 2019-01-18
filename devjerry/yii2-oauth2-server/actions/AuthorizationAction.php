@@ -8,6 +8,9 @@ namespace devjerry\yii2\oauth2\server\actions;
 
 use Yii;
 use yii\base\InvalidConfigException;
+use yii\widgets\ActiveForm;
+use yii\web\Response;
+use yii\helpers\Url;
 use devzyj\oauth2\server\interfaces\ClientEntityInterface;
 use devzyj\oauth2\server\interfaces\ScopeEntityInterface;
 use devjerry\yii2\oauth2\server\repositories\ClientRepository;
@@ -23,6 +26,11 @@ use devjerry\yii2\oauth2\server\interfaces\OAuthAuthorizationFormInterface;
 class AuthorizationAction extends \yii\base\Action
 {
     /**
+     * @var string|array 授权用户的应用组件ID或配置。如果没有设置，则使用 `Yii::$app->getUser()`。
+     */
+    public $user;
+    
+    /**
      * @var OAuthAuthorizationFormInterface 表单模型类名。
      */
     public $modelClass;
@@ -36,6 +44,11 @@ class AuthorizationAction extends \yii\base\Action
      * @var string 布局文件。
      */
     public $layout;
+
+    /**
+     * @var string|array 登录地址。
+     */
+    public $loginUrl;
     
     /**
      * {@inheritdoc}
@@ -44,7 +57,9 @@ class AuthorizationAction extends \yii\base\Action
     {
         parent::init();
     
-        if ($this->modelClass === null) {
+        if ($this->user === null) {
+            throw new InvalidConfigException('The `user` property must be set.');
+        } elseif ($this->modelClass === null) {
             throw new InvalidConfigException('The `modelClass` property must be set.');
         }
 
@@ -65,30 +80,47 @@ class AuthorizationAction extends \yii\base\Action
         $scope = $request->getQueryParam('scope');
         $scopes = $scope ? explode(' ', $scope) : [];
         $returnUrl = $request->getQueryParam('return_url');
-        $referrerUrl = $request->getQueryParam('referrer_url');
-        
+
         /* @var $model OAuthAuthorizationFormInterface */
         $model = Yii::createObject($this->modelClass);
 
-        // 设置请求的默认权限。
-        $model->setDefaultScopes($scopes);
-        
-        /* @var $module \devjerry\yii2\oauth2\server\Module */
-        $module = $this->controller->module;
-        
         // 处理提交后的数据。
-        if ($model->load($request->post()) && $model->authorization($module->getUser())) {
-            return $this->controller->redirect($returnUrl);
+        if ($model->load($request->post())) {
+            if ($request->getIsAjax()) {
+                // AJAX 数据验证。
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                return ActiveForm::validate($model);
+            } elseif ($model->authorization($this->getUser())) {
+                // 授权成功。
+                return $this->controller->redirect($returnUrl);
+            }
         }
         
         // 显示登录页面。
         $this->controller->layout = $this->layout;
         return $this->controller->render($this->view, [
             'model' => $model,
-            'user' => $module->getUser(),
             'clientEntity' => $this->getClientEntity($clientId),
             'scopeEntities' => $this->getScopeEntities($scopes),
+            'loginUrl' => $this->makeLoginUrl(),
+            'user' => $this->getUser(),
         ]);
+    }
+    
+    /**
+     * 获取授权用户。
+     * 
+     * @return User
+     */
+    public function getUser()
+    {
+        if ($this->user === null) {
+            return Yii::$app->getUser();
+        } elseif (is_string($this->user)) {
+            return Yii::$app->get($this->user);
+        }
+        
+        return Yii::createObject($this->user);
     }
     
     /**
@@ -118,6 +150,7 @@ class AuthorizationAction extends \yii\base\Action
         $result = [];
         foreach ($scopes as $scope) {
             if (!isset($result[$scope])) {
+                /* @var $scopeEntity ScopeEntityInterface */
                 $scopeEntity = $repository->getScopeEntity($scope);
                 if ($scopeEntity) {
                     $result[$scope] = $scopeEntity;
@@ -126,5 +159,29 @@ class AuthorizationAction extends \yii\base\Action
         }
         
         return array_values($result);
+    }
+
+    /**
+     * 构造登录地址。
+     *
+     * @return string
+     */
+    protected function makeLoginUrl()
+    {
+        if ($this->loginUrl === null) {
+            return '';
+        }
+        
+        $request = Yii::$app->getRequest();
+        $params['client_id'] = $request->getQueryParam('client_id');
+        $params['scope'] = $request->getQueryParam('scope');
+        $params['return_url'] = $request->getQueryParam('return_url');
+
+        $url = Url::to($this->loginUrl);
+        if (strpos($url, '?') === false) {
+            return $url . '?' . http_build_query($params);
+        } else {
+            return $url . '&' . http_build_query($params);
+        }
     }
 }

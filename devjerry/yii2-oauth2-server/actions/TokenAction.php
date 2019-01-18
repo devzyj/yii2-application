@@ -7,6 +7,7 @@
 namespace devjerry\yii2\oauth2\server\actions;
 
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\helpers\ArrayHelper;
 use yii\web\HttpException;
 use devzyj\oauth2\server\AuthorizationServer;
@@ -27,6 +28,58 @@ use devjerry\yii2\oauth2\server\repositories\ScopeRepository;
 class TokenAction extends \yii\base\Action
 {
     /**
+     * @var array 权限授予类型类名。
+     */
+    public $grantTypeClasses;
+    
+    /**
+     * @var string|array|callable 用户存储库。
+     */
+    public $userRepositoryClass;
+
+    /**
+     * @var array 默认权限。
+     */
+    public $defaultScopes;
+    
+    /**
+     * @var integer 访问令牌的持续时间。
+     */
+    public $accessTokenDuration;
+    
+    /**
+     * @var string|array 访问令牌密钥。
+     */
+    public $accessTokenCryptKey;
+    
+    /**
+     * @var array 授权码密钥。
+     */
+    public $authorizationCodeCryptKey;
+    
+    /**
+     * @var integer 更新令牌的持续时间。
+     */
+    public $refreshTokenDuration;
+    
+    /**
+     * @var array 更新令牌密钥。
+     */
+    public $refreshTokenCryptKey;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function init()
+    {
+        parent::init();
+    
+        if ($this->grantTypeClasses === null) {
+            throw new InvalidConfigException('The `grantTypeClasses` property must be set.');
+        }
+    }
+    
+    /**
      * @return array
      */
     public function run()
@@ -34,9 +87,6 @@ class TokenAction extends \yii\base\Action
         // 创建授权服务器实例。
         $authorizationServer = $this->getAuthorizationServer();
 
-        /* @var $module \devjerry\yii2\oauth2\server\Module */
-        $module = $this->controller->module;
-        
         // 服务器请求实例。
         $serverRequest = Yii::createObject(ServerRequest::class);
         $serverRequest->parsers = ArrayHelper::merge([
@@ -58,9 +108,6 @@ class TokenAction extends \yii\base\Action
      */
     protected function getAuthorizationServer()
     {
-        /* @var $module \devjerry\yii2\oauth2\server\Module */
-        $module = $this->controller->module;
-        
         // 实例化对像。
         $authorizationServer = Yii::createObject([
             'class' => AuthorizationServer::class,
@@ -69,17 +116,17 @@ class TokenAction extends \yii\base\Action
             'clientRepository' => Yii::createObject(ClientRepository::class),
             'refreshTokenRepository' => Yii::createObject(RefreshTokenRepository::class),
             'scopeRepository' => Yii::createObject(ScopeRepository::class),
-            'userRepository' => Yii::createObject($module->userRepositoryClass),
-            'defaultScopes' => $module->defaultScopes,
-            'accessTokenDuration' => $module->accessTokenDuration,
-            'accessTokenCryptKey' => $module->accessTokenCryptKey,
-            'authorizationCodeCryptKey' => $module->authorizationCodeCryptKey,
-            'refreshTokenDuration' => $module->refreshTokenDuration,
-            'refreshTokenCryptKey' => $module->refreshTokenCryptKey,
+            'userRepository' => Yii::createObject($this->userRepositoryClass),
+            'defaultScopes' => $this->defaultScopes,
+            'accessTokenDuration' => $this->accessTokenDuration,
+            'accessTokenCryptKey' => $this->accessTokenCryptKey,
+            'authorizationCodeCryptKey' => $this->authorizationCodeCryptKey,
+            'refreshTokenDuration' => $this->refreshTokenDuration,
+            'refreshTokenCryptKey' => $this->refreshTokenCryptKey,
         ]);
 
         // 添加授予类型。
-        foreach ($module->grantTypeClasses as $grantTypeClass) {
+        foreach ($this->grantTypeClasses as $grantTypeClass) {
             $authorizationServer->addGrantType(Yii::createObject($grantTypeClass));
         }
         

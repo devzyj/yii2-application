@@ -6,9 +6,6 @@
  */
 namespace devjerry\yii2\oauth2\server\interfaces;
 
-use devzyj\oauth2\server\interfaces\UserEntityInterface;
-use devzyj\oauth2\server\interfaces\ScopeEntityInterface;
-
 /**
  * OAuthIdentityInterface 需要用户身份证验实例实现的接口。
  * 
@@ -18,6 +15,13 @@ use devzyj\oauth2\server\interfaces\ScopeEntityInterface;
 interface OAuthIdentityInterface
 {
     /**
+     * 获取授权用户实体对像。
+     * 
+     * @return \devzyj\oauth2\server\interfaces\UserEntityInterface
+     */
+    public function getOAuthUserEntity();
+    
+    /**
      * 获取用户是否同意授权。
      * 
      * @return boolean|null 返回 `null` 表示未进行同意或拒绝授权的操作。
@@ -25,23 +29,19 @@ interface OAuthIdentityInterface
     public function getOAuthIsApproved();
     
     /**
-     * 设置用户是否同意授权。
-     * 
-     * @param boolean|null $value
+     * 释放用户是否同意授权状态。
      */
-    public function setOAuthIsApproved($value);
-    
-    /**
-     * 获取授权用户实体对像。
-     * 
-     * @return UserEntityInterface
-     */
-    public function getOAuthUserEntity();
+    public function unsetOAuthIsApproved();
     
     /**
      * 获取同意授权的权限实体列表。
      * 
-     * @return ScopeEntityInterface[]|null 返回 `null` 表示请求的全部权限。
+     * @return \devzyj\oauth2\server\interfaces\ScopeEntityInterface[]|null 返回 `null` 表示请求的全部权限。
      */
     public function getOAuthScopeEntities();
+
+    /**
+     * 释放同意授权的权限实体列表。
+     */
+    public function unsetOAuthScopeEntities();
 }

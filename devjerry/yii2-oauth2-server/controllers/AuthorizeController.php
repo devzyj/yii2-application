@@ -29,14 +29,32 @@ class AuthorizeController extends \yii\web\Controller
         return [
             'index' => [
                 'class' => AuthorizeAction::class,
+                'authorizeTypeClasses' => $module->authorizeTypeClasses,
+                'userRepositoryClass' => $module->userRepositoryClass,
+                'defaultScopes' => $module->defaultScopes,
+                'accessTokenDuration' => $module->accessTokenDuration,
+                'accessTokenCryptKey' => $module->accessTokenCryptKey,
+                'authorizationCodeDuration' => $module->authorizationCodeDuration,
+                'authorizationCodeCryptKey' => $module->authorizationCodeCryptKey,
+                'user' => $module->user,
+                'loginUrl' => $module->loginUrl,
+                'authorizationUrl' => $module->authorizationUrl,
             ],
             'login' => [
                 'class' => LoginAction::class,
+                'user' => $module->user,
                 'modelClass' => $module->loginFormClass,
+                'view' => $module->loginActionView,
+                'layout' => $module->loginActionLayout,
+                'authorizationUrl' => $module->authorizationUrl,
             ],
             'authorization' => [
                 'class' => AuthorizationAction::class,
+                'user' => $module->user,
                 'modelClass' => $module->authorizationFormClass,
+                'view' => $module->authorizationActionView,
+                'layout' => $module->authorizationActionLayout,
+                'loginUrl' => $module->loginUrl,
             ],
         ];
     }

@@ -19,18 +19,24 @@ class TestController extends \yii\web\Controller
     {
         $url = 'http://api.backend.application.yii2.devzyj.zyj/oauth2/authorize';
         $params = [
-            'response_type' => 'code', 
+            'response_type' => '', 
             'client_id' => 'f4c22926e400ebca', 
             'scope' => 'basic basic3', 
             'state' => 'abc123',
             'redirect_uri' => Url::toRoute('/test/oauth-callback', true),
         ];
         
-        return Html::a('授权', $url . '?' . http_build_query($params), ['target' => '_blank']);
+        $params['response_type'] = 'code';
+        $content[] = Html::a('授权码模式', $url . '?' . http_build_query($params), ['target' => '_blank']);
+        
+        $params['response_type'] = 'token';
+        $content[] = Html::a('简化模式', $url . '?' . http_build_query($params), ['target' => '_blank']);
+        
+        return implode(' | ', $content);
     }
     
     public function actionOauthCallback()
     {
-        var_dump(Yii::$app->getRequest()->getQueryParams());
+        print_r(Yii::$app->getRequest()->getQueryParams());
     }
 }

@@ -106,7 +106,7 @@ class ResourceController extends \yii\web\Controller
             'class' => ResourceServer::class,
             'accessTokenRepository' => Yii::createObject(AccessTokenRepository::class),
             'accessTokenCryptKey' => $this->module->accessTokenCryptKey,
-            'accessTokenQueryParam' => $this->module->accessTokenQueryParam,
+            'accessTokenQueryParam' => $this->module->validateAccessTokenQueryParam,
         ]);
     }
     

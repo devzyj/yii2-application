@@ -7,6 +7,7 @@
 namespace devjerry\yii2\oauth2\server\entities;
 
 use devzyj\oauth2\server\interfaces\ClientEntityInterface;
+use devjerry\yii2\oauth2\server\interfaces\OAuthClientEntityInterface;
 use devjerry\yii2\oauth2\server\models\OauthClient;
 use devjerry\yii2\oauth2\server\models\OauthClientScope;
 
@@ -19,7 +20,7 @@ use devjerry\yii2\oauth2\server\models\OauthClientScope;
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
-class ClientEntity extends OauthClient implements ClientEntityInterface
+class ClientEntity extends OauthClient implements ClientEntityInterface, OAuthClientEntityInterface
 {
     /**
      * 获取客户端的权限。
@@ -42,7 +43,7 @@ class ClientEntity extends OauthClient implements ClientEntityInterface
             $query->andWhere(['is_default'=>OauthClientScope::IS_DEFAULT_YES]);
         });
     }
-    
+
     /******************************** ClientEntityInterface ********************************/
     /**
      * {@inheritdoc}
@@ -87,16 +88,17 @@ class ClientEntity extends OauthClient implements ClientEntityInterface
     /**
      * {@inheritdoc}
      */
-    public function getScopeEntities()
-    {
-        return $this->oauthScopes;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getDefaultScopeEntities()
     {
         return $this->defaultOauthScopes;
+    }
+
+    /******************************** OAuthClientEntityInterface ********************************/
+    /**
+     * {@inheritdoc}
+     */
+    public function getScopeEntities()
+    {
+        return $this->oauthScopes;
     }
 }
