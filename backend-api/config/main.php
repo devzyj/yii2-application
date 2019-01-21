@@ -40,12 +40,15 @@ $config = [
             'showScriptName' => false,
             'rules' => [
                 '/' => 'site/index',
+                '/oauth2/demo/login' => '/oauth2/demo/login',
+                '/oauth2/demo/authorization' => '/oauth2/demo/authorization',
+                '/oauth2/demo/logout' => '/oauth2/demo/logout',
             ],
         ],
-        'authorizeUser' => [
+        /*'authorizeUser' => [
             'class' => 'yii\web\User',
-            'identityClass' => 'devjerry\yii2\oauth2\server\demos\DemoUserIdentity',
-        ],
+            'identityClass' => 'devzyj\yii2\oauth2\server\demos\DemoUserIdentity',
+        ],*/
     ],
     'modules' => [
         'oauth' => [
@@ -55,21 +58,13 @@ $config = [
             'class' => 'backendApiV1\Module',
         ],
         'oauth2' => [
-            'class' => 'devjerry\yii2\oauth2\server\Module',
-            'loginFormClass' => 'devjerry\yii2\oauth2\server\demos\DemoLoginForm',
-            'authorizationFormClass' => 'devjerry\yii2\oauth2\server\demos\DemoAuthorizationForm',
-            //'user' => 'authorizeUser',
-            'user' => [
-                'class' => 'yii\web\User',
-                'identityClass' => 'devjerry\yii2\oauth2\server\demos\DemoUserIdentity',
+            'class' => 'devzyj\yii2\oauth2\server\Module',
+            'accessTokenCryptKey' => [ // 私钥文件加密。
+                //'privateKey' => '@common/oauth2/server/private.key',
+                //'passphrase' => '',
+                //'publicKey' => '@common/oauth2/server/public.key',
+                'signKey' => 'test',
             ],
-            'userRepositoryClass' => 'devjerry\yii2\oauth2\server\demos\DemoUserRepository',
-            'accessTokenCryptKey' => 'test', // 字符串签名加密。
-            /*'accessTokenCryptKey' => [ // 私钥文件加密。
-                'privateKey' => '@common/oauth2/server/private.key',
-                'passphrase' => '',
-                'publicKey' => '@common/oauth2/server/public.key',
-            ],*/
             'authorizationCodeCryptKey' => [
                 'password' => 'test',
             ],
@@ -79,7 +74,21 @@ $config = [
                 'password' => 'test',
             ],
             'defaultScopes' => ['basic', 'basic3'],
-            'validateAccessTokenQueryParam' => 'access-token'
+            'validateAccessTokenQueryParam' => 'access-token',
+            // demo config.
+            'controllerMap' => [
+                'demo' => 'devzyj\yii2\oauth2\server\demos\controllers\DemoController',
+            ],
+            'loginUrl' => ['/oauth2/demo/login'],
+            'authorizationUrl' => ['/oauth2/demo/authorization'],
+            'user' => [
+                'class' => 'yii\web\User',
+                'identityClass' => 'devzyj\yii2\oauth2\server\demos\models\DemoUserIdentity',
+            ],
+            'userRepositoryClass' => 'devzyj\yii2\oauth2\server\demos\models\DemoUserRepository',
+            'classMap' => [
+                '\devzyj\yii2\oauth2\server\entities\ClientEntity' => '\app\models\ClientEntityaaa',
+            ],
         ],
     ]
 ];
