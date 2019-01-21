@@ -4,7 +4,7 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace devjerry\yii2\oauth2\server\demos;
+namespace devjerry\yii2\oauth2\server\demos\models;
 
 use devzyj\oauth2\server\interfaces\UserEntityInterface;
 use devjerry\yii2\oauth2\server\interfaces\OAuthUserEntityInterface;

@@ -11,6 +11,7 @@ use yii\base\InvalidConfigException;
 use yii\helpers\ArrayHelper;
 use yii\web\HttpException;
 use devzyj\oauth2\server\AuthorizationServer;
+use devzyj\oauth2\server\interfaces\ServerRequestInterface;
 use devzyj\oauth2\server\exceptions\OAuthServerException;
 use devjerry\yii2\oauth2\server\ServerRequest;
 use devjerry\yii2\oauth2\server\repositories\AccessTokenRepository;
@@ -84,14 +85,11 @@ class TokenAction extends \yii\base\Action
      */
     public function run()
     {
-        // 创建授权服务器实例。
+        // 授权服务器实例。
         $authorizationServer = $this->getAuthorizationServer();
 
         // 服务器请求实例。
-        $serverRequest = Yii::createObject(ServerRequest::class);
-        $serverRequest->parsers = ArrayHelper::merge([
-            'application/json' => 'yii\web\JsonParser',
-        ], $serverRequest->parsers);
+        $serverRequest = $this->getServerRequest();
         
         try {
             // 运行并获取授予的认证信息。
@@ -132,5 +130,20 @@ class TokenAction extends \yii\base\Action
         
         // 返回对像。
         return $authorizationServer;
+    }
+    
+    /**
+     * 获取服务器请求实例。
+     * 
+     * @return ServerRequestInterface
+     */
+    protected function getServerRequest()
+    {
+        $serverRequest = Yii::createObject(ServerRequest::class);
+        $serverRequest->parsers = ArrayHelper::merge([
+            'application/json' => 'yii\web\JsonParser',
+        ], $serverRequest->parsers);
+        
+        return $serverRequest;
     }
 }

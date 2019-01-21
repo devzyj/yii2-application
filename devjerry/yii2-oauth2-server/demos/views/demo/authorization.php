@@ -1,7 +1,7 @@
 <?php
 /* @var $this \yii\web\View */
 /* @var $form \yii\bootstrap\ActiveForm */
-/* @var $model \devjerry\yii2\oauth2\server\demos\DemoAuthorizationForm */
+/* @var $model \devjerry\yii2\oauth2\server\demos\models\DemoAuthorizationForm */
 /* @var $clientEntity \devjerry\yii2\oauth2\server\entities\ClientEntity  */
 /* @var $scopeEntities \devjerry\yii2\oauth2\server\entities\ScopeEntity[]  */
 /* @var $user \yii\web\User */
@@ -10,7 +10,7 @@
 use yii\bootstrap\Html;
 use yii\bootstrap\ActiveForm;
 use yii\bootstrap\Tabs;
-use devjerry\yii2\oauth2\server\demos\DemoAsset;
+use devjerry\yii2\oauth2\server\demos\assets\DemoAsset;
 
 DemoAsset::register($this);
 $this->title = 'OAuth2 Authorization Demo';

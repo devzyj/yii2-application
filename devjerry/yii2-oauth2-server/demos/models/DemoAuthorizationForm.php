@@ -4,11 +4,10 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace devjerry\yii2\oauth2\server\demos;
+namespace devjerry\yii2\oauth2\server\demos\models;
 
 use yii\helpers\Html;
 use yii\web\User;
-use devjerry\yii2\oauth2\server\interfaces\OAuthAuthorizationFormInterface;
 
 /**
  * DemoAuthorizationForm class.
@@ -16,7 +15,7 @@ use devjerry\yii2\oauth2\server\interfaces\OAuthAuthorizationFormInterface;
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
-class DemoAuthorizationForm extends DemoLoginForm implements OAuthAuthorizationFormInterface
+class DemoAuthorizationForm extends DemoLoginForm
 {
     /**
      * @var string 已登录用户授权模式。

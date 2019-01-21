@@ -21,11 +21,6 @@ class m181203_032806_oauth2_server_initial extends Migration
         'oauth_client' => '{{%oauth_client}}',
         'oauth_scope' => '{{%oauth_scope}}',
         'oauth_client_scope' => '{{%oauth_client_scope}}',
-        
-        /*'oauth_user_scope' => '{{%oauth_user_scope}}',
-        'oauth_access_token' => '{{%oauth_access_token}}',
-        'oauth_refresh_token' => '{{%oauth_refresh_token}}',
-        'oauth_auth_code' => '{{%oauth_auth_code}}',*/
     ];
     
     /**

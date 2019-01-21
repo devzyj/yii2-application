@@ -13,8 +13,6 @@ use devzyj\oauth2\server\grants\AuthorizationCodeGrant;
 use devzyj\oauth2\server\grants\ClientCredentialsGrant;
 use devzyj\oauth2\server\grants\PasswordGrant;
 use devzyj\oauth2\server\grants\RefreshTokenGrant;
-use devjerry\yii2\oauth2\server\interfaces\OAuthLoginFormInterface;
-use devjerry\yii2\oauth2\server\interfaces\AuthorizationFormInterface;
 
 /**
  * OAuth2 Server Module.
@@ -25,7 +23,38 @@ use devjerry\yii2\oauth2\server\interfaces\AuthorizationFormInterface;
  *     'modules' => [
  *         'oauth2' => [
  *             'class' => 'devjerry\yii2\oauth2\server\Module',
- *             'userRepositoryClass' => 'app\models\UserRepository',
+ *             'defaultScopes' => ['basic', 'basic2', 'basic3'], // 默认权限。
+ *             'accessTokenCryptKey' => [
+ *                 'privateKey' => '@app/path/to/private.key', // 访问令牌的私钥路径。
+ *                 'passphrase' => '', // 访问令牌的私钥密码。没有密码可以为 `null`。
+ *                 'publicKey' => '@app/path/to/public.key', // 访问令牌的公钥路径。
+ *                 //'signKey' => 'test-sign-key', // 字符串签名密钥。
+ *             ],
+ *             'authorizationCodeCryptKey' => [
+ *                 'ascii' => 'def0000086937b.....', // 使用 `vendor/bin/generate-defuse-key` 生成的字符串。
+ *                 //'path' => '/path/to/ascii.txt', // 保存了 `vendor/bin/generate-defuse-key` 生成的字符串的文件路径。
+ *                 //'password' => 'test-password', // 字符串密钥。
+ *             ],
+ *             'refreshTokenCryptKey' => [
+ *                 'ascii' => 'def000008......', // 使用 `vendor/bin/generate-defuse-key` 生成的字符串。
+ *                 //'path' => '/path/to/ascii.txt', // 保存了 `vendor/bin/generate-defuse-key` 生成的字符串的文件路径。
+ *                 //'password' => 'test-password', // 字符串密钥。
+ *             ],
+ *             'validateAccessTokenQueryParam' => 'access-token', // 验证访问令牌时，在查询参数中的名称。
+ *             'classMap' => [
+ *                 'devjerry\yii2\oauth2\server\entities\ClientEntity' => 'app\models\ClientEntity',
+ *                 ....
+ *             ],
+ *             'userRepositoryClass' => 'devjerry\yii2\oauth2\server\demos\models\DemoUserRepository',
+ *             'user' => [
+ *                 'class' => 'yii\web\User',
+ *                 'identityClass' => 'devjerry\yii2\oauth2\server\demos\models\DemoUserIdentity',
+ *             ],
+ *             'controllerMap' => [
+ *                 'demo' => 'devjerry\yii2\oauth2\server\demos\controllers\DemoController',
+ *             ],
+ *             'loginUrl' => ['/oauth2/demo/login'],
+ *             'authorizationUrl' => ['/oauth2/demo/authorization'],
  *         ],
  *     ],
  * ]
@@ -33,10 +62,14 @@ use devjerry\yii2\oauth2\server\interfaces\AuthorizationFormInterface;
  * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
- * @todo 修正授权页面显示的权限列表，不能自适应当前用户的有效权限的问题。
  */
 class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
 {
+    /**
+     * @var array 类映射。
+     */
+    public $classMap = [];
+    
     /**
      * @var array 授权类型类名。
      */
@@ -60,11 +93,6 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
      */
     public $userRepositoryClass;
 
-    /**
-     * @var array 类映射。
-     */
-    public $classMap = [];
-    
     /**
      * @var array 默认权限。
      */
@@ -106,44 +134,14 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
     public $user;
     
     /**
-     * @var string|array 登录地址。如果没有设置，则使用 ['/MODULE_ID/login']。
+     * @var string|array 登录地址。
      */
     public $loginUrl;
 
     /**
-     * @var OAuthLoginFormInterface 登录页面表单模型类名。
-     */
-    public $loginFormClass;
-    
-    /**
-     * @var string 登录页面视图文件。
-     */
-    public $loginActionView;
-
-    /**
-     * @var string 登录页面布局文件。
-     */
-    public $loginActionLayout;
-    
-    /**
-     * @var string|array 确认授权地址。如果没有设置，则使用 ['/MODULE_ID/authorization']。
+     * @var string|array 确认授权地址。
      */
     public $authorizationUrl;
-
-    /**
-     * @var AuthorizationFormInterface 确认授权页面表单模型类名。
-     */
-    public $authorizationFormClass;
-    
-    /**
-     * @var string 确认授权页面视图文件。
-     */
-    public $authorizationActionView;
-
-    /**
-     * @var string 确认授权页面布局文件。
-     */
-    public $authorizationActionLayout;
     
     /**
      * @var string 验证访问令牌时，在查询参数中的名称。
@@ -170,27 +168,6 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
     public $validateAccessTokenResult;
 
     /**
-     * @var string|array 数据库连接的应用组件ID或配置。如果没有设置，则使用 `Yii::$app->getDb()`。
-     */
-    //public $db;
-    
-    /**
-     * {@inheritdoc}
-     */
-    public function init()
-    {
-        parent::init();
-        
-        if ($this->loginUrl === null) {
-            $this->loginUrl = ['/' . $this->uniqueId . '/login'];
-        }
-
-        if ($this->authorizationUrl === null) {
-            $this->authorizationUrl = ['/' . $this->uniqueId . '/authorization'];
-        }
-    }
-    
-    /**
      * {@inheritdoc}
      */
     public function bootstrap($app)
@@ -198,8 +175,6 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
         if ($app instanceof \yii\web\Application) {
             $app->getUrlManager()->addRules([
                 "<module:({$this->uniqueId})>/authorize" => "<module>/authorize/index",
-                "<module:({$this->uniqueId})>/login" => "<module>/authorize/login",
-                "<module:({$this->uniqueId})>/authorization" => "<module>/authorize/authorization",
                 "<module:({$this->uniqueId})>/token" => "<module>/token/index",
                 "<module:({$this->uniqueId})>/resource" => "<module>/resource/index",
             ], false);

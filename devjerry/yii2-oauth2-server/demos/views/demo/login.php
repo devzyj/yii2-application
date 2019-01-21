@@ -1,14 +1,14 @@
 <?php
 /* @var $this \yii\web\View */
 /* @var $form yii\bootstrap\ActiveForm */
-/* @var $model devjerry\yii2\oauth2\server\demos\DemoLoginForm */
+/* @var $model devjerry\yii2\oauth2\server\demos\models\DemoLoginForm */
 /* @var $clientEntity devjerry\yii2\oauth2\server\entities\ClientEntity  */
 /* @var $scopeEntities devjerry\yii2\oauth2\server\entities\ScopeEntity[]  */
 /* @var $authorizationUrl string */
 
 use yii\bootstrap\Html;
 use yii\bootstrap\ActiveForm;
-use devjerry\yii2\oauth2\server\demos\DemoAsset;
+use devjerry\yii2\oauth2\server\demos\assets\DemoAsset;
 
 DemoAsset::register($this);
 $this->title = 'OAuth2 Login Demo';

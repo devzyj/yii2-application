@@ -12,6 +12,7 @@ use yii\helpers\Url;
 use yii\web\User;
 use yii\web\HttpException;
 use devzyj\oauth2\server\AuthorizationServer;
+use devzyj\oauth2\server\interfaces\ServerRequestInterface;
 use devzyj\oauth2\server\authorizes\AuthorizeRequestInterface;
 use devzyj\oauth2\server\interfaces\ScopeEntityInterface;
 use devzyj\oauth2\server\exceptions\OAuthServerException;
@@ -103,11 +104,11 @@ class AuthorizeAction extends \yii\base\Action
      */
     public function run()
     {
-        // 创建授权服务器实例。
+        // 授权服务器实例。
         $authorizationServer = $this->getAuthorizationServer();
 
         // 服务器请求实例。
-        $serverRequest = Yii::createObject(ServerRequest::class);
+        $serverRequest = $this->getServerRequest();
         
         try {
             // 获取并验证授权请求。
@@ -189,11 +190,21 @@ class AuthorizeAction extends \yii\base\Action
     }
     
     /**
+     * 获取服务器请求实例。
+     * 
+     * @return ServerRequestInterface
+     */
+    protected function getServerRequest()
+    {
+        return Yii::createObject(ServerRequest::class);
+    }
+    
+    /**
      * 获取授权用户。
      * 
      * @return User
      */
-    public function getUser()
+    protected function getUser()
     {
         if ($this->user === null) {
             return Yii::$app->getUser();
