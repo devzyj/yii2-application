@@ -9,7 +9,7 @@ $config = [
     'id' => 'app-backend-api',
     'basePath' => dirname(__DIR__),
     'controllerNamespace' => 'backendApi\controllers',
-    'bootstrap' => ['log', 'oauth', 'v1', 'oauth2'],
+    'bootstrap' => ['log', 'oauth2', 'v1'],
     'components' => [
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
@@ -45,35 +45,25 @@ $config = [
                 '/oauth2/demo/logout' => '/oauth2/demo/logout',
             ],
         ],
-        /*'authorizeUser' => [
+        /*'oauthUser' => [
             'class' => 'yii\web\User',
-            'identityClass' => 'devzyj\yii2\oauth2\server\demos\DemoUserIdentity',
+            'identityClass' => 'devzyj\yii2\oauth2\server\demos\models\DemoUserIdentity',
         ],*/
     ],
     'modules' => [
-        'oauth' => [
-            'class' => 'backendApiOauth\Module',
-        ],
-        'v1' => [
-            'class' => 'backendApiV1\Module',
-        ],
         'oauth2' => [
             'class' => 'devzyj\yii2\oauth2\server\Module',
-            'accessTokenCryptKey' => [ // 私钥文件加密。
-                //'privateKey' => '@common/oauth2/server/private.key',
-                //'passphrase' => '',
-                //'publicKey' => '@common/oauth2/server/public.key',
-                'signKey' => 'test',
+            'accessTokenCryptKey' => [
+                'privateKey' => '@backendApi/config/keys/access-token-private.key',
+                'publicKey' => '@backendApi/config/keys/access-token-public.key',
             ],
             'authorizationCodeCryptKey' => [
-                'password' => 'test',
+                'path' => '@backendApi/config/keys/authorization-code-ascii.txt',
             ],
             'refreshTokenCryptKey' => [
-                //'ascii' => 'def000008f058ff223434851b1d087e64bc0ac984be363bf9bb719c9cc8962fe53b2b0e61728e0d121df64493bd9a3089d5be0785fb3383d561aa44312bb97f211987368',
-                //'path' => '@common/oauth2/server/refresh-token.txt',
-                'password' => 'test',
+                'path' => '@backendApi/config/keys/refresh-token-ascii.txt',
             ],
-            'defaultScopes' => ['basic', 'basic3'],
+            'defaultScopes' => ['basic'],
             'validateAccessTokenQueryParam' => 'access-token',
             // demo config.
             'controllerMap' => [
@@ -89,6 +79,9 @@ $config = [
             'classMap' => [
                 '\devzyj\yii2\oauth2\server\entities\ClientEntity' => '\app\models\ClientEntityaaa',
             ],
+        ],
+        'v1' => [
+            'class' => 'backendApiV1\Module',
         ],
     ]
 ];

@@ -501,12 +501,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/devzyj/php-oauth2-server.git",
-                "reference": "d0f46452f0bc04a83c71c30ca0cca793f9df463c"
+                "reference": "e642e4752e38aa69efed759f1459e48f9fb33876"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/devzyj/php-oauth2-server/zipball/d0f46452f0bc04a83c71c30ca0cca793f9df463c",
-                "reference": "d0f46452f0bc04a83c71c30ca0cca793f9df463c",
+                "url": "https://api.github.com/repos/devzyj/php-oauth2-server/zipball/e642e4752e38aa69efed759f1459e48f9fb33876",
+                "reference": "e642e4752e38aa69efed759f1459e48f9fb33876",
                 "shasum": ""
             },
             "require": {
@@ -544,7 +544,7 @@
                 "source": "https://github.com/devzyj/php-oauth2-server/tree/master",
                 "issues": "https://github.com/devzyj/php-oauth2-server/issues"
             },
-            "time": "2019-01-21T10:12:45+00:00"
+            "time": "2019-01-22T08:36:37+00:00"
         },
         {
             "name": "devzyj/yii2-attribute-cache-behavior",
@@ -598,12 +598,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/devzyj/yii2-oauth2-server.git",
-                "reference": "f610ed0a809dd5b2e1f6e548755eef2fd970c6e2"
+                "reference": "10bc92649487ece6d49cecc2b1f82562e28bc73e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/devzyj/yii2-oauth2-server/zipball/f610ed0a809dd5b2e1f6e548755eef2fd970c6e2",
-                "reference": "f610ed0a809dd5b2e1f6e548755eef2fd970c6e2",
+                "url": "https://api.github.com/repos/devzyj/yii2-oauth2-server/zipball/10bc92649487ece6d49cecc2b1f82562e28bc73e",
+                "reference": "10bc92649487ece6d49cecc2b1f82562e28bc73e",
                 "shasum": ""
             },
             "require": {
@@ -646,7 +646,7 @@
                 "source": "https://github.com/devzyj/yii2-oauth2-server/tree/master",
                 "issues": "https://github.com/devzyj/yii2-oauth2-server/issues"
             },
-            "time": "2019-01-21T10:02:52+00:00"
+            "time": "2019-01-22T09:31:37+00:00"
         },
         {
             "name": "devzyj/yii2-rest",
