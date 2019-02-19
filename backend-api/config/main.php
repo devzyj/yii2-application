@@ -53,6 +53,10 @@ $config = [
     'modules' => [
         'oauth2' => [
             'class' => 'devzyj\yii2\oauth2\server\Module',
+            'authorizeTypeClasses' => [],
+            'grantTypeClasses' => [
+                'devzyj\oauth2\server\grants\ClientCredentialsGrant',
+            ],
             'accessTokenCryptKey' => [
                 'privateKey' => '@backendApi/config/keys/access-token-private.key',
                 'publicKey' => '@backendApi/config/keys/access-token-public.key',
@@ -66,18 +70,15 @@ $config = [
             'defaultScopes' => ['basic'],
             'validateAccessTokenQueryParam' => 'access-token',
             // demo config.
-            'controllerMap' => [
-                'demo' => 'devzyj\yii2\oauth2\server\demos\controllers\DemoController',
-            ],
-            'loginUrl' => ['/oauth2/demo/login'],
-            'authorizationUrl' => ['/oauth2/demo/authorization'],
+            'userRepositoryClass' => 'devzyj\yii2\oauth2\server\demos\models\DemoUserRepository',
             'user' => [
                 'class' => 'yii\web\User',
                 'identityClass' => 'devzyj\yii2\oauth2\server\demos\models\DemoUserIdentity',
             ],
-            'userRepositoryClass' => 'devzyj\yii2\oauth2\server\demos\models\DemoUserRepository',
-            'classMap' => [
-                '\devzyj\yii2\oauth2\server\entities\ClientEntity' => '\app\models\ClientEntityaaa',
+            'loginUrl' => ['/oauth2/demo/login'],
+            'authorizationUrl' => ['/oauth2/demo/authorization'],
+            'controllerMap' => [
+                'demo' => 'devzyj\yii2\oauth2\server\demos\controllers\DemoController',
             ],
         ],
         'v1' => [
