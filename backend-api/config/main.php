@@ -53,10 +53,10 @@ $config = [
     'modules' => [
         'oauth2' => [
             'class' => 'devzyj\yii2\oauth2\server\Module',
-            'authorizeTypeClasses' => [],
+            /*'authorizeTypeClasses' => [],
             'grantTypeClasses' => [
                 'devzyj\oauth2\server\grants\ClientCredentialsGrant',
-            ],
+            ],*/
             'accessTokenCryptKey' => [
                 'privateKey' => '@backendApi/config/keys/access-token-private.key',
                 'publicKey' => '@backendApi/config/keys/access-token-public.key',
