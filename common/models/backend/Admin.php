@@ -28,7 +28,6 @@ use common\validators\MobileValidator;
  * @property string $allowed_ips 允许登录的 IPs
  *
  * @property AdminLoginLog[] $adminLoginLogs 管理员登录日志
- * @property OauthClient[] $oauthClients 创建的授权客户端
  * 
  * @property string $password 设置的密码
  * @property boolean $isValid 管理员是否有效
@@ -121,16 +120,6 @@ class Admin extends \yii\db\ActiveRecord
         return $this->hasMany(AdminLoginLog::class, ['admin_id' => 'id']);
     }
 
-    /**
-     * 获取创建的授权客户端。
-     * 
-     * @return \yii\db\ActiveQuery
-     */
-    public function getOauthClients()
-    {
-        return $this->hasMany(OauthClient::class, ['admin_id' => 'id']);
-    }
-    
     /**
      * 通过用户名，查询并返回一个管理员模型。
      * 

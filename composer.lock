@@ -590,21 +590,18 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/devzyj/yii2-oauth2-server.git",
-                "reference": "314982ad34b76bf03c667c8d9e23c95bb05ba64d"
+                "reference": "7fd3dd2a47e84eb9cab75f04155a7091e132d19d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/devzyj/yii2-oauth2-server/zipball/314982ad34b76bf03c667c8d9e23c95bb05ba64d",
-                "reference": "314982ad34b76bf03c667c8d9e23c95bb05ba64d",
+                "url": "https://api.github.com/repos/devzyj/yii2-oauth2-server/zipball/7fd3dd2a47e84eb9cab75f04155a7091e132d19d",
+                "reference": "7fd3dd2a47e84eb9cab75f04155a7091e132d19d",
                 "shasum": ""
             },
             "require": {
                 "devzyj/php-oauth2-server": "~1.0.0",
                 "php": ">=5.5.0",
                 "yiisoft/yii2": "*"
-            },
-            "require-dev": {
-                "codeception/codeception": "~2.5"
             },
             "type": "yii2-extension",
             "autoload": {
@@ -630,7 +627,7 @@
                 "server",
                 "yii2"
             ],
-            "time": "2019-02-21T03:44:35+00:00"
+            "time": "2019-02-21T09:06:46+00:00"
         },
         {
             "name": "devzyj/yii2-rest",

@@ -6,10 +6,10 @@
  */
 
 $config = [
-    'id' => 'app-backend-api',
+    'id' => 'app-backend-auth',
     'basePath' => dirname(__DIR__),
-    'controllerNamespace' => 'backendApi\controllers',
-    'bootstrap' => ['log', 'oauth2', 'v1'],
+    'controllerNamespace' => 'backendAuth\controllers',
+    'bootstrap' => ['log', 'oauth2'],
     'components' => [
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
@@ -27,13 +27,6 @@ $config = [
                 'application/json' => 'yii\web\JsonParser',
             ],
         ],
-        'response' => [
-            // 设置判断是否始终使用 `200` 作为 HTTP 状态，并将实际的 HTTP 状态码包含在响应内容中。
-            'as suppressResponseCodeBehavior' => [
-                'class' => '\devzyj\rest\behaviors\SuppressResponseCodeBehavior',
-                'suppressResponseCodeParam' => 'suppress_response_code'
-            ],
-        ],
         'urlManager' => [
             'enablePrettyUrl' => true,
             'enableStrictParsing' => true,
@@ -45,28 +38,28 @@ $config = [
                 '/oauth2/demo/logout' => '/oauth2/demo/logout',
             ],
         ],
-        'oauth2User' => [
+        'user' => [
             'class' => 'yii\web\User',
-            'identityClass' => 'backendApi\components\oauth2\UserIdentity',
+            'identityClass' => 'backendAuth\components\oauth2\UserIdentity',
         ],
     ],
     'modules' => [
         'oauth2' => [
             'class' => 'devzyj\yii2\oauth2\server\Module',
             'accessTokenCryptKey' => [
-                'privateKey' => '@backendApi/config/keys/access-token-private.key',
-                'publicKey' => '@backendApi/config/keys/access-token-public.key',
+                'privateKey' => '@backendAuth/config/keys/access-token-private.key',
+                'publicKey' => '@backendAuth/config/keys/access-token-public.key',
             ],
             'authorizationCodeCryptKey' => [
-                'path' => '@backendApi/config/keys/authorization-code-ascii.txt',
+                'path' => '@backendAuth/config/keys/authorization-code-ascii.txt',
             ],
             'refreshTokenCryptKey' => [
-                'path' => '@backendApi/config/keys/refresh-token-ascii.txt',
+                'path' => '@backendAuth/config/keys/refresh-token-ascii.txt',
             ],
             'defaultScopes' => ['basic'],
             'validateAccessTokenQueryParam' => 'access-token',
             // user authorize
-            'userRepositoryClass' => 'backendApi\components\oauth2\UserRepository',
+            'userRepositoryClass' => 'backendAuth\components\oauth2\UserRepository',
             // user authorize page
             'user' => 'oauth2User',
             'loginUrl' => ['/oauth2/demo/login'],
@@ -75,8 +68,8 @@ $config = [
                 'demo' => 'devzyj\yii2\oauth2\server\demos\controllers\DemoController',
             ],
             'classMap' => [
-                'devzyj\yii2\oauth2\server\demos\models\DemoLoginForm' => 'backendApi\components\oauth2\DemoLoginForm',
-                'devzyj\yii2\oauth2\server\demos\models\DemoAuthorizationForm' => 'backendApi\components\oauth2\DemoAuthorizationForm',
+                'devzyj\yii2\oauth2\server\demos\models\DemoLoginForm' => 'backendAuth\components\oauth2\DemoLoginForm',
+                'devzyj\yii2\oauth2\server\demos\models\DemoAuthorizationForm' => 'backendAuth\components\oauth2\DemoAuthorizationForm',
             ],
             // demo config.
             /*'userRepositoryClass' => 'devzyj\yii2\oauth2\server\demos\models\DemoUserRepository',
@@ -89,9 +82,6 @@ $config = [
             'controllerMap' => [
                 'demo' => 'devzyj\yii2\oauth2\server\demos\controllers\DemoController',
             ],*/
-        ],
-        'v1' => [
-            'class' => 'backendApiV1\Module',
         ],
     ]
 ];

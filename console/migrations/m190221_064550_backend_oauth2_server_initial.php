@@ -8,9 +8,9 @@
 use yii\db\Migration;
 
 /**
- * Class m190221_033205_oauth2_server_initial
+ * Class m190221_064550_backend_oauth2_server_initial
  */
-class m190221_033205_oauth2_server_initial extends Migration
+class m190221_064550_backend_oauth2_server_initial extends Migration
 {
     /**
      * {@inheritdoc}
