@@ -501,12 +501,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/devzyj/php-oauth2-server.git",
-                "reference": "e642e4752e38aa69efed759f1459e48f9fb33876"
+                "reference": "3efa2f7d1c870f7cf04fb739896256e68e4d457d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/devzyj/php-oauth2-server/zipball/e642e4752e38aa69efed759f1459e48f9fb33876",
-                "reference": "e642e4752e38aa69efed759f1459e48f9fb33876",
+                "url": "https://api.github.com/repos/devzyj/php-oauth2-server/zipball/3efa2f7d1c870f7cf04fb739896256e68e4d457d",
+                "reference": "3efa2f7d1c870f7cf04fb739896256e68e4d457d",
                 "shasum": ""
             },
             "require": {
@@ -536,7 +536,7 @@
                 "oauth",
                 "oauth2"
             ],
-            "time": "2019-01-22T08:36:37+00:00"
+            "time": "2019-02-21T03:14:52+00:00"
         },
         {
             "name": "devzyj/yii2-attribute-cache-behavior",
@@ -590,12 +590,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/devzyj/yii2-oauth2-server.git",
-                "reference": "1c419745dcea6f4034e36185a080d7fd7c8fcaa4"
+                "reference": "314982ad34b76bf03c667c8d9e23c95bb05ba64d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/devzyj/yii2-oauth2-server/zipball/1c419745dcea6f4034e36185a080d7fd7c8fcaa4",
-                "reference": "1c419745dcea6f4034e36185a080d7fd7c8fcaa4",
+                "url": "https://api.github.com/repos/devzyj/yii2-oauth2-server/zipball/314982ad34b76bf03c667c8d9e23c95bb05ba64d",
+                "reference": "314982ad34b76bf03c667c8d9e23c95bb05ba64d",
                 "shasum": ""
             },
             "require": {
@@ -630,7 +630,7 @@
                 "server",
                 "yii2"
             ],
-            "time": "2019-02-20T03:03:11+00:00"
+            "time": "2019-02-21T03:44:35+00:00"
         },
         {
             "name": "devzyj/yii2-rest",
@@ -1610,16 +1610,16 @@
         },
         {
             "name": "codeception/base",
-            "version": "2.5.3",
+            "version": "2.5.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Codeception/base.git",
-                "reference": "ceff0b4fee4846b6bd8b5a37abbbb1acd6e78f58"
+                "reference": "41f2257227130faa1a43c476c72f8031f9504d7b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Codeception/base/zipball/ceff0b4fee4846b6bd8b5a37abbbb1acd6e78f58",
-                "reference": "ceff0b4fee4846b6bd8b5a37abbbb1acd6e78f58",
+                "url": "https://api.github.com/repos/Codeception/base/zipball/41f2257227130faa1a43c476c72f8031f9504d7b",
+                "reference": "41f2257227130faa1a43c476c72f8031f9504d7b",
                 "shasum": ""
             },
             "require": {
@@ -1696,7 +1696,7 @@
                 "functional testing",
                 "unit testing"
             ],
-            "time": "2019-02-02T16:29:38+00:00"
+            "time": "2019-02-20T21:29:36+00:00"
         },
         {
             "name": "codeception/phpunit-wrapper",
@@ -2661,6 +2661,7 @@
                 "mock",
                 "xunit"
             ],
+            "abandoned": true,
             "time": "2017-06-30T09:13:00+00:00"
         },
         {
