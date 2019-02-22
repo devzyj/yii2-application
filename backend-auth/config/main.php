@@ -45,7 +45,7 @@ $config = [
             'defaultScopes' => ['basic'],
             'validateAccessTokenQueryParam' => 'access-token',
             'userRepositoryClass' => 'backendAuth\models\UserRepository',
-            /*// user authorize page
+            /*// @todo user authorize page
             'user' => [
                 'class' => 'yii\web\User',
                 'identityClass' => 'backendAuth\models\DemoUserIdentity',
