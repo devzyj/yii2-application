@@ -23,24 +23,10 @@ $config = [
         'request' => [
             'enableCsrfValidation' => false,
             'enableCookieValidation' => false,
-            'parsers' => [
-                'application/json' => 'yii\web\JsonParser',
-            ],
         ],
         'urlManager' => [
             'enablePrettyUrl' => true,
-            'enableStrictParsing' => true,
             'showScriptName' => false,
-            'rules' => [
-                '/' => 'site/index',
-                '/oauth2/demo/login' => '/oauth2/demo/login',
-                '/oauth2/demo/authorization' => '/oauth2/demo/authorization',
-                '/oauth2/demo/logout' => '/oauth2/demo/logout',
-            ],
-        ],
-        'user' => [
-            'class' => 'yii\web\User',
-            'identityClass' => 'backendAuth\components\oauth2\UserIdentity',
         ],
     ],
     'modules' => [
@@ -58,29 +44,20 @@ $config = [
             ],
             'defaultScopes' => ['basic'],
             'validateAccessTokenQueryParam' => 'access-token',
-            // user authorize
-            'userRepositoryClass' => 'backendAuth\components\oauth2\UserRepository',
-            // user authorize page
-            'user' => 'oauth2User',
+            'userRepositoryClass' => 'backendAuth\models\UserRepository',
+            /*// user authorize page
+            'user' => [
+                'class' => 'yii\web\User',
+                'identityClass' => 'backendAuth\models\DemoUserIdentity',
+            ],
             'loginUrl' => ['/oauth2/demo/login'],
             'authorizationUrl' => ['/oauth2/demo/authorization'],
             'controllerMap' => [
                 'demo' => 'devzyj\yii2\oauth2\server\demos\controllers\DemoController',
             ],
             'classMap' => [
-                'devzyj\yii2\oauth2\server\demos\models\DemoLoginForm' => 'backendAuth\components\oauth2\DemoLoginForm',
-                'devzyj\yii2\oauth2\server\demos\models\DemoAuthorizationForm' => 'backendAuth\components\oauth2\DemoAuthorizationForm',
-            ],
-            // demo config.
-            /*'userRepositoryClass' => 'devzyj\yii2\oauth2\server\demos\models\DemoUserRepository',
-            'user' => [
-                'class' => 'yii\web\User',
-                'identityClass' => 'devzyj\yii2\oauth2\server\demos\models\DemoUserIdentity',
-            ],
-            'loginUrl' => ['/oauth2/demo/login'],
-            'authorizationUrl' => ['/oauth2/demo/authorization'],
-            'controllerMap' => [
-                'demo' => 'devzyj\yii2\oauth2\server\demos\controllers\DemoController',
+                'devzyj\yii2\oauth2\server\demos\models\DemoLoginForm' => 'backendAuth\models\DemoLoginForm',
+                'devzyj\yii2\oauth2\server\demos\models\DemoAuthorizationForm' => 'backendAuth\models\DemoAuthorizationForm',
             ],*/
         ],
     ]
