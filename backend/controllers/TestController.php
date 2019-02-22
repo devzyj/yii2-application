@@ -17,7 +17,7 @@ class TestController extends \yii\web\Controller
 {
     public function actionOauth()
     {
-        $url = 'http://api.backend.application.yii2.devzyj.zyj/oauth2/authorize';
+        $url = 'http://auth.backend.application.yii2.devzyj.zyj/oauth2/authorize';
         $params = [
             'response_type' => '', 
             'client_id' => 'f4c22926e400ebca', 

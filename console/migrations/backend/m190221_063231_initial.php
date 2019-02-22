@@ -8,16 +8,16 @@
 use yii\db\Migration;
 
 /**
- * Class m190221_063231_backend_initial
+ * Class m190221_063231_initial
  */
-class m190221_063231_backend_initial extends Migration
+class m190221_063231_initial extends Migration
 {
     /**
      * @var array 全部数据表名。
      */
     protected $tables = [
-        'admin' => '{{%backend_admin}}',
-        'admin_login_log' => '{{%backend_admin_login_log}}',
+        'admin' => '{{%admin}}',
+        'admin_login_log' => '{{%admin_login_log}}',
     ];
     
     /**

@@ -4,4 +4,13 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-Yii::setAlias('@backendApiV1', '@backendApi/modules/v1');
+
+return [
+    // admin rest api.
+    [
+        'class' => 'devzyj\rest\UrlRule',
+        'controller' => [
+            "{$this->uniqueId}/admin",
+        ],
+    ],
+];

@@ -70,7 +70,7 @@ class ClientIpFilter extends \yii\base\ActionFilter
                 Yii::debug('Check client ip.', __METHOD__);
                 
                 $ip = $this->request->getUserIP();
-                if (!$identity->checkClientIp($ip, $action, $this->request)) {
+                if (!$identity->checkAllowedClientIp($ip, $action, $this->request)) {
                     throw new ForbiddenHttpException($this->errorMessage, $this->errorCode);
                 }
             } else {

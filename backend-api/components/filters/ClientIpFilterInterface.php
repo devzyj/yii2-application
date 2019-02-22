@@ -7,7 +7,7 @@
 namespace backendApi\components\filters;
 
 /**
- * ClientIpFilterInterface 是可以由标识对象实现的接口，用于验证客户端 IP 是否被允许访问。
+ * ClientIpFilterInterface 是可以由用户标识对象实现的接口，用于验证客户端 IP 是否被允许访问。
  *
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
@@ -22,5 +22,5 @@ interface ClientIpFilterInterface
      * @param \yii\web\Request $request 当前请求对像。
      * @return boolean 是否允许。
      */
-    public function checkClientIp($ip, $action, $request);
+    public function checkAllowedClientIp($ip, $action, $request);
 }

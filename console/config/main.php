@@ -10,10 +10,11 @@ $config = [
     'basePath' => dirname(__DIR__),
     'controllerNamespace' => 'console\controllers',
     'controllerMap' => [
-        'migrate' => [
+        'migrate-backend' => [
             'class' => 'yii\console\controllers\MigrateController',
+            'db' => 'db_backend',
             'migrationPath' => [
-                '@console/migrations',
+                '@console/migrations/backend',
                 '@devzyj/yii2/oauth2/server/migrations',
             ],
         ],

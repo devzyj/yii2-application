@@ -7,6 +7,8 @@
 namespace backendApi\components\traits;
 
 use Yii;
+use yii\log\Dispatcher;
+use backendApi\components\behaviors\LogResponseBehavior;
 
 /**
  * ModuleLogTrait 提供了模块日志的相关方法，用于记录接口调用的日志。
@@ -17,9 +19,9 @@ use Yii;
 trait ModuleLogTrait
 {
     /**
-     * 获取日志组件。
+     * 获取模块日志组件。
      *
-     * @return \yii\log\Dispatcher
+     * @return Dispatcher
      */
     public function getLog()
     {
@@ -27,9 +29,9 @@ trait ModuleLogTrait
     }
     
     /**
-     * 设置日志组件。
+     * 设置模块日志组件。
      * 
-     * 文件存放在：`@runtime/logs/modules/app.log`
+     * 文件存放在：`@runtime/logs/modules/[MODULE_ID].log`
      */
     protected function setLog()
     {
@@ -39,7 +41,7 @@ trait ModuleLogTrait
             'targets' => [
                 [
                     'class' => 'yii\log\FileTarget',
-                    'logFile' => "@runtime/logs/modules/app.log",
+                    'logFile' => "@runtime/logs/modules/{$this->getUniqueId()}.log",
                     'microtime' => true,
                     'logVars' => []
                 ]
@@ -50,12 +52,12 @@ trait ModuleLogTrait
     /**
      * 附加记录响应时日志的行为。
      * 
-     * @see \backendApi\components\behaviors\LogResponseBehavior
+     * @see LogResponseBehavior
      */
     protected function attachLogResponseBehavior()
     {
         Yii::$app->getResponse()->attachBehavior('logResponseBehavior', [
-            'class' => 'backendApi\components\behaviors\LogResponseBehavior',
+            'class' => LogResponseBehavior::class,
             'logger' => $this->getLog()->getLogger(),
         ]);
     }

@@ -9,6 +9,4 @@
  * dev configuration.
  */
 return [
-    // 授权令牌的加密 KEY。
-    'oauth.token.signKey' => '123456789',
 ];

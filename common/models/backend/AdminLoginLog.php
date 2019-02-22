@@ -9,7 +9,7 @@ namespace common\models\backend;
 use Yii;
 
 /**
- * This is the model class for table "{{%backend_admin_login_log}}".
+ * This is the model class for table "{{%admin_login_log}}".
  *
  * @property string $id ID
  * @property int $admin_id 管理员 ID
@@ -28,9 +28,17 @@ class AdminLoginLog extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return '{{%backend_admin_login_log}}';
+        return '{{%admin_login_log}}';
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public static function getDb()
+    {
+        return Yii::$app->get('db_backend');
+    }
+    
     /**
      * {@inheritdoc}
      */

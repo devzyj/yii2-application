@@ -13,7 +13,7 @@ use common\validators\backend\NicknameValidator;
 use common\validators\MobileValidator;
 
 /**
- * This is the model class for table "{{%backend_admin}}".
+ * This is the model class for table "{{%admin}}".
  *
  * @property int $id ID
  * @property string $username 用户名
@@ -53,9 +53,17 @@ class Admin extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return '{{%backend_admin}}';
+        return '{{%admin}}';
     }
-
+    
+    /**
+     * {@inheritdoc}
+     */
+    public static function getDb()
+    {
+        return Yii::$app->get('db_backend');
+    }
+    
     /**
      * {@inheritdoc}
      */

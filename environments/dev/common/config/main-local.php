@@ -23,5 +23,13 @@ return [
             'tablePrefix' => '',
             'charset' => 'utf8',
         ],
+        'db_backend' => [
+            'class' => 'yii\db\Connection',
+            'dsn' => 'mysql:host=localhost;port=3306;dbname=yii2application',
+            'username' => 'root',
+            'password' => '123456',
+            'tablePrefix' => 'backend_',
+            'charset' => 'utf8',
+        ],
     ],
 ];

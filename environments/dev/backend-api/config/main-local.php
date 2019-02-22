@@ -18,6 +18,15 @@ $config = [
                 ],
             ],
         ],
+        'urlManager' => [
+            'rules' => [
+                '/' => 'site/index',
+            ],
+        ],
+        'oauthClient' => [
+            'class' => 'yii\httpclient\Client',
+            'baseUrl' => 'http://auth.backend.application.yii2.devzyj.zyj/oauth2',
+        ],
     ],
 ];
 
