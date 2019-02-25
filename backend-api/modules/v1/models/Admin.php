@@ -46,12 +46,12 @@ class Admin extends \backendApi\models\Admin
     
         // 新增数据的场景。
         $scenarios[self::SCENARIO_INSERT] = [
-            'username', 'password', 'nickname', 'status', 'email', 'mobile', 'avatar', 'allowed_ips'
+            'username', 'password', 'nickname', 'description', 'status', 'email', 'mobile', 'avatar', 'allowed_ips'
         ];
     
         // 更新数据的场景。
         $scenarios[self::SCENARIO_UPDATE] = [
-            'username', 'password', 'nickname', 'status', 'email', 'mobile', 'avatar', 'allowed_ips'
+            'username', 'password', 'nickname', 'description', 'status', 'email', 'mobile', 'avatar', 'allowed_ips'
         ];
     
         // 返回修改后的场景列表。

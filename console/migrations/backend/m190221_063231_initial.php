@@ -50,6 +50,7 @@ class m190221_063231_initial extends Migration
             'password_hash' => $this->string(32)->notNull()->comment('密码 hash 值'),
             'hash_code' => $this->string(6)->notNull()->comment('密码 hash 附加值'),
             'nickname' => $this->string(20)->notNull()->unique()->comment('昵称'),
+            'description' => $this->string(255)->notNull()->defaultValue('')->comment('描述'),
             'create_time' => $this->integer(10)->unsigned()->notNull()->comment('创建时间'),
             'status' => $this->tinyInteger(1)->unsigned()->notNull()->defaultValue(0)->comment('状态（0=禁用；1=可用）'),
             'email' => $this->string(255)->notNull()->defaultValue('')->comment('邮箱地址'),
@@ -87,11 +88,13 @@ class m190221_063231_initial extends Migration
     {
         // admin
         $password = '123456';
+        $hashCode = (string) rand(100000, 999999);
         $this->insert($this->tables['admin'], [
             'username' => 'admin',
-            'password_hash' => md5($password . '135790'),
-            'hash_code' => '135790',
+            'password_hash' => md5($password . $hashCode),
+            'hash_code' => $hashCode,
             'nickname' => '后台管理员',
+            'description' => '后台管理员账号',
             'create_time' => time(),
             'status' => 1,
             'email' => 'admin@example.com',

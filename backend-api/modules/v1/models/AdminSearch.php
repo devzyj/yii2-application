@@ -21,7 +21,7 @@ class AdminSearch extends Admin
     {
         return [
             [['id', 'create_time', 'status'], 'integer'],
-            [['username', 'nickname', 'email', 'mobile', 'allowed_ips'], 'string'],
+            [['username', 'nickname', 'description', 'email', 'mobile', 'allowed_ips'], 'string'],
         ];
     }
 }

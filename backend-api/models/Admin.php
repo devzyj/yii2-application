@@ -20,6 +20,7 @@ use backendApi\validators\MobileValidator;
  * @property string $password_hash 密码 hash 值
  * @property string $hash_code 密码 hash 附加值
  * @property string $nickname 昵称
+ * @property string $description 描述
  * @property int $create_time 创建时间
  * @property int $status 状态（0=禁用；1=可用）
  * @property string $email 邮箱地址
@@ -92,7 +93,7 @@ class Admin extends \yii\db\ActiveRecord
             [['username', 'nickname'], 'required'],
             [['status'], 'boolean'],
             [['username', 'nickname', 'mobile'], 'string', 'max' => 20],
-            [['email', 'avatar', 'allowed_ips'], 'string', 'max' => 255],
+            [['description', 'email', 'avatar', 'allowed_ips'], 'string', 'max' => 255],
             [['email'], 'email'],
             [['username'], UsernameValidator::class],
             [['password'], PasswordValidator::class],
@@ -114,6 +115,7 @@ class Admin extends \yii\db\ActiveRecord
             'password_hash' => 'Password Hash',
             'hash_code' => 'Hash Code',
             'nickname' => 'Nickname',
+            'description' => 'Description',
             'create_time' => 'Create Time',
             'status' => 'Status',
             'email' => 'Email',

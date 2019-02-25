@@ -51,6 +51,8 @@ class m190221_064550_oauth2_server_initial extends Migration
         
         // 初始化默认数据。
         $this->update($this->tables['oauth_client'], [
+            'name' => '后台管理系统',
+            'description' => '后台管理系统',
             'identifier' => 'f4c22926e400ebca',
             'secret' => '692569f364854bc130687297c770c2c0',
             'redirect_uri' => 'http://backend.application.yii2.devzyj.zyj/test/oauth-callback',
