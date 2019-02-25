@@ -4,7 +4,7 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace backendApi\components\filters;
+namespace backendApi\filters;
 
 /**
  * ClientIpFilterInterface 是可以由用户标识对象实现的接口，用于验证客户端 IP 是否被允许访问。

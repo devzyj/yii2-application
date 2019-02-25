@@ -41,10 +41,10 @@ class ActiveController extends \backendApi\components\ActiveController
      */
     public function checkActionAccess($action, $params = [])
     {
-        /* @var $identity \api\components\Identity 
+        /* @var $identity \backendApiV1\components\ClientIdentity */
         if (!($user = Yii::$app->getUser()) || !($identity = $user->getIdentity(false)) 
-                || !$identity->checkClientAllowedApi($action->getUniqueId())) {
-            throw new ForbiddenHttpException('Client API limit.');
-        }*/
+                || !$identity->checkAllowedApi($action->getUniqueId())) {
+            throw new ForbiddenHttpException('API limit.');
+        }
     }
 }

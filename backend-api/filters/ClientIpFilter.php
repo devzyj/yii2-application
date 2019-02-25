@@ -4,7 +4,7 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace backendApi\components\filters;
+namespace backendApi\filters;
 
 use Yii;
 use yii\web\ForbiddenHttpException;
@@ -17,7 +17,7 @@ use yii\web\ForbiddenHttpException;
  * {
  *     return [
  *         'clientIpFilter' => [
- *             'class' => 'backendApi\components\filters\ClientIpFilter',
+ *             'class' => 'backendApi\filters\ClientIpFilter',
  *         ],
  *     ];
  * }
@@ -34,7 +34,7 @@ class ClientIpFilter extends \yii\base\ActionFilter
     /**
      * @var string 错误信息。
      */
-    public $errorMessage = 'Client IP address limit.';
+    public $errorMessage = 'IP address limit.';
 
     /**
      * @var integer 错误编码。

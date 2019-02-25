@@ -23,6 +23,18 @@ class Admin extends \backendApi\models\Admin
      * @var string 更新数据的场景名称。
      */
     const SCENARIO_UPDATE = 'update';
+
+    /**
+     * {@inheritdoc}
+     */
+    public function fields()
+    {
+        $fields = parent::fields();
+        
+        unset($fields['password_hash'], $fields['hash_code']);
+        
+        return $fields;
+    }
     
     /**
      * {@inheritdoc}

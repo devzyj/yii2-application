@@ -4,7 +4,7 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace common\validators\backend;
+namespace backendApi\validators;
 
 /**
  * PasswordValidator 验证密码格式是否有效。

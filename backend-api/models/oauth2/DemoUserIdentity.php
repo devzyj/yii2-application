@@ -4,7 +4,7 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace backendAuth\models;
+namespace backendApi\models\oauth2;
 
 use Yii;
 use yii\web\IdentityInterface;
@@ -16,6 +16,7 @@ use devzyj\yii2\oauth2\server\entities\ScopeEntity;
  * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
+ * @deprecated 测试时使用，正式环境中禁用该文件。
  */
 class DemoUserIdentity extends UserEntity implements IdentityInterface, OAuthIdentityInterface
 {

@@ -7,7 +7,7 @@
 namespace backendApiV1;
 
 use Yii;
-use backendApi\components\traits\ModuleLogTrait;
+use backendApi\traits\ModuleLogTrait;
 
 /**
  * v1 接口模块。

@@ -4,11 +4,11 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace backendApi\components\traits;
+namespace backendApi\traits;
 
 use Yii;
 use yii\log\Dispatcher;
-use backendApi\components\behaviors\LogResponseBehavior;
+use backendApi\behaviors\LogResponseBehavior;
 
 /**
  * ModuleLogTrait 提供了模块日志的相关方法，用于记录接口调用的日志。

@@ -8,6 +8,7 @@ namespace backendApi\components;
 
 use Yii;
 use yii\helpers\ArrayHelper;
+use backendApi\filters\ClientIpFilter;
 
 /**
  * ActiveController class.
@@ -38,7 +39,7 @@ class ActiveController extends \devzyj\rest\ActiveController
         return ArrayHelper::merge(parent::behaviors(), [
             // 验证客户端 IP 是否被允许访问。
             'clientIpFilter' => [
-                'class' => 'backendApi\components\filters\ClientIpFilter',
+                'class' => ClientIpFilter::class,
             ],
         ]);
     }

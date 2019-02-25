@@ -6,7 +6,8 @@
  */
 namespace backendApi\models;
 
-use common\models\backend\OauthClientScope as CommonBackendOauthClientScope;
+use Yii;
+use devzyj\yii2\oauth2\server\models\OauthClientScope as DevzyjOauthClientScope;
 
 /**
  * This is the model class for table "{{%oauth_client_scope}}".
@@ -17,8 +18,16 @@ use common\models\backend\OauthClientScope as CommonBackendOauthClientScope;
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
-class OauthClientScope extends CommonBackendOauthClientScope
+class OauthClientScope extends DevzyjOauthClientScope
 {
+    /**
+     * {@inheritdoc}
+     */
+    public static function getDb()
+    {
+        return Yii::$app->get('db_backend');
+    }
+    
     /**
      * @return \yii\db\ActiveQuery
      */

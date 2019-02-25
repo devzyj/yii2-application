@@ -4,7 +4,7 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace backendApi\components\behaviors;
+namespace backendApi\behaviors;
 
 use Yii;
 use yii\web\Response;
@@ -19,7 +19,7 @@ use yii\helpers\Json;
  * {
  *     return [
  *         'logResponseBehavior' => [
- *             'class' => 'backendApi\components\behaviors\LogResponseBehavior',
+ *             'class' => 'backendApi\behaviors\LogResponseBehavior',
  *         ],
  *     ];
  * }

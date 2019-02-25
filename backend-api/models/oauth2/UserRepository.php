@@ -4,7 +4,7 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace backendAuth\models;
+namespace backendApi\models\oauth2;
 
 use devzyj\oauth2\server\interfaces\UserRepositoryInterface;
 
@@ -21,7 +21,11 @@ class UserRepository implements UserRepositoryInterface
      */
     public function getUserEntity($identifier)
     {
-        return UserEntity::findOne($identifier);
+        /* @var $model UserEntity */
+        $model = UserEntity::findOne($identifier);
+        if ($model && $model->getIsValid()) {
+            return $model;
+        }
     }
     
     /**
@@ -31,7 +35,7 @@ class UserRepository implements UserRepositoryInterface
     {
         /* @var $model UserEntity */
         $model = UserEntity::findOneByUsername($username);
-        if ($model && $model->validatePassword($password)) {
+        if ($model && $model->getIsValid() && $model->validatePassword($password)) {
             return $model;
         }
     }

@@ -4,9 +4,10 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace backendAuth\models;
+namespace backendApi\models\oauth2;
 
 use devzyj\oauth2\server\interfaces\UserEntityInterface;
+use backendApi\models\Admin;
 
 /**
  * UserEntity class.

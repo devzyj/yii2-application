@@ -6,19 +6,29 @@
  */
 namespace backendApi\models;
 
-use common\models\backend\OauthScope as CommonBackendOauthScope;
+use Yii;
+use devzyj\yii2\oauth2\server\models\OauthScope as DevzyjOauthScope;
 
 /**
  * This is the model class for table "{{%oauth_scope}}".
  *
  * @property OauthClientScope[] $oauthClientScopes 客户端与权限的关联关系
  * @property OauthClient[] $oauthClients 客户端
+ * @property OauthScopeContent $oauthScopeContent 权限内容
  *
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
-class OauthScope extends CommonBackendOauthScope
+class OauthScope extends DevzyjOauthScope
 {
+    /**
+     * {@inheritdoc}
+     */
+    public static function getDb()
+    {
+        return Yii::$app->get('db_backend');
+    }
+    
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -28,10 +38,37 @@ class OauthScope extends CommonBackendOauthScope
     }
 
     /**
+     * 获取客户端。
+     * 
      * @return \yii\db\ActiveQuery
      */
     public function getOauthClients()
     {
         return $this->hasMany(OauthClient::class, ['id' => 'client_id'])->viaTable(OauthClientScope::tableName(), ['scope_id' => 'id']);
+    }
+    
+    /**
+     * 获取权限内容。
+     * 
+     * @return \yii\db\ActiveQuery
+     */
+    public function getOauthScopeContent()
+    {
+        return $this->hasOne(OauthScopeContent::class, ['scope_id' => 'id']);
+    }
+    
+    /**
+     * 检查 API 是否被允许。
+     *
+     * @param string $api 需要检查的 API。
+     * @return boolean
+     */
+    public function checkAllowedApi($api)
+    {
+        if ($this->oauthScopeContent && $this->oauthScopeContent->checkAllowedApi($api)) {
+            return true;
+        }
+        
+        return false;
     }
 }
