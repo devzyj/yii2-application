@@ -99,7 +99,7 @@
             "version": "3.3.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/jquery/jquery-dist.git",
+                "url": "git@github.com:jquery/jquery-dist.git",
                 "reference": "9e8ec3d10fad04748176144f108d7355662ae75e"
             },
             "dist": {
@@ -590,12 +590,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/devzyj/yii2-oauth2-server.git",
-                "reference": "7fd3dd2a47e84eb9cab75f04155a7091e132d19d"
+                "reference": "0ac575a1a00c89c9a8453307b233a1e6c74ef056"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/devzyj/yii2-oauth2-server/zipball/7fd3dd2a47e84eb9cab75f04155a7091e132d19d",
-                "reference": "7fd3dd2a47e84eb9cab75f04155a7091e132d19d",
+                "url": "https://api.github.com/repos/devzyj/yii2-oauth2-server/zipball/0ac575a1a00c89c9a8453307b233a1e6c74ef056",
+                "reference": "0ac575a1a00c89c9a8453307b233a1e6c74ef056",
                 "shasum": ""
             },
             "require": {
@@ -627,7 +627,7 @@
                 "server",
                 "yii2"
             ],
-            "time": "2019-02-21T09:06:46+00:00"
+            "time": "2019-02-26T04:54:34+00:00"
         },
         {
             "name": "devzyj/yii2-rest",

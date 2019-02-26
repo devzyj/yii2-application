@@ -25,25 +25,7 @@ class m190221_063231_initial extends Migration
      */
     public function safeUp()
     {
-        $this->createTables();
-        $this->insertRows();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function safeDown()
-    {
-        $this->dropTable($this->tables['admin_login_log']);
-        $this->dropTable($this->tables['admin']);
-    }
-
-    /**
-     * 创建数据表。
-     */
-    protected function createTables()
-    {
-        // admin
+        // create table: admin
         $this->createTable($this->tables['admin'], [
             'id' => $this->primaryKey(10)->unsigned()->comment('ID'),
             'username' => $this->string(20)->notNull()->unique()->comment('用户名'),
@@ -56,20 +38,36 @@ class m190221_063231_initial extends Migration
             'email' => $this->string(255)->notNull()->defaultValue('')->comment('邮箱地址'),
             'mobile' => $this->string(20)->notNull()->defaultValue('')->comment('手机号码'),
             'avatar' => $this->string(255)->notNull()->defaultValue('')->comment('头像信息'),
-            'allowed_ips' => $this->string(255)->notNull()->defaultValue('')->comment('允许登录的 IPs'),
+            'allowed_ips' => $this->string(255)->notNull()->defaultValue('')->comment('允许登录的 IPs（多个使用空隔符分隔）'),
         ], "COMMENT='后端管理员表'");
 
-        // admin_login_log
+        // create table: admin_login_log
         $this->createTable($this->tables['admin_login_log'], [
             'id' => $this->bigPrimaryKey()->unsigned()->comment('ID'),
             'admin_id' => $this->integer(10)->unsigned()->notNull()->comment('管理员 ID'),
             'ip' => $this->string(50)->notNull()->comment('登录 IP'),
             'time' => $this->integer(10)->unsigned()->notNull()->comment('登录时间'),
         ], "COMMENT='后端管理员登录日志表'");
-
         $foreignKeyName = $this->getForeignKeyName($this->tables['admin_login_log'], 'admin_id');
         $this->addForeignKey($foreignKeyName, $this->tables['admin_login_log'], 'admin_id', $this->tables['admin'], 'id', 'CASCADE', 'CASCADE');
         
+        
+        // insert rows: admin
+        $password = '123456';
+        $hashCode = (string) rand(100000, 999999);
+        $this->insert($this->tables['admin'], [
+            'username' => 'admin',
+            'password_hash' => md5($password . $hashCode),
+            'hash_code' => $hashCode,
+            'nickname' => '后台管理员',
+            'description' => '后台管理员账号',
+            'create_time' => time(),
+            'status' => 1,
+            'email' => '',
+            'mobile' => '',
+            'avatar' => '',
+            'allowed_ips' => '*',
+        ]);
     }
 
     /**
@@ -82,25 +80,11 @@ class m190221_063231_initial extends Migration
     }
     
     /**
-     * 插入数据。
+     * {@inheritdoc}
      */
-    protected function insertRows()
+    public function safeDown()
     {
-        // admin
-        $password = '123456';
-        $hashCode = (string) rand(100000, 999999);
-        $this->insert($this->tables['admin'], [
-            'username' => 'admin',
-            'password_hash' => md5($password . $hashCode),
-            'hash_code' => $hashCode,
-            'nickname' => '后台管理员',
-            'description' => '后台管理员账号',
-            'create_time' => time(),
-            'status' => 1,
-            'email' => 'admin@example.com',
-            'mobile' => '13123456789',
-            'avatar' => '',
-            'allowed_ips' => '*',
-        ]);
+        $this->dropTable($this->tables['admin_login_log']);
+        $this->dropTable($this->tables['admin']);
     }
 }
