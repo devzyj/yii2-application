@@ -95,9 +95,9 @@ class OauthClientSetting extends \yii\db\ActiveRecord
      */
     public function getAllowedIPs()
     {
-        $allowedIPs = trim($this->allowed_ips, ',');
+        $allowedIPs = trim($this->allowed_ips);
         if ($allowedIPs) {
-            return explode(',', $allowedIPs);
+            return explode(' ', $allowedIPs);
         }
     
         return [];

@@ -8,11 +8,11 @@
 use yii\db\Migration;
 
 /**
- * Class m190226_121707_demo_data_initial
+ * Class m999999_000000_demo_data_initial
  * 
  * 只在开发测试时使用。
  */
-class m190226_121707_demo_data_initial extends Migration
+class m999999_000000_demo_data_initial extends Migration
 {
     /**
      * @var array 全部数据表名。

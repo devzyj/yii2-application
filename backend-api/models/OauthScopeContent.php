@@ -81,9 +81,9 @@ class OauthScopeContent extends \yii\db\ActiveRecord
      */
     public function getAllowedAPIs()
     {
-        $allowedAPIs = trim($this->allowed_apis, ',');
+        $allowedAPIs = trim($this->allowed_apis);
         if ($allowedAPIs) {
-            return explode(',', $allowedAPIs);
+            return explode(' ', $allowedAPIs);
         }
     
         return [];

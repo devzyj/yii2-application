@@ -33,7 +33,7 @@ class m190221_064550_oauth2_server_initial extends Migration
         $this->createTable($this->tables['oauth_client_setting'], [
             'client_id' => $this->integer(10)->unsigned()->notNull()->comment('客户端 ID'),
             'admin_id' => $this->integer(10)->unsigned()->notNull()->comment('管理员 ID'),
-            'allowed_ips' => $this->string(255)->notNull()->defaultValue('')->comment('允许访问的 IPs'),
+            'allowed_ips' => $this->string(255)->notNull()->defaultValue('')->comment('允许访问的 IPs（多个使用空隔符分隔）'),
         ], "COMMENT='OAuth - 客户端配置表'");
         $this->addPrimaryKey('PK_oauth_client_setting_client_id', $this->tables['oauth_client_setting'], 'client_id');
         $foreignKeyName = $this->getForeignKeyName($this->tables['oauth_client_setting'], 'client_id');
@@ -44,7 +44,7 @@ class m190221_064550_oauth2_server_initial extends Migration
         // create table: oauth_scope_content
         $this->createTable($this->tables['oauth_scope_content'], [
             'scope_id' => $this->integer(10)->unsigned()->notNull()->comment('权限 ID'),
-            'allowed_apis' => $this->string(2000)->notNull()->defaultValue('')->comment('允许访问的 APIs'),
+            'allowed_apis' => $this->string(2000)->notNull()->defaultValue('')->comment('允许访问的 APIs（多个使用空隔符分隔）'),
         ], "COMMENT='OAuth - 权限内容表'");
         $this->addPrimaryKey('PK_oauth_scope_content_scope_id', $this->tables['oauth_scope_content'], 'scope_id');
         $foreignKeyName = $this->getForeignKeyName($this->tables['oauth_scope_content'], 'scope_id');
