@@ -1,7 +1,7 @@
 <?php
 /**
  * @link https://github.com/devzyj/yii2-application
- * @copyright Copyright (c) 2018 Zhang Yan Jiong
+ * @copyright Copyright (c) 2019 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
 namespace backendApi\models;
@@ -18,17 +18,27 @@ use Yii;
  * @property int $create_time 创建时间
  * @property int $status 状态（0=禁用；1=可用）
  *
- * @property RbacPermissionRole[] $rbacPermissionRoles
- * @property RbacPermission[] $permissions
- * @property RbacClient $client
- * @property RbacRoleUser[] $rbacRoleUsers
- * @property RbacUser[] $users
- * 
+ * @property RbacPermissionRole[] $rbacPermissionRoles 权限与角色关联数据
+ * @property RbacPermission[] $rbacPermissions 权限
+ * @property RbacClient $rbacClient 客户端
+ * @property RbacRoleUser[] $rbacRoleUsers 角色与用户关联数据
+ * @property RbacUser[] $rbacUsers 用户
+ *
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
 class RbacRole extends \yii\db\ActiveRecord
 {
+    /**
+     * @var integer 状态 - 禁用的。
+     */
+    const STATUS_DISABLED = 0;
+
+    /**
+     * @var integer 状态 - 启用的。
+     */
+    const STATUS_ENABLED = 1;
+    
     /**
      * {@inheritdoc}
      */
@@ -48,15 +58,30 @@ class RbacRole extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
+    public function behaviors()
+    {
+        return [
+            'timestampBehavior' => [
+                'class' => 'yii\behaviors\TimestampBehavior',
+                'createdAtAttribute' => 'create_time',
+                'updatedAtAttribute' => null,
+            ],
+        ];
+    }
+    
+    /**
+     * {@inheritdoc}
+     */
     public function rules()
     {
         return [
-            [['client_id', 'name', 'create_time'], 'required'],
-            [['client_id', 'create_time', 'status'], 'integer'],
+            [['client_id', 'name'], 'required'],
+            [['client_id'], 'integer'],
             [['name'], 'string', 'max' => 50],
             [['description'], 'string', 'max' => 255],
-            [['client_id', 'name'], 'unique', 'targetAttribute' => ['client_id', 'name']],
-            [['client_id'], 'exist', 'skipOnError' => true, 'targetClass' => RbacClient::className(), 'targetAttribute' => ['client_id' => 'id']],
+            [['status'], 'boolean'],
+            [['name'], 'unique', 'targetAttribute' => ['client_id', 'name']],
+            [['client_id'], 'exist', 'skipOnError' => true, 'targetClass' => RbacClient::class, 'targetAttribute' => ['client_id' => 'id']],
         ];
     }
 
@@ -76,42 +101,52 @@ class RbacRole extends \yii\db\ActiveRecord
     }
 
     /**
+     * 获取权限与角色关联查询对像。
+     * 
      * @return \yii\db\ActiveQuery
      */
     public function getRbacPermissionRoles()
     {
-        return $this->hasMany(RbacPermissionRole::className(), ['role_id' => 'id']);
+        return $this->hasMany(RbacPermissionRole::class, ['role_id' => 'id']);
     }
 
     /**
+     * 获取权限查询对像。
+     * 
      * @return \yii\db\ActiveQuery
      */
-    public function getPermissions()
+    public function getRbacPermissions()
     {
-        return $this->hasMany(RbacPermission::className(), ['id' => 'permission_id'])->viaTable('{{%rbac_permission_role}}', ['role_id' => 'id']);
+        return $this->hasMany(RbacPermission::class, ['id' => 'permission_id'])->viaTable(RbacPermissionRole::tableName(), ['role_id' => 'id']);
     }
 
     /**
+     * 获取客户端查询对像。
+     * 
      * @return \yii\db\ActiveQuery
      */
-    public function getClient()
+    public function getRbacClient()
     {
-        return $this->hasOne(RbacClient::className(), ['id' => 'client_id']);
+        return $this->hasOne(RbacClient::class, ['id' => 'client_id']);
     }
 
     /**
+     * 获取角色与用户关联查询对像。
+     * 
      * @return \yii\db\ActiveQuery
      */
     public function getRbacRoleUsers()
     {
-        return $this->hasMany(RbacRoleUser::className(), ['role_id' => 'id']);
+        return $this->hasMany(RbacRoleUser::class, ['role_id' => 'id']);
     }
 
     /**
+     * 获取用户查询对像。
+     * 
      * @return \yii\db\ActiveQuery
      */
-    public function getUsers()
+    public function getRbacUsers()
     {
-        return $this->hasMany(RbacUser::className(), ['id' => 'user_id'])->viaTable('{{%rbac_role_user}}', ['role_id' => 'id']);
+        return $this->hasMany(RbacUser::class, ['id' => 'user_id'])->viaTable(RbacRoleUser::tableName(), ['role_id' => 'id']);
     }
 }

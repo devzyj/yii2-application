@@ -1,7 +1,7 @@
 <?php
 /**
  * @link https://github.com/devzyj/yii2-application
- * @copyright Copyright (c) 2018 Zhang Yan Jiong
+ * @copyright Copyright (c) 2019 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
 namespace backendApi\models;
@@ -18,21 +18,27 @@ use Yii;
  * @property int $create_time 创建时间
  * @property int $status 状态（0=禁用；1=可用）
  *
- * @property RbacMenuPermission[] $rbacMenuPermissions
- * @property RbacMenu[] $menus
- * @property RbacOperationPermission[] $rbacOperationPermissions
- * @property RbacOperation[] $operations
- * @property RbacClient $client
- * @property RbacPermissionGroup[] $rbacPermissionGroups
- * @property RbacGroup[] $groups
- * @property RbacPermissionRole[] $rbacPermissionRoles
- * @property RbacRole[] $roles
- * 
+ * @property RbacOperationPermission[] $rbacOperationPermissions 操作与权限关联数据
+ * @property RbacOperation[] $rbacOperations 操作
+ * @property RbacClient $rbacClient 客户端
+ * @property RbacPermissionRole[] $rbacPermissionRoles 权限与角色关联数据
+ * @property RbacRole[] $rbacRoles 角色
+ *
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
 class RbacPermission extends \yii\db\ActiveRecord
 {
+    /**
+     * @var integer 状态 - 禁用的。
+     */
+    const STATUS_DISABLED = 0;
+
+    /**
+     * @var integer 状态 - 启用的。
+     */
+    const STATUS_ENABLED = 1;
+    
     /**
      * {@inheritdoc}
      */
@@ -52,15 +58,30 @@ class RbacPermission extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
+    public function behaviors()
+    {
+        return [
+            'timestampBehavior' => [
+                'class' => 'yii\behaviors\TimestampBehavior',
+                'createdAtAttribute' => 'create_time',
+                'updatedAtAttribute' => null,
+            ],
+        ];
+    }
+    
+    /**
+     * {@inheritdoc}
+     */
     public function rules()
     {
         return [
-            [['client_id', 'name', 'create_time'], 'required'],
-            [['client_id', 'create_time', 'status'], 'integer'],
+            [['client_id', 'name'], 'required'],
+            [['client_id'], 'integer'],
             [['name'], 'string', 'max' => 50],
             [['description'], 'string', 'max' => 255],
-            [['client_id', 'name'], 'unique', 'targetAttribute' => ['client_id', 'name']],
-            [['client_id'], 'exist', 'skipOnError' => true, 'targetClass' => RbacClient::className(), 'targetAttribute' => ['client_id' => 'id']],
+            [['status'], 'boolean'],
+            [['name'], 'unique', 'targetAttribute' => ['client_id', 'name']],
+            [['client_id'], 'exist', 'skipOnError' => true, 'targetClass' => RbacClient::class, 'targetAttribute' => ['client_id' => 'id']],
         ];
     }
 
@@ -80,74 +101,52 @@ class RbacPermission extends \yii\db\ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getRbacMenuPermissions()
-    {
-        return $this->hasMany(RbacMenuPermission::className(), ['permission_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getMenus()
-    {
-        return $this->hasMany(RbacMenu::className(), ['id' => 'menu_id'])->viaTable('{{%rbac_menu_permission}}', ['permission_id' => 'id']);
-    }
-
-    /**
+     * 获取操作与权限关联查询对像。
+     * 
      * @return \yii\db\ActiveQuery
      */
     public function getRbacOperationPermissions()
     {
-        return $this->hasMany(RbacOperationPermission::className(), ['permission_id' => 'id']);
+        return $this->hasMany(RbacOperationPermission::class, ['permission_id' => 'id']);
     }
 
     /**
+     * 获取操作查询对像。
+     * 
      * @return \yii\db\ActiveQuery
      */
-    public function getOperations()
+    public function getRbacOperations()
     {
-        return $this->hasMany(RbacOperation::className(), ['id' => 'operation_id'])->viaTable('{{%rbac_operation_permission}}', ['permission_id' => 'id']);
+        return $this->hasMany(RbacOperation::class, ['id' => 'operation_id'])->viaTable(RbacOperationPermission::tableName(), ['permission_id' => 'id']);
     }
 
     /**
+     * 获取客户端查询对像。
+     * 
      * @return \yii\db\ActiveQuery
      */
-    public function getClient()
+    public function getRbacClient()
     {
-        return $this->hasOne(RbacClient::className(), ['id' => 'client_id']);
+        return $this->hasOne(RbacClient::class, ['id' => 'client_id']);
     }
 
     /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getRbacPermissionGroups()
-    {
-        return $this->hasMany(RbacPermissionGroup::className(), ['permission_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getGroups()
-    {
-        return $this->hasMany(RbacGroup::className(), ['id' => 'group_id'])->viaTable('{{%rbac_permission_group}}', ['permission_id' => 'id']);
-    }
-
-    /**
+     * 获取权限与角色关联查询对像。
+     * 
      * @return \yii\db\ActiveQuery
      */
     public function getRbacPermissionRoles()
     {
-        return $this->hasMany(RbacPermissionRole::className(), ['permission_id' => 'id']);
+        return $this->hasMany(RbacPermissionRole::class, ['permission_id' => 'id']);
     }
 
     /**
+     * 获取角色查询对像。
+     * 
      * @return \yii\db\ActiveQuery
      */
-    public function getRoles()
+    public function getRbacRoles()
     {
-        return $this->hasMany(RbacRole::className(), ['id' => 'role_id'])->viaTable('{{%rbac_permission_role}}', ['permission_id' => 'id']);
+        return $this->hasMany(RbacRole::class, ['id' => 'role_id'])->viaTable(RbacPermissionRole::tableName(), ['permission_id' => 'id']);
     }
 }

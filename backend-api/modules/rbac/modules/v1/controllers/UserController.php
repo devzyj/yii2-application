@@ -4,12 +4,25 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace apiRbacV1\controllers;
+namespace backendApiRbacV1\controllers;
 
 use Yii;
 use yii\helpers\ArrayHelper;
-use apiRbacV1\models\User;
-use apiRbacV1\models\UserSearch;
+use yii\data\ActiveDataFilter;
+use devzyj\rest\behaviors\EagerLoadingBehavior;
+use backendApiRbacV1\models\RbacUser;
+use backendApiRbacV1\models\RbacUserSearch;
+use backendApiRbacV1\models\RbacRole;
+use backendApiRbacV1\behaviors\QueryClientIdBehavior;
+use backendApiRbacV1\behaviors\QueryParamBehavior;
+use backendApiRbacV1\behaviors\QueryJoinWithBehavior;
+use backendApiRbacV1\behaviors\LoadClientIdBehavior;
+use backendApiRbacV1\actions\AssignAction;
+use backendApiRbacV1\actions\RemoveAction;
+use backendApiRbacV1\actions\AssignMultipleAction;
+use backendApiRbacV1\actions\RemoveMultipleAction;
+use backendApiRbacV1\actions\users\CheckOperationAction;
+use backendApiRbacV1\actions\users\CheckOperationsAction;
 
 /**
  * 用户控制器。
@@ -17,27 +30,27 @@ use apiRbacV1\models\UserSearch;
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
-class UserController extends \apiRbacV1\components\ActiveController
+class UserController extends \backendApiRbacV1\components\ActiveController
 {
     /**
      * {@inheritdoc}
      */
-    public $modelClass = User::class;
+    public $modelClass = RbacUser::class;
 
     /**
      * {@inheritdoc}
      */
-    public $searchModelClass = UserSearch::class;
+    public $searchModelClass = RbacUserSearch::class;
 
     /**
      * {@inheritdoc}
      */
-    public $createScenario = User::SCENARIO_INSERT;
+    public $createScenario = RbacUser::SCENARIO_INSERT;
     
     /**
      * {@inheritdoc}
      */
-    public $updateScenario = User::SCENARIO_UPDATE;
+    public $updateScenario = RbacUser::SCENARIO_UPDATE;
     
     /**
      * {@inheritdoc}
@@ -50,18 +63,18 @@ class UserController extends \apiRbacV1\components\ActiveController
         return ArrayHelper::merge(parent::actions(), [
             'index' => [
                 'dataFilter' => [
-                    'class' => 'yii\data\ActiveDataFilter',
+                    'class' => ActiveDataFilter::class,
                     'searchModel' => $searchModelClass,
                     'attributeMap' => $searchAttributeFieldMap,
                 ],
                 // 通过判断客户端类型，为查询对像添加 `client_id` 过滤条件的行为。
                 'as queryClientIdBehavior' => [
-                    'class' => 'apiRbacV1\components\behaviors\QueryClientIdBehavior',
+                    'class' => QueryClientIdBehavior::class,
                     'attribute' => $searchAttributeFieldMap['client_id'],
                 ],
                 // 为查询对像添加 URL 查询参数中的过滤条件的行为。
                 'as queryParamBehavior' => [
-                    'class' => 'apiRbacV1\components\behaviors\QueryParamBehavior',
+                    'class' => QueryParamBehavior::class,
                     'paramMap' => [
                         'clientid' => $searchAttributeFieldMap['client_id'],
                         'roleid' => $searchAttributeFieldMap['role_id'],
@@ -71,76 +84,76 @@ class UserController extends \apiRbacV1\components\ActiveController
                 ],
                 // 通过遍历查询条件中的数据表名，自动使用 [[joinWith()]]。
                 'as queryJoinWithBehavior' => [
-                    'class' => 'apiRbacV1\components\behaviors\QueryJoinWithBehavior',
+                    'class' => QueryJoinWithBehavior::class,
                 ],
                 // 即时加载指定的额外资源。
                 'as eagerLoadingBehavior' => [
-                    'class' => 'devzyj\rest\behaviors\EagerLoadingBehavior',
+                    'class' => EagerLoadingBehavior::class,
                 ],
             ],
             'create' => [
                 // 通过判断客户端类型，为数据模型加载适当的 `client_id` 的行为。
                 'as loadClientIdBehavior' => [
-                    'class' => 'apiRbacV1\components\behaviors\LoadClientIdBehavior',
+                    'class' => LoadClientIdBehavior::class,
                 ]
             ],
             'batch-create' => [
                 // 通过判断客户端类型，为数据模型加载适当的 `client_id` 的行为。
                 'as loadClientIdBehavior' => [
-                    'class' => 'apiRbacV1\components\behaviors\LoadClientIdBehavior',
+                    'class' => LoadClientIdBehavior::class,
                 ]
             ],
             'create-validate' => [
                 // 通过判断客户端类型，为数据模型加载适当的 `client_id` 的行为。
                 'as loadClientIdBehavior' => [
-                    'class' => 'apiRbacV1\components\behaviors\LoadClientIdBehavior',
+                    'class' => LoadClientIdBehavior::class,
                 ]
             ],
             // 分配角色。
             'assign-role' => [
-                'class' => 'apiRbacV1\components\actions\AssignAction',
+                'class' => AssignAction::class,
                 'modelClass' => $this->modelClass,
                 'checkActionAccess' => [$this, 'checkActionAccess'],
                 'checkModelAccess' => [$this, 'checkModelAccess'],
                 'notFoundMessage' => $this->notFoundMessage,
                 'notFoundCode' => $this->notFoundCode,
-                'relationName' => 'roles',
-                'relationModelClass' => 'apiRbacV1\models\Role',
+                'relationName' => 'rbacRoles',
+                'relationModelClass' => RbacRole::class,
             ],
             // 移除角色。
             'remove-role' => [
-                'class' => 'apiRbacV1\components\actions\RemoveAction',
+                'class' => RemoveAction::class,
                 'modelClass' => $this->modelClass,
                 'checkActionAccess' => [$this, 'checkActionAccess'],
                 'checkModelAccess' => [$this, 'checkModelAccess'],
                 'notFoundMessage' => $this->notFoundMessage,
                 'notFoundCode' => $this->notFoundCode,
-                'relationName' => 'roles',
+                'relationName' => 'rbacRoles',
             ],
             // 分配多个角色。
             'assign-roles' => [
-                'class' => 'apiRbacV1\components\actions\AssignMultipleAction',
+                'class' => AssignMultipleAction::class,
                 'modelClass' => $this->modelClass,
                 'checkActionAccess' => [$this, 'checkActionAccess'],
                 'checkModelAccess' => [$this, 'checkModelAccess'],
                 'notFoundMessage' => $this->notFoundMessage,
                 'notFoundCode' => $this->notFoundCode,
-                'relationName' => 'roles',
-                'relationModelClass' => 'apiRbacV1\models\Role',
+                'relationName' => 'rbacRoles',
+                'relationModelClass' => RbacRole::class,
             ],
             // 移除多个角色。
             'remove-roles' => [
-                'class' => 'apiRbacV1\components\actions\RemoveMultipleAction',
+                'class' => RemoveMultipleAction::class,
                 'modelClass' => $this->modelClass,
                 'checkActionAccess' => [$this, 'checkActionAccess'],
                 'checkModelAccess' => [$this, 'checkModelAccess'],
                 'notFoundMessage' => $this->notFoundMessage,
                 'notFoundCode' => $this->notFoundCode,
-                'relationName' => 'roles',
+                'relationName' => 'rbacRoles',
             ],
             // 检查操作。
             'check-operation' => [
-                'class' => 'apiRbacV1\components\actions\users\CheckOperationAction',
+                'class' => CheckOperationAction::class,
                 'modelClass' => $this->modelClass,
                 'checkActionAccess' => [$this, 'checkActionAccess'],
                 'checkModelAccess' => [$this, 'checkModelAccess'],
@@ -149,7 +162,7 @@ class UserController extends \apiRbacV1\components\ActiveController
             ],
             // 检查多个操作。
             'check-operations' => [
-                'class' => 'apiRbacV1\components\actions\users\CheckOperationsAction',
+                'class' => CheckOperationsAction::class,
                 'modelClass' => $this->modelClass,
                 'checkActionAccess' => [$this, 'checkActionAccess'],
                 'checkModelAccess' => [$this, 'checkModelAccess'],

@@ -21,7 +21,7 @@ $config = [
             ],
         ],
         'request' => [
-            'cookieValidationKey' => '',
+            'cookieValidationKey' => 'fssPsrBrJhag6a2kK-Pwu6QuxDtKo-mK',
         ],
     ],
     'modules' => [
@@ -38,7 +38,13 @@ $config = [
                     'templates' => [
                         'adminlte' => '@vendor/dmstr/yii2-adminlte-asset/gii/templates/crud/simple',
                     ]
-                ]
+                ],
+                'model' => [
+                    'class' => 'yii\gii\generators\model\Generator',
+                    'templates' => [
+                        'backend-1.0' => '@backend/gii/templates/model/default-1.0',
+                    ]
+                ],
             ],
         ]
     ],

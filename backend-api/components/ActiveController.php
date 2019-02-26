@@ -8,6 +8,7 @@ namespace backendApi\components;
 
 use Yii;
 use yii\helpers\ArrayHelper;
+use yii\web\ForbiddenHttpException;
 use backendApi\filters\ClientIpFilter;
 
 /**
@@ -37,6 +38,13 @@ class ActiveController extends \devzyj\rest\ActiveController
     public function behaviors()
     {
         return ArrayHelper::merge(parent::behaviors(), [
+            // 身份验证。
+            'authenticator' => [
+                'authMethods' => [
+                    'yii\filters\auth\HttpBearerAuth',
+                    'yii\filters\auth\QueryParamAuth',
+                ]
+            ],
             // 验证客户端 IP 是否被允许访问。
             'clientIpFilter' => [
                 'class' => ClientIpFilter::class,
@@ -66,5 +74,18 @@ class ActiveController extends \devzyj\rest\ActiveController
                 },
             ],
         ]);
+    }
+
+    /**
+     * {@inheritdoc}
+     * 
+     * @throws ForbiddenHttpException 客户端没有登录，或者没有访问权限。
+     */
+    public function checkActionAccess($action, $params = [])
+    {
+        /* @var $identity ClientIdentity */
+        if (!($user = Yii::$app->getUser()) || !($identity = $user->getIdentity(false)) || !$identity->checkAllowedApi($action->getUniqueId())) {
+            throw new ForbiddenHttpException('API limit.');
+        }
     }
 }

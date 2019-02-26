@@ -7,8 +7,9 @@
 namespace backendApi\components;
 
 use Yii;
-use yii\web\IdentityInterface;
 use yii\helpers\ArrayHelper;
+use yii\web\IdentityInterface;
+use backendApi\filters\ClientIpFilterInterface;
 use backendApi\models\OauthClient;
 use backendApi\models\OauthClientSetting;
 use backendApi\models\OauthScope;
@@ -24,7 +25,7 @@ use backendApi\models\OauthScope;
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
-class ClientIdentity extends OauthClient implements IdentityInterface
+class ClientIdentity extends OauthClient implements IdentityInterface, ClientIpFilterInterface
 {
     /**
      * @var array 访问令牌数据。
@@ -139,4 +140,13 @@ class ClientIdentity extends OauthClient implements IdentityInterface
      */
     public function validateAuthKey($authKey)
     {}
+    
+    /******************************* ClientIpFilterInterface *******************************/
+    /**
+     * {@inheritdoc}
+     */
+    public function checkAllowedClientIp($ip, $action, $request)
+    {
+        return $this->checkAllowedIp($ip);
+    }
 }

@@ -4,12 +4,23 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace apiRbacV1\controllers;
+namespace backendApiRbacV1\controllers;
 
 use Yii;
 use yii\helpers\ArrayHelper;
-use apiRbacV1\models\Operation;
-use apiRbacV1\models\OperationSearch;
+use yii\data\ActiveDataFilter;
+use devzyj\rest\behaviors\EagerLoadingBehavior;
+use backendApiRbacV1\models\RbacOperation;
+use backendApiRbacV1\models\RbacOperationSearch;
+use backendApiRbacV1\models\RbacPermission;
+use backendApiRbacV1\behaviors\QueryClientIdBehavior;
+use backendApiRbacV1\behaviors\QueryParamBehavior;
+use backendApiRbacV1\behaviors\QueryJoinWithBehavior;
+use backendApiRbacV1\behaviors\LoadClientIdBehavior;
+use backendApiRbacV1\actions\AssignAction;
+use backendApiRbacV1\actions\RemoveAction;
+use backendApiRbacV1\actions\AssignMultipleAction;
+use backendApiRbacV1\actions\RemoveMultipleAction;
 
 /**
  * 操作控制器。
@@ -17,27 +28,27 @@ use apiRbacV1\models\OperationSearch;
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
-class OperationController extends \apiRbacV1\components\ActiveController
+class OperationController extends \backendApiRbacV1\components\ActiveController
 {
     /**
      * {@inheritdoc}
      */
-    public $modelClass = Operation::class;
+    public $modelClass = RbacOperation::class;
 
     /**
      * {@inheritdoc}
      */
-    public $searchModelClass = OperationSearch::class;
+    public $searchModelClass = RbacOperationSearch::class;
     
     /**
      * {@inheritdoc}
      */
-    public $createScenario = Operation::SCENARIO_INSERT;
+    public $createScenario = RbacOperation::SCENARIO_INSERT;
     
     /**
      * {@inheritdoc}
      */
-    public $updateScenario = Operation::SCENARIO_UPDATE;
+    public $updateScenario = RbacOperation::SCENARIO_UPDATE;
     
     /**
      * {@inheritdoc}
@@ -50,18 +61,18 @@ class OperationController extends \apiRbacV1\components\ActiveController
         return ArrayHelper::merge(parent::actions(), [
             'index' => [
                 'dataFilter' => [
-                    'class' => 'yii\data\ActiveDataFilter',
+                    'class' => ActiveDataFilter::class,
                     'searchModel' => $searchModelClass,
                     'attributeMap' => $searchAttributeFieldMap,
                 ],
                 // 通过判断客户端类型，为查询对像添加 `client_id` 过滤条件的行为。
                 'as queryClientIdBehavior' => [
-                    'class' => 'apiRbacV1\components\behaviors\QueryClientIdBehavior',
+                    'class' => QueryClientIdBehavior::class,
                     'attribute' => $searchAttributeFieldMap['client_id'],
                 ],
                 // 为查询对像添加 URL 查询参数中的过滤条件的行为。
                 'as queryParamBehavior' => [
-                    'class' => 'apiRbacV1\components\behaviors\QueryParamBehavior',
+                    'class' => QueryParamBehavior::class,
                     'paramMap' => [
                         'clientid' => $searchAttributeFieldMap['client_id'],
                         'permissionid' => $searchAttributeFieldMap['permission_id'],
@@ -71,72 +82,72 @@ class OperationController extends \apiRbacV1\components\ActiveController
                 ],
                 // 通过遍历查询条件中的数据表名，自动使用 [[joinWith()]]。
                 'as queryJoinWithBehavior' => [
-                    'class' => 'apiRbacV1\components\behaviors\QueryJoinWithBehavior',
+                    'class' => QueryJoinWithBehavior::class,
                 ],
                 // 即时加载指定的额外资源。
                 'as eagerLoadingBehavior' => [
-                    'class' => 'devzyj\rest\behaviors\EagerLoadingBehavior',
+                    'class' => EagerLoadingBehavior::class,
                 ],
             ],
             'create' => [
                 // 通过判断客户端类型，为数据模型加载适当的 `client_id` 的行为。
                 'as loadClientIdBehavior' => [
-                    'class' => 'apiRbacV1\components\behaviors\LoadClientIdBehavior',
+                    'class' => LoadClientIdBehavior::class,
                 ]
             ],
             'batch-create' => [
                 // 通过判断客户端类型，为数据模型加载适当的 `client_id` 的行为。
                 'as loadClientIdBehavior' => [
-                    'class' => 'apiRbacV1\components\behaviors\LoadClientIdBehavior',
+                    'class' => LoadClientIdBehavior::class,
                 ]
             ],
             'create-validate' => [
                 // 通过判断客户端类型，为数据模型加载适当的 `client_id` 的行为。
                 'as loadClientIdBehavior' => [
-                    'class' => 'apiRbacV1\components\behaviors\LoadClientIdBehavior',
+                    'class' => LoadClientIdBehavior::class,
                 ]
             ],
             // 分配权限。
             'assign-permission' => [
-                'class' => 'apiRbacV1\components\actions\AssignAction',
+                'class' => AssignAction::class,
                 'modelClass' => $this->modelClass,
                 'checkActionAccess' => [$this, 'checkActionAccess'],
                 'checkModelAccess' => [$this, 'checkModelAccess'],
                 'notFoundMessage' => $this->notFoundMessage,
                 'notFoundCode' => $this->notFoundCode,
-                'relationName' => 'permissions',
-                'relationModelClass' => 'apiRbacV1\models\Permission',
+                'relationName' => 'rbacPermissions',
+                'relationModelClass' => RbacPermission::class,
             ],
             // 移除权限。
             'remove-permission' => [
-                'class' => 'apiRbacV1\components\actions\RemoveAction',
+                'class' => RemoveAction::class,
                 'modelClass' => $this->modelClass,
                 'checkActionAccess' => [$this, 'checkActionAccess'],
                 'checkModelAccess' => [$this, 'checkModelAccess'],
                 'notFoundMessage' => $this->notFoundMessage,
                 'notFoundCode' => $this->notFoundCode,
-                'relationName' => 'permissions',
+                'relationName' => 'rbacPermissions',
             ],
             // 分配多个权限。
             'assign-permissions' => [
-                'class' => 'apiRbacV1\components\actions\AssignMultipleAction',
+                'class' => AssignMultipleAction::class,
                 'modelClass' => $this->modelClass,
                 'checkActionAccess' => [$this, 'checkActionAccess'],
                 'checkModelAccess' => [$this, 'checkModelAccess'],
                 'notFoundMessage' => $this->notFoundMessage,
                 'notFoundCode' => $this->notFoundCode,
-                'relationName' => 'permissions',
-                'relationModelClass' => 'apiRbacV1\models\Permission',
+                'relationName' => 'rbacPermissions',
+                'relationModelClass' => RbacPermission::class,
             ],
             // 移除多个权限。
             'remove-permissions' => [
-                'class' => 'apiRbacV1\components\actions\RemoveMultipleAction',
+                'class' => RemoveMultipleAction::class,
                 'modelClass' => $this->modelClass,
                 'checkActionAccess' => [$this, 'checkActionAccess'],
                 'checkModelAccess' => [$this, 'checkModelAccess'],
                 'notFoundMessage' => $this->notFoundMessage,
                 'notFoundCode' => $this->notFoundCode,
-                'relationName' => 'permissions',
+                'relationName' => 'rbacPermissions',
             ],
         ]);
     }

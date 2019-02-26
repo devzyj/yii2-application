@@ -1,7 +1,7 @@
 <?php
 /**
  * @link https://github.com/devzyj/yii2-application
- * @copyright Copyright (c) 2018 Zhang Yan Jiong
+ * @copyright Copyright (c) 2019 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
 namespace backendApi\models;
@@ -18,18 +18,29 @@ use Yii;
  * @property string $type 类型
  * @property int $create_time 创建时间
  *
- * @property RbacGroup[] $rbacGroups
- * @property RbacMenu[] $rbacMenus
- * @property RbacOperation[] $rbacOperations
- * @property RbacPermission[] $rbacPermissions
- * @property RbacRole[] $rbacRoles
- * @property RbacUser[] $rbacUsers
+ * @property boolean $isNormal 是否为普通类型的客户端
+ * @property boolean $isManager 是否为管理类型的客户端
  * 
+ * @property RbacOperation[] $rbacOperations 操作
+ * @property RbacPermission[] $rbacPermissions 权限
+ * @property RbacRole[] $rbacRoles 角色
+ * @property RbacUser[] $rbacUsers 用户
+ *
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
 class RbacClient extends \yii\db\ActiveRecord
 {
+    /**
+     * @var string 普通类型的客户端。
+     */
+    const TYPE_NORMAL = 'NORMAL';
+    
+    /**
+     * @var string 管理类型的客户端。
+     */
+    const TYPE_MANAGER = 'MANAGER';
+    
     /**
      * {@inheritdoc}
      */
@@ -49,13 +60,29 @@ class RbacClient extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
+    public function behaviors()
+    {
+        return [
+            'timestampBehavior' => [
+                'class' => 'yii\behaviors\TimestampBehavior',
+                'createdAtAttribute' => 'create_time',
+                'updatedAtAttribute' => null,
+            ],
+        ];
+    }
+    
+    /**
+     * {@inheritdoc}
+     */
     public function rules()
     {
         return [
-            [['identifier', 'name', 'type', 'create_time'], 'required'],
-            [['create_time'], 'integer'],
-            [['identifier', 'type'], 'string', 'max' => 20],
+            // 默认值。
+            [['type'], 'default', 'value' => self::TYPE_NORMAL],
+            // 验证规则。
+            [['identifier', 'name', 'type'], 'required'],
             [['name'], 'string', 'max' => 50],
+            [['identifier', 'type'], 'string', 'max' => 20],
             [['description'], 'string', 'max' => 255],
             [['identifier'], 'unique'],
             [['name'], 'unique'],
@@ -78,50 +105,62 @@ class RbacClient extends \yii\db\ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getRbacGroups()
-    {
-        return $this->hasMany(RbacGroup::className(), ['client_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getRbacMenus()
-    {
-        return $this->hasMany(RbacMenu::className(), ['client_id' => 'id']);
-    }
-
-    /**
+     * 获取操作查询对像。
+     * 
      * @return \yii\db\ActiveQuery
      */
     public function getRbacOperations()
     {
-        return $this->hasMany(RbacOperation::className(), ['client_id' => 'id']);
+        return $this->hasMany(RbacOperation::class, ['client_id' => 'id']);
     }
 
     /**
+     * 获取权限查询对像。
+     * 
      * @return \yii\db\ActiveQuery
      */
     public function getRbacPermissions()
     {
-        return $this->hasMany(RbacPermission::className(), ['client_id' => 'id']);
+        return $this->hasMany(RbacPermission::class, ['client_id' => 'id']);
     }
 
     /**
+     * 获取角色查询对像。
+     * 
      * @return \yii\db\ActiveQuery
      */
     public function getRbacRoles()
     {
-        return $this->hasMany(RbacRole::className(), ['client_id' => 'id']);
+        return $this->hasMany(RbacRole::class, ['client_id' => 'id']);
     }
 
     /**
+     * 获取用户查询对像。
+     * 
      * @return \yii\db\ActiveQuery
      */
     public function getRbacUsers()
     {
-        return $this->hasMany(RbacUser::className(), ['client_id' => 'id']);
+        return $this->hasMany(RbacUser::class, ['client_id' => 'id']);
+    }
+    
+    /**
+     * 获取是否为普通类型的客户端。
+     * 
+     * @return boolean
+     */
+    public function getIsNormal()
+    {
+        return empty($this->type) || $this->type === self::TYPE_NORMAL;
+    }
+    
+    /**
+     * 获取是否为管理类型的客户端。
+     * 
+     * @return boolean
+     */
+    public function getIsManager()
+    {
+        return $this->type === self::TYPE_MANAGER;
     }
 }

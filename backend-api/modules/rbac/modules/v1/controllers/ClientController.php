@@ -4,43 +4,44 @@
  * @copyright Copyright (c) 2018 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace apiRbacV1\controllers;
+namespace backendApiRbacV1\controllers;
 
 use Yii;
 use yii\helpers\ArrayHelper;
-use yii\web\ForbiddenHttpException;
-use apiRbacV1\models\Client;
-use apiRbacV1\models\ClientSearch;
+use yii\data\ActiveDataFilter;
+use devzyj\rest\behaviors\EagerLoadingBehavior;
+use backendApiRbacV1\models\RbacClient;
+use backendApiRbacV1\models\RbacClientSearch;
+use backendApiRbacV1\behaviors\QueryClientIdBehavior;
+use backendApiRbacV1\behaviors\QueryJoinWithBehavior;
 
 /**
  * 客户端控制器。
  * 
- * 只允许`超级客户端`访问。
- * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
-class ClientController extends \apiRbacV1\components\ActiveController
+class ClientController extends \backendApiRbacV1\components\ActiveController
 {
     /**
      * {@inheritdoc}
      */
-    public $modelClass = Client::class;
+    public $modelClass = RbacClient::class;
 
     /**
      * {@inheritdoc}
      */
-    public $searchModelClass = ClientSearch::class;
+    public $searchModelClass = RbacClientSearch::class;
     
     /**
      * {@inheritdoc}
      */
-    public $createScenario = Client::SCENARIO_INSERT;
+    public $createScenario = RbacClient::SCENARIO_INSERT;
 
     /**
      * {@inheritdoc}
      */
-    public $updateScenario = Client::SCENARIO_UPDATE;
+    public $updateScenario = RbacClient::SCENARIO_UPDATE;
     
     /**
      * {@inheritdoc}
@@ -53,39 +54,24 @@ class ClientController extends \apiRbacV1\components\ActiveController
         return ArrayHelper::merge(parent::actions(), [
             'index' => [
                 'dataFilter' => [
-                    'class' => 'yii\data\ActiveDataFilter',
+                    'class' => ActiveDataFilter::class,
                     'searchModel' => $searchModelClass,
                     'attributeMap' => $searchAttributeFieldMap,
                 ],
                 // 通过判断客户端类型，为查询对像添加 `id` 过滤条件的行为。
                 'as queryClientIdBehavior' => [
-                    'class' => 'apiRbacV1\components\behaviors\QueryClientIdBehavior',
+                    'class' => QueryClientIdBehavior::class,
                     'attribute' => $searchAttributeFieldMap['id'],
                 ],
                 // 通过遍历查询条件中的数据表名，自动使用 [[joinWith()]]。
                 'as queryJoinWithBehavior' => [
-                    'class' => 'apiRbacV1\components\behaviors\QueryJoinWithBehavior',
+                    'class' => QueryJoinWithBehavior::class,
                 ],
                 // 即时加载指定的额外资源。
                 'as eagerLoadingBehavior' => [
-                    'class' => 'devzyj\rest\behaviors\EagerLoadingBehavior',
+                    'class' => EagerLoadingBehavior::class,
                 ],
             ],
         ]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function checkActionAccess($action, $params = [])
-    {
-        parent::checkActionAccess($action, $params);
-
-        /* @var $identity \apiRbacV1\components\Identity */
-        if (!($user = Yii::$app->getUser()) || !($identity = $user->getIdentity(false)) 
-                || !($client = $identity->getRbacClient()) || !$client->getIsSuper()) {
-            // 只有超级客户端才能访问。
-            throw new ForbiddenHttpException('Only super client can access.');
-        }
     }
 }

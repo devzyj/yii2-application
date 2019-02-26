@@ -34,7 +34,7 @@ class m190225_094659_rbac_initial extends Migration
         // create table: rbac_client
         $this->createTable($this->tables['rbac_client'], [
             'id' => $this->primaryKey(10)->unsigned()->comment('ID'),
-            'identifier' => $this->string(20)->notNull()->unique()->comment('授权客户端标识'),
+            'identifier' => $this->string(255)->notNull()->unique()->comment('授权客户端标识'),
             'name' => $this->string(50)->notNull()->unique()->comment('名称'),
             'description' => $this->string(255)->notNull()->defaultValue('')->comment('描述'),
             'type' => $this->string(20)->notNull()->comment('类型'),
@@ -134,9 +134,9 @@ class m190225_094659_rbac_initial extends Migration
 
         // insert rows: rbac_client
         $this->insert($this->tables['rbac_client'], [
-            'identifier' => 'f4c22926e400ebca',
+            'identifier' => 1,
             'name' => '后台管理系统',
-            'description' => '后台管理系统',
+            'description' => '关联 `授权客户端` 中 id = 1 的记录',
             'type' => 'MANAGER',
             'create_time' => time(),
         ]);
@@ -144,8 +144,8 @@ class m190225_094659_rbac_initial extends Migration
         // insert rows: rbac_user
         $this->insert($this->tables['rbac_user'], [
             'client_id' => 1,
-            'identifier' => 'admin',
-            'description' => '后台管理员',
+            'identifier' => 1,
+            'description' => '关联 `后台管理员` 中 id = 1 的记录',
             'create_time' => time(),
         ]);
     }

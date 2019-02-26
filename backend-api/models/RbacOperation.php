@@ -1,12 +1,13 @@
 <?php
 /**
  * @link https://github.com/devzyj/yii2-application
- * @copyright Copyright (c) 2018 Zhang Yan Jiong
+ * @copyright Copyright (c) 2019 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
 namespace backendApi\models;
 
 use Yii;
+use backendApi\validators\rbac\OperationCodeValidator;
 
 /**
  * This is the model class for table "{{%rbac_operation}}".
@@ -20,15 +21,25 @@ use Yii;
  * @property int $status 状态（0=禁用；1=可用）
  * @property string $data 额外数据
  *
- * @property RbacClient $client
- * @property RbacOperationPermission[] $rbacOperationPermissions
- * @property RbacPermission[] $permissions
- * 
+ * @property RbacClient $rbacClient 客户端
+ * @property RbacOperationPermission[] $rbacOperationPermissions 操作与权限关联数据
+ * @property RbacPermission[] $rbacPermissions 权限
+ *
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
 class RbacOperation extends \yii\db\ActiveRecord
 {
+    /**
+     * @var integer 状态 - 禁用的。
+     */
+    const STATUS_DISABLED = 0;
+
+    /**
+     * @var integer 状态 - 启用的。
+     */
+    const STATUS_ENABLED = 1;
+    
     /**
      * {@inheritdoc}
      */
@@ -48,17 +59,37 @@ class RbacOperation extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
+    public function behaviors()
+    {
+        return [
+            'timestampBehavior' => [
+                'class' => 'yii\behaviors\TimestampBehavior',
+                'createdAtAttribute' => 'create_time',
+                'updatedAtAttribute' => null,
+            ],
+        ];
+    }
+    
+    /**
+     * {@inheritdoc}
+     */
     public function rules()
     {
         return [
-            [['client_id', 'code', 'name', 'create_time', 'data'], 'required'],
-            [['client_id', 'create_time', 'status'], 'integer'],
-            [['data'], 'string'],
+            // 过滤和处理数据。
+            [['code'], 'filter', 'filter' => 'strtolower'],
+            [['data'], 'default', 'value' => ''],
+            // 验证规则。
+            [['client_id', 'code', 'name'], 'required'],
+            [['client_id'], 'integer'],
+            [['code'], OperationCodeValidator::class],
             [['code', 'description'], 'string', 'max' => 255],
             [['name'], 'string', 'max' => 50],
-            [['client_id', 'code'], 'unique', 'targetAttribute' => ['client_id', 'code']],
-            [['client_id', 'name'], 'unique', 'targetAttribute' => ['client_id', 'name']],
-            [['client_id'], 'exist', 'skipOnError' => true, 'targetClass' => RbacClient::className(), 'targetAttribute' => ['client_id' => 'id']],
+            [['data'], 'string', 'max' => 5000],
+            [['status'], 'boolean'],
+            [['code'], 'unique', 'targetAttribute' => ['client_id', 'code']],
+            [['name'], 'unique', 'targetAttribute' => ['client_id', 'name']],
+            [['client_id'], 'exist', 'skipOnError' => true, 'targetClass' => RbacClient::class, 'targetAttribute' => ['client_id' => 'id']],
         ];
     }
 
@@ -80,26 +111,32 @@ class RbacOperation extends \yii\db\ActiveRecord
     }
 
     /**
+     * 获取客户端查询对像。
+     * 
      * @return \yii\db\ActiveQuery
      */
-    public function getClient()
+    public function getRbacClient()
     {
-        return $this->hasOne(RbacClient::className(), ['id' => 'client_id']);
+        return $this->hasOne(RbacClient::class, ['id' => 'client_id']);
     }
 
     /**
+     * 获取操作与权限关联查询对像。
+     * 
      * @return \yii\db\ActiveQuery
      */
     public function getRbacOperationPermissions()
     {
-        return $this->hasMany(RbacOperationPermission::className(), ['operation_id' => 'id']);
+        return $this->hasMany(RbacOperationPermission::class, ['operation_id' => 'id']);
     }
 
     /**
+     * 获取权限查询对像。
+     * 
      * @return \yii\db\ActiveQuery
      */
-    public function getPermissions()
+    public function getRbacPermissions()
     {
-        return $this->hasMany(RbacPermission::className(), ['id' => 'permission_id'])->viaTable('{{%rbac_operation_permission}}', ['operation_id' => 'id']);
+        return $this->hasMany(RbacPermission::class, ['id' => 'permission_id'])->viaTable(RbacOperationPermission::tableName(), ['operation_id' => 'id']);
     }
 }

@@ -1,7 +1,7 @@
 <?php
 /**
  * @link https://github.com/devzyj/yii2-application
- * @copyright Copyright (c) 2018 Zhang Yan Jiong
+ * @copyright Copyright (c) 2019 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
 namespace backendApi\models;
@@ -15,9 +15,9 @@ use Yii;
  * @property int $role_id 角色 ID
  * @property int $create_time 创建时间
  *
- * @property RbacRole $role
- * @property RbacPermission $permission
- * 
+ * @property RbacRole $rbacRole 角色
+ * @property RbacPermission $rbacPermission 权限
+ *
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
@@ -42,14 +42,28 @@ class RbacPermissionRole extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
+    public function behaviors()
+    {
+        return [
+            'timestampBehavior' => [
+                'class' => 'yii\behaviors\TimestampBehavior',
+                'createdAtAttribute' => 'create_time',
+                'updatedAtAttribute' => null,
+            ],
+        ];
+    }
+    
+    /**
+     * {@inheritdoc}
+     */
     public function rules()
     {
         return [
-            [['permission_id', 'role_id', 'create_time'], 'required'],
-            [['permission_id', 'role_id', 'create_time'], 'integer'],
+            [['permission_id', 'role_id'], 'required'],
+            [['permission_id', 'role_id'], 'integer'],
             [['permission_id', 'role_id'], 'unique', 'targetAttribute' => ['permission_id', 'role_id']],
-            [['role_id'], 'exist', 'skipOnError' => true, 'targetClass' => RbacRole::className(), 'targetAttribute' => ['role_id' => 'id']],
-            [['permission_id'], 'exist', 'skipOnError' => true, 'targetClass' => RbacPermission::className(), 'targetAttribute' => ['permission_id' => 'id']],
+            [['permission_id'], 'exist', 'skipOnError' => true, 'targetClass' => RbacPermission::class, 'targetAttribute' => ['permission_id' => 'id']],
+            [['role_id'], 'exist', 'skipOnError' => true, 'targetClass' => RbacRole::class, 'targetAttribute' => ['role_id' => 'id']],
         ];
     }
 
@@ -66,18 +80,22 @@ class RbacPermissionRole extends \yii\db\ActiveRecord
     }
 
     /**
+     * 获取角色查询对像。
+     * 
      * @return \yii\db\ActiveQuery
      */
-    public function getRole()
+    public function getRbacRole()
     {
-        return $this->hasOne(RbacRole::className(), ['id' => 'role_id']);
+        return $this->hasOne(RbacRole::class, ['id' => 'role_id']);
     }
 
     /**
+     * 获取权限查询对像。
+     * 
      * @return \yii\db\ActiveQuery
      */
-    public function getPermission()
+    public function getRbacPermission()
     {
-        return $this->hasOne(RbacPermission::className(), ['id' => 'permission_id']);
+        return $this->hasOne(RbacPermission::class, ['id' => 'permission_id']);
     }
 }

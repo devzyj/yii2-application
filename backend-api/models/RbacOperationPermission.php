@@ -1,7 +1,7 @@
 <?php
 /**
  * @link https://github.com/devzyj/yii2-application
- * @copyright Copyright (c) 2018 Zhang Yan Jiong
+ * @copyright Copyright (c) 2019 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
 namespace backendApi\models;
@@ -15,9 +15,9 @@ use Yii;
  * @property int $permission_id 权限 ID
  * @property int $create_time 创建时间
  *
- * @property RbacPermission $permission
- * @property RbacOperation $operation
- * 
+ * @property RbacPermission $rbacPermission 权限
+ * @property RbacOperation $rbacOperation 操作
+ *
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
@@ -42,14 +42,28 @@ class RbacOperationPermission extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
+    public function behaviors()
+    {
+        return [
+            'timestampBehavior' => [
+                'class' => 'yii\behaviors\TimestampBehavior',
+                'createdAtAttribute' => 'create_time',
+                'updatedAtAttribute' => null,
+            ],
+        ];
+    }
+    
+    /**
+     * {@inheritdoc}
+     */
     public function rules()
     {
         return [
-            [['operation_id', 'permission_id', 'create_time'], 'required'],
-            [['operation_id', 'permission_id', 'create_time'], 'integer'],
+            [['operation_id', 'permission_id'], 'required'],
+            [['operation_id', 'permission_id'], 'integer'],
             [['operation_id', 'permission_id'], 'unique', 'targetAttribute' => ['operation_id', 'permission_id']],
-            [['permission_id'], 'exist', 'skipOnError' => true, 'targetClass' => RbacPermission::className(), 'targetAttribute' => ['permission_id' => 'id']],
-            [['operation_id'], 'exist', 'skipOnError' => true, 'targetClass' => RbacOperation::className(), 'targetAttribute' => ['operation_id' => 'id']],
+            [['operation_id'], 'exist', 'skipOnError' => true, 'targetClass' => RbacOperation::class, 'targetAttribute' => ['operation_id' => 'id']],
+            [['permission_id'], 'exist', 'skipOnError' => true, 'targetClass' => RbacPermission::class, 'targetAttribute' => ['permission_id' => 'id']],
         ];
     }
 
@@ -66,18 +80,22 @@ class RbacOperationPermission extends \yii\db\ActiveRecord
     }
 
     /**
+     * 获取权限查询对像。
+     * 
      * @return \yii\db\ActiveQuery
      */
-    public function getPermission()
+    public function getRbacPermission()
     {
-        return $this->hasOne(RbacPermission::className(), ['id' => 'permission_id']);
+        return $this->hasOne(RbacPermission::class, ['id' => 'permission_id']);
     }
 
     /**
+     * 获取操作查询对像。
+     * 
      * @return \yii\db\ActiveQuery
      */
-    public function getOperation()
+    public function getRbacOperation()
     {
-        return $this->hasOne(RbacOperation::className(), ['id' => 'operation_id']);
+        return $this->hasOne(RbacOperation::class, ['id' => 'operation_id']);
     }
 }

@@ -21,6 +21,7 @@ $config = [
             ],
         ],
         'oauth2',
+        'rbac/v1',
         'v1',
     ],
     'components' => [
@@ -71,6 +72,14 @@ $config = [
             'defaultScopes' => ['basic'],
             'validateAccessTokenQueryParam' => 'access-token',
             'userRepositoryClass' => 'backendApi\models\oauth2\UserRepository',
+        ],
+        'rbac' => [
+            'class' => 'backendApiRbac\Module',
+            'modules' => [
+                'v1' => [
+                    'class' => 'backendApiRbacV1\Module',
+                ],
+            ],
         ],
         'v1' => [
             'class' => 'backendApiV1\Module',
