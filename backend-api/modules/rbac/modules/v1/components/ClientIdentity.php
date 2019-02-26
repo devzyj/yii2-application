@@ -32,7 +32,7 @@ class ClientIdentity extends \backendApi\components\ClientIdentity
     public function getRbacClient()
     {
         if ($this->_rbacClient === false) {
-            $this->_rbacClient = RbacClient::findOne(['identifier' => $this->identifier]);
+            $this->_rbacClient = RbacClient::findOne(['identifier' => $this->getPrimaryKey()]);
         }
         
         return $this->_rbacClient;
