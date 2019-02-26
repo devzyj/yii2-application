@@ -81,9 +81,9 @@ class RbacClient extends \yii\db\ActiveRecord
             [['type'], 'default', 'value' => self::TYPE_NORMAL],
             // 验证规则。
             [['identifier', 'name', 'type'], 'required'],
+            [['identifier', 'description'], 'string', 'max' => 255],
             [['name'], 'string', 'max' => 50],
-            [['identifier', 'type'], 'string', 'max' => 20],
-            [['description'], 'string', 'max' => 255],
+            [['type'], 'string', 'max' => 20],
             [['identifier'], 'unique'],
             [['name'], 'unique'],
         ];
