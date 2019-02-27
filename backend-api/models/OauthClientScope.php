@@ -29,7 +29,7 @@ class OauthClientScope extends DevzyjOauthClientScope
     }
     
     /**
-     * @return \yii\db\ActiveQuery
+     * {@inheritdoc}
      */
     public function getOauthScope()
     {
@@ -37,7 +37,7 @@ class OauthClientScope extends DevzyjOauthClientScope
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * {@inheritdoc}
      */
     public function getOauthClient()
     {

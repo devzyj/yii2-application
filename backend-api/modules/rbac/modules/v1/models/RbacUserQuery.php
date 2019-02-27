@@ -31,7 +31,7 @@ class RbacUserQuery extends \yii\db\ActiveQuery
     /**
      * {@inheritdoc}
      * 
-     * @return User[]|array
+     * @return RbacUser[]|array
      */
     public function all($db = null)
     {
@@ -41,7 +41,7 @@ class RbacUserQuery extends \yii\db\ActiveQuery
     /**
      * {@inheritdoc}
      * 
-     * @return User|array|null
+     * @return RbacUser|array|null
      */
     public function one($db = null)
     {

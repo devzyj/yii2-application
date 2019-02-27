@@ -4,22 +4,22 @@
  * @copyright Copyright (c) 2019 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace backendApiRbacV1\models;
+namespace backendApiOauthV1\models;
 
 /**
- * This is the ActiveQuery class for [[RbacClient]].
+ * This is the ActiveQuery class for [[OauthClient]].
  * 
- * @see RbacClient
+ * @see OauthClient
  * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
-class RbacClientQuery extends \yii\db\ActiveQuery
+class OauthClientQuery extends \yii\db\ActiveQuery
 {
     /**
      * {@inheritdoc}
      * 
-     * @return RbacClient[]|array
+     * @return OauthClient[]|array
      */
     public function all($db = null)
     {
@@ -29,7 +29,7 @@ class RbacClientQuery extends \yii\db\ActiveQuery
     /**
      * {@inheritdoc}
      * 
-     * @return RbacClient|array|null
+     * @return OauthClient|array|null
      */
     public function one($db = null)
     {

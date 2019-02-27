@@ -12,6 +12,9 @@ $config = [
     'language' => 'zh-CN',
     'bootstrap'=> ['debug', 'gii'],
     'components' => [
+        'request' => [
+            'cookieValidationKey' => '',
+        ],
         'log' => [
             'targets' => [
                 [
@@ -19,9 +22,6 @@ $config = [
                     'logFile' => '@runtime/logs/app-dev.log',
                 ],
             ],
-        ],
-        'request' => [
-            'cookieValidationKey' => 'fssPsrBrJhag6a2kK-Pwu6QuxDtKo-mK',
         ],
     ],
     'modules' => [

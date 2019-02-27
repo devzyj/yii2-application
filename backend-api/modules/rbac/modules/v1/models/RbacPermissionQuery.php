@@ -65,7 +65,7 @@ class RbacPermissionQuery extends \yii\db\ActiveQuery
     /**
      * {@inheritdoc}
      * 
-     * @return Permission[]|array
+     * @return RbacPermission[]|array
      */
     public function all($db = null)
     {
@@ -75,7 +75,7 @@ class RbacPermissionQuery extends \yii\db\ActiveQuery
     /**
      * {@inheritdoc}
      * 
-     * @return Permission|array|null
+     * @return RbacPermission|array|null
      */
     public function one($db = null)
     {

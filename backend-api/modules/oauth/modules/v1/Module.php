@@ -4,14 +4,14 @@
  * @copyright Copyright (c) 2019 Zhang Yan Jiong
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
-namespace backendApiRbacV1;
+namespace backendApiOauthV1;
 
 use Yii;
 use backendApi\traits\ModuleLogTrait;
-use backendApiRbacV1\components\ClientIdentity;
+use backendApiOauthV1\components\ClientIdentity;
 
 /**
- * rbac v1 接口模块。
+ * oauth v1 接口模块。
  * 
  * @property \yii\log\Dispatcher $log 模块日志组件。
  * 

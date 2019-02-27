@@ -65,7 +65,7 @@ class RbacOperationQuery extends \yii\db\ActiveQuery
     /**
      * {@inheritdoc}
      * 
-     * @return Operation[]|array
+     * @return RbacOperation[]|array
      */
     public function all($db = null)
     {
@@ -75,7 +75,7 @@ class RbacOperationQuery extends \yii\db\ActiveQuery
     /**
      * {@inheritdoc}
      * 
-     * @return Operation|array|null
+     * @return RbacOperation|array|null
      */
     public function one($db = null)
     {

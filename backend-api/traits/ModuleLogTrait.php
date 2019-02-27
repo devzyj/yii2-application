@@ -8,6 +8,8 @@ namespace backendApi\traits;
 
 use Yii;
 use yii\log\Dispatcher;
+use yii\log\Logger;
+use yii\log\FileTarget;
 use backendApi\behaviors\LogResponseBehavior;
 
 /**
@@ -36,11 +38,11 @@ trait ModuleLogTrait
     protected function setLog()
     {
         $this->set('log', [
-            'class' => 'yii\log\Dispatcher',
-            'logger' => 'yii\log\Logger',
+            'class' => Dispatcher::class,
+            'logger' => Logger::class,
             'targets' => [
                 [
-                    'class' => 'yii\log\FileTarget',
+                    'class' => FileTarget::class,
                     'logFile' => "@runtime/logs/modules/{$this->getUniqueId()}.log",
                     'microtime' => true,
                     'logVars' => []

@@ -69,7 +69,7 @@ class OauthClientSetting extends \yii\db\ActiveRecord
     }
 
     /**
-     * 获取管理员。
+     * 获取管理员查询对像。
      * 
      * @return \yii\db\ActiveQuery
      */
@@ -79,7 +79,7 @@ class OauthClientSetting extends \yii\db\ActiveRecord
     }
 
     /**
-     * 获取客户端。
+     * 获取客户端查询对像。
      * 
      * @return \yii\db\ActiveQuery
      */

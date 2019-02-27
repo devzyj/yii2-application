@@ -8,6 +8,7 @@ namespace backendApiV1;
 
 use Yii;
 use backendApi\traits\ModuleLogTrait;
+use backendApiV1\components\ClientIdentity;
 
 /**
  * v1 接口模块。
@@ -56,7 +57,7 @@ class Module extends \yii\base\Module implements \yii\base\BootstrapInterface
         // 设置身份认证类。
         Yii::$app->set('user', [
             'class' => 'yii\web\User',
-            'identityClass' => 'backendApiV1\components\ClientIdentity',
+            'identityClass' => ClientIdentity::class,
             'enableSession' => false,
             'loginUrl' => null,
         ]);

@@ -5,10 +5,19 @@
  * @license http://opensource.org/licenses/BSD-3-Clause
  */
 
+use yii\web\Response;
+
 /**
  * dev configuration.
  */
 $config = [
+    'bootstrap' => [
+        'contentNegotiator' => [
+            'formats' => [
+                'text/html' => Response::FORMAT_HTML,
+            ],
+        ],
+    ],
     'components' => [
         'log' => [
             'targets' => [
@@ -21,11 +30,27 @@ $config = [
         'urlManager' => [
             'rules' => [
                 '/' => 'site/index',
+                '/oauth2/demo/login' => '/oauth2/demo/login',
+                '/oauth2/demo/authorization' => '/oauth2/demo/authorization',
+                '/oauth2/demo/logout' => '/oauth2/demo/logout',
             ],
         ],
-        'oauthClient' => [
-            'class' => 'yii\httpclient\Client',
-            'baseUrl' => 'http://auth.backend.application.yii2.devzyj.zyj/oauth2',
+    ],
+    'modules' => [
+        'oauth2' => [
+            'user' => [
+                'class' => 'yii\web\User',
+                'identityClass' => 'backendApi\models\oauth2\DemoUserIdentity',
+            ],
+            'loginUrl' => ['/oauth2/demo/login'],
+            'authorizationUrl' => ['/oauth2/demo/authorization'],
+            'controllerMap' => [
+                'demo' => 'devzyj\yii2\oauth2\server\demos\controllers\DemoController',
+            ],
+            'classMap' => [
+                'devzyj\yii2\oauth2\server\demos\models\DemoLoginForm' => 'backendApi\models\oauth2\DemoLoginForm',
+                'devzyj\yii2\oauth2\server\demos\models\DemoAuthorizationForm' => 'backendApi\models\oauth2\DemoAuthorizationForm',
+            ],
         ],
     ],
 ];

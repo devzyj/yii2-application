@@ -9,4 +9,14 @@
  * prod configuration.
  */
 return [
+    'modules' => [
+        'oauth2' => [
+            'user' => [
+                'class' => 'yii\web\User',
+                'identityClass' => '',
+            ],
+            'loginUrl' => [],
+            'authorizationUrl' => [],
+        ],
+    ],
 ];

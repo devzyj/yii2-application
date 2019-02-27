@@ -30,7 +30,7 @@ class OauthScope extends DevzyjOauthScope
     }
     
     /**
-     * @return \yii\db\ActiveQuery
+     * {@inheritdoc}
      */
     public function getOauthClientScopes()
     {
@@ -38,9 +38,7 @@ class OauthScope extends DevzyjOauthScope
     }
 
     /**
-     * 获取客户端。
-     * 
-     * @return \yii\db\ActiveQuery
+     * {@inheritdoc}
      */
     public function getOauthClients()
     {
@@ -48,7 +46,7 @@ class OauthScope extends DevzyjOauthScope
     }
     
     /**
-     * 获取权限内容。
+     * 获取权限内容查询对像。
      * 
      * @return \yii\db\ActiveQuery
      */

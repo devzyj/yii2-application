@@ -109,7 +109,9 @@ class ClientIdentity extends OauthClient implements IdentityInterface, ClientIpF
      * {@inheritdoc}
      */
     public static function findIdentity($id)
-    {}
+    {
+        return static::findOne($id);
+    }
 
     /**
      * {@inheritdoc}

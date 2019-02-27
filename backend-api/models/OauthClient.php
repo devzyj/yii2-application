@@ -7,6 +7,8 @@
 namespace backendApi\models;
 
 use Yii;
+use yii\helpers\ArrayHelper;
+use yii\behaviors\AttributesBehavior;
 use devzyj\yii2\oauth2\server\models\OauthClient as DevzyjOauthClient;
 
 /**
@@ -29,9 +31,32 @@ class OauthClient extends DevzyjOauthClient
     {
         return Yii::$app->get('db_backend');
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function behaviors()
+    {
+        return ArrayHelper::merge(parent::behaviors(), [
+            'attributesBehavior' => [
+                'class' => AttributesBehavior::class,
+                'preserveNonEmptyValues' => true,
+                'attributes' => [
+                    'identifier' => [
+                        self::EVENT_BEFORE_INSERT => $fn = [static::class, 'generateIdentifier'],
+                        self::EVENT_BEFORE_UPDATE => $fn,
+                    ],
+                    'secret' => [
+                        self::EVENT_BEFORE_INSERT => $fn = [static::class, 'generateSecret'],
+                        self::EVENT_BEFORE_UPDATE => $fn,
+                    ],
+                ],
+            ],
+        ]);
+    }
     
     /**
-     * @return \yii\db\ActiveQuery
+     * {@inheritdoc}
      */
     public function getOauthClientScopes()
     {
@@ -39,9 +64,7 @@ class OauthClient extends DevzyjOauthClient
     }
     
     /**
-     * 获取客户端的权限。
-     * 
-     * @return \yii\db\ActiveQuery
+     * {@inheritdoc}
      */
     public function getOauthScopes()
     {
@@ -49,9 +72,7 @@ class OauthClient extends DevzyjOauthClient
     }
 
     /**
-     * 获取客户端的默认权限。
-     * 
-     * @return \yii\db\ActiveQuery
+     * {@inheritdoc}
      */
     public function getDefaultOauthScopes()
     {
@@ -61,7 +82,7 @@ class OauthClient extends DevzyjOauthClient
     }
     
     /**
-     * 获取客户端配置。
+     * 获取客户端配置查询对像。
      * 
      * @return \yii\db\ActiveQuery
      */
@@ -70,6 +91,34 @@ class OauthClient extends DevzyjOauthClient
         return $this->hasOne(OauthClientSetting::class, ['client_id' => 'id']);
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public static function findOneByIdentifier($identifier)
+    {
+        return static::findOne(['identifier' => $identifier]);
+    }
+
+    /**
+     * 生成客户端标识。
+     *
+     * @return string
+     */
+    public static function generateIdentifier()
+    {
+        return substr(md5(microtime().rand(1000, 9999)), 8, 16);
+    }
+    
+    /**
+     * 生成客户端密钥。
+     *
+     * @return string
+     */
+    public static function generateSecret()
+    {
+        return md5(microtime().rand(1000, 9999));
+    }
+    
     /**
      * 检查  IP 是否被允许。
      * 

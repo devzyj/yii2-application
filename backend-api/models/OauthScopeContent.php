@@ -65,7 +65,7 @@ class OauthScopeContent extends \yii\db\ActiveRecord
     }
 
     /**
-     * 获取权限。
+     * 获取权限查询对像。
      * 
      * @return \yii\db\ActiveQuery
      */

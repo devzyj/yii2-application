@@ -7,5 +7,8 @@
 
 Yii::setAlias('@backendApiV1', '@backendApi/modules/v1');
 
+Yii::setAlias('@backendApiOauth', '@backendApi/modules/oauth');
+Yii::setAlias('@backendApiOauthV1', '@backendApiOauth/modules/v1');
+
 Yii::setAlias('@backendApiRbac', '@backendApi/modules/rbac');
 Yii::setAlias('@backendApiRbacV1', '@backendApiRbac/modules/v1');

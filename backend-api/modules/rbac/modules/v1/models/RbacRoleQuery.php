@@ -65,7 +65,7 @@ class RbacRoleQuery extends \yii\db\ActiveQuery
     /**
      * {@inheritdoc}
      * 
-     * @return Role[]|array
+     * @return RbacRole[]|array
      */
     public function all($db = null)
     {
@@ -75,7 +75,7 @@ class RbacRoleQuery extends \yii\db\ActiveQuery
     /**
      * {@inheritdoc}
      * 
-     * @return Role|array|null
+     * @return RbacRole|array|null
      */
     public function one($db = null)
     {

@@ -80,7 +80,7 @@ class AdminLoginLog extends \yii\db\ActiveRecord
     }
 
     /**
-     * 获取管理员。
+     * 获取管理员查询对像。
      * 
      * @return \yii\db\ActiveQuery
      */
