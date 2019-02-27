@@ -50,6 +50,15 @@ $config = [
             'classMap' => [
                 'devzyj\yii2\oauth2\server\demos\models\DemoLoginForm' => 'backendApi\models\oauth2\DemoLoginForm',
                 'devzyj\yii2\oauth2\server\demos\models\DemoAuthorizationForm' => 'backendApi\models\oauth2\DemoAuthorizationForm',
+                'devzyj\oauth2\server\authorizes\CodeAuthorize' => [
+                    'class' => 'devzyj\oauth2\server\authorizes\CodeAuthorize',
+                    'enableCodeChallenge' => true,
+                    'defaultCodeChallengeMethod' => 'S256',
+                ],
+                'devzyj\oauth2\server\grants\AuthorizationCodeGrant' => [
+                    'class' => 'devzyj\oauth2\server\grants\AuthorizationCodeGrant',
+                    'enableCodeChallenge' => true,
+                ],
             ],
         ],
     ],

@@ -34,7 +34,7 @@ class m999999_000000_demo_data_initial extends Migration
     {
         // update rows: oauth_client
         $this->update($this->tables['oauth_client'], [
-            'redirect_uri' => 'http://backend.application.yii2.devzyj.zyj/test/oauth-callback',
+            'redirect_uri' => 'http://api.backend.application.yii2.devzyj.zyj/demo/oauth/callback',
             'access_token_duration' => 86400,
         ], ['id' => 1]);
         
