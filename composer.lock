@@ -443,12 +443,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/devzyj/php-oauth2-server.git",
-                "reference": "2177cb385bace034f4fa71b038ff494433b504e2"
+                "reference": "3bd1b4f472b5ab4bd3ce8d23d87bc7f76092611c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/devzyj/php-oauth2-server/zipball/2177cb385bace034f4fa71b038ff494433b504e2",
-                "reference": "2177cb385bace034f4fa71b038ff494433b504e2",
+                "url": "https://api.github.com/repos/devzyj/php-oauth2-server/zipball/3bd1b4f472b5ab4bd3ce8d23d87bc7f76092611c",
+                "reference": "3bd1b4f472b5ab4bd3ce8d23d87bc7f76092611c",
                 "shasum": ""
             },
             "require": {
@@ -478,7 +478,7 @@
                 "oauth",
                 "oauth2"
             ],
-            "time": "2019-02-27T09:29:04+00:00"
+            "time": "2019-02-27T09:33:15+00:00"
         },
         {
             "name": "devzyj/yii2-attribute-cache-behavior",

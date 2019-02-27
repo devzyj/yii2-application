@@ -7,6 +7,7 @@
 namespace backendApi\controllers;
 
 use Yii;
+use yii\helpers\Html;
 
 /**
  * Site controller.
@@ -20,6 +21,7 @@ class SiteController extends \yii\web\Controller
      */
     public function actionIndex()
     {
-        return Yii::$app->id . ' index page.';
+        $content[] = Html::a('授权演示', ['/demo/oauth'], ['target' => '_blank']);
+        return implode(' | ', $content);
     }
 }
