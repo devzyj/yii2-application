@@ -21,7 +21,7 @@ class TestController extends \yii\web\Controller
         $params = [
             'response_type' => '', 
             'client_id' => 'f4c22926e400ebca', 
-            'scope' => 'basic', 
+            'scope' => 'any', 
             'state' => 'abc123',
             'redirect_uri' => Url::toRoute('/test/oauth-callback', true),
         ];
