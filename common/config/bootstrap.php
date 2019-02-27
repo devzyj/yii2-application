@@ -18,9 +18,4 @@ Yii::setAlias('@frontend', '@application/frontend');
 
 
 
-
-
-Yii::setAlias('@api', '@application/api');
-Yii::setAlias('@devjerry', '@application/devjerry');
-Yii::setAlias('@devjerry/oauth2/server', '@devjerry/php-oauth2-server');
-Yii::setAlias('@devjerry/yii2/oauth2/server', '@devjerry/yii2-oauth2-server');
+Yii::setAlias('@devjerry/yii2/adminlte', '@application/devjerry/yii2-adminlte');
