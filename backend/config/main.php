@@ -57,18 +57,21 @@ $config = [
         'view' => [
             'theme' => [
                 'pathMap' => [
-                    '@app/views' => '@library/adminlte/views'
+                    '@app/views' => '@devjerry/yii2/adminlte/views',
+                    //'@app/views' => '@library/adminlte/views',
                 ],
             ],
         ],
-        /*'assetManager' => [
+        'assetManager' => [
             'bundles' => [
-                'library\adminlte\web\AdminLteAsset' => [
-                    'skin' => 'skin-purple-light',
+                'devjerry\yii2\adminlte\web\AdminLteAsset' => [
+                    'extraAssetBundles' => [
+                        'backend\assets\AppAsset',
+                    ],
                 ],
             ],
         ],
-        'i18n' => [
+        /*'i18n' => [
             'translations' => [
                 'adminlte' => [
                     'class' => 'yii\i18n\PhpMessageSource',

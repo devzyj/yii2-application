@@ -7,12 +7,12 @@
 namespace devjerry\yii2\adminlte\web;
 
 /**
- * BasicAsset 基础的资源包，适用于未登录的页面。
+ * BasicAdminLteAsset 基础的资源包，适用于未登录的页面。
  * 
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
-class BasicAsset extends \yii\web\AssetBundle
+class BasicAdminLteAsset extends \yii\web\AssetBundle
 {
     /**
      * {@inheritdoc}
@@ -22,15 +22,21 @@ class BasicAsset extends \yii\web\AssetBundle
     /**
      * {@inheritdoc}
      */
-    public $css = [
-        'css/AdminLTE.min.css',
-    ];
-    
-    /**
-     * {@inheritdoc}
-     */
     public $depends = [
         'yii\bootstrap\BootstrapAsset',
         'rmrevin\yii\fontawesome\AssetBundle',
     ];
+
+    /**
+     * {@inheritdoc}
+     */
+    public function init()
+    {
+        // CSS 文件。
+        if (empty($this->css)) {
+            $this->css[] = YII_ENV_DEV ? 'css/AdminLTE.css' : 'css/AdminLTE.min.css';
+        }
+    
+        parent::init();
+    }
 }

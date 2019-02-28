@@ -43,8 +43,9 @@ class AppAsset extends \yii\web\AssetBundle
      * {@inheritdoc}
      */
     public $depends = [
+        'devjerry\yii2\adminlte\web\AdminLteAsset',
+        'yii\web\YiiAsset',
         //'library\adminlte\web\FontsAsset',
-        //'yii\web\YiiAsset',
         //'yii\bootstrap\BootstrapAsset'
     ];
 }
