@@ -13,6 +13,8 @@ use Yii;
  */
 class SiteController extends \yii\web\Controller
 {
+    public $layout = 'basic';
+    
     /**
      * {@inheritdoc}
      */
@@ -26,24 +28,34 @@ class SiteController extends \yii\web\Controller
             'captcha' => [
                 'class' => 'yii\captcha\CaptchaAction',
             ],
-            'login' => [
+            /*'login' => [
                 'class' => 'library\adminlte\actions\LoginAction',
                 'modelClass' => 'app\models\User',
             ],
             'logout' => [
                 'class' => 'library\adminlte\actions\LogoutAction',
-            ],
+            ],*/
         ];
     }
     
     /**
-     * Displays homepage.
+     * 首页。
      *
      * @return string
      */
     public function actionIndex()
     {
         return $this->render('index');
+    }
+    
+    /**
+     * 用户登录。
+     *
+     * @return string
+     */
+    public function actionLogin()
+    {
+        return $this->render('login');
     }
     
     /**
