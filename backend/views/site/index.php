@@ -2,6 +2,8 @@
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
+
+$this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="box">
     <div class="box-header with-border">

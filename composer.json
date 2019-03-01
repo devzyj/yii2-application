@@ -13,7 +13,7 @@
         "devzyj/yii2-rest": "~1.0.0",
         "devzyj/yii2-attribute-cache-behavior": "~1.0.0",
         "devzyj/yii2-oauth2-server": "~1.0.0",
-        "dmstr/yii2-adminlte-asset": "^2.1"
+        "devzyj/yii2-adminlte": "dev-master"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",

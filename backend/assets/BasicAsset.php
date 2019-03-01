@@ -7,12 +7,12 @@
 namespace backend\assets;
 
 /**
- * Main application asset bundle.
+ * Basic application asset bundle.
  *
  * @author ZhangYanJiong <zhangyanjiong@163.com>
  * @since 1.0
  */
-class AppAsset extends \yii\web\AssetBundle
+class BasicAsset extends \yii\web\AssetBundle
 {
     /**
      * {@inheritdoc}
@@ -28,22 +28,21 @@ class AppAsset extends \yii\web\AssetBundle
      * {@inheritdoc}
      */
     public $css = [
-        'css/site.css',
+        'https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic',
+        'css/basic.css',
     ];
 
     /**
      * {@inheritdoc}
      */
     public $js = [
-        'js/site.js'
+        'js/basic.js'
     ];
 
     /**
      * {@inheritdoc}
      */
     public $depends = [
-        'devzyj\yii2\adminlte\web\AdminLteAsset',
-        'yii\web\YiiAsset',
-        'backend\assets\BasicAsset',
+        'devzyj\yii2\adminlte\web\BasicAdminLteAsset',
     ];
 }

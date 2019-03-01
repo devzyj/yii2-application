@@ -13,8 +13,6 @@ use Yii;
  */
 class SiteController extends \yii\web\Controller
 {
-    public $layout = 'basic';
-    
     /**
      * {@inheritdoc}
      */
@@ -55,7 +53,11 @@ class SiteController extends \yii\web\Controller
      */
     public function actionLogin()
     {
-        return $this->render('login');
+        $this->layout = 'main-login';
+        $model = new \backend\models\user();
+        return $this->render('login', [
+            'model' => $model,
+        ]);
     }
     
     /**

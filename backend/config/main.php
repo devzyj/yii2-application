@@ -11,7 +11,7 @@ $config = [
     //'sourceLanguage' => 'zh-CN',
     'controllerNamespace' => 'backend\controllers',
     'aliases' => [
-        '@library' => '@backend/library',
+        //'@library' => '@backend/library',
     ],
     'bootstrap' => ['log'],
     'components' => [
@@ -57,17 +57,17 @@ $config = [
         'view' => [
             'theme' => [
                 'pathMap' => [
-                    '@app/views' => '@devjerry/yii2/adminlte/views',
-                    //'@app/views' => '@library/adminlte/views',
+                    '@backend/views' => [
+                        '@backend/views', 
+                        '@devzyj/yii2/adminlte/views',
+                    ],
                 ],
             ],
         ],
         'assetManager' => [
             'bundles' => [
-                'devjerry\yii2\adminlte\web\AdminLteAsset' => [
-                    'extraAssetBundles' => [
-                        'backend\assets\AppAsset',
-                    ],
+                'devzyj\yii2\adminlte\web\AdminLteAsset' => [
+                    //'layout' => 'fixed',
                 ],
             ],
         ],
