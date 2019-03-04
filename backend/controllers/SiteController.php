@@ -20,8 +20,8 @@ class SiteController extends \yii\web\Controller
     {
         return [
             'error' => [
-                //'class' => 'library\adminlte\actions\ErrorAction',
-                'class' => 'yii\web\ErrorAction',
+                'class' => 'devzyj\yii2\adminlte\actions\ErrorAction',
+                //'class' => 'yii\web\ErrorAction',
             ],
             'captcha' => [
                 'class' => 'yii\captcha\CaptchaAction',

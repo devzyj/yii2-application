@@ -28,8 +28,9 @@ class BasicAsset extends \yii\web\AssetBundle
      * {@inheritdoc}
      */
     public $css = [
-        'https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic',
+        //'https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic',
         'css/basic.css',
+        'font-googleapis/css/font-googleapis.css'
     ];
 
     /**
