@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "af7feaed8d53fa9fa522f36bbdc869af",
+    "content-hash": "2b25d000aca179df4ad68aba75efe251",
     "packages": [
         {
             "name": "almasaeed2010/adminlte",
@@ -318,16 +318,16 @@
         },
         {
             "name": "devzyj/yii2-adminlte",
-            "version": "dev-master",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/devzyj/yii2-adminlte.git",
-                "reference": "e79342657cc82c3449dcff8d6292c9b3b4aa0772"
+                "reference": "52ba155f8ee9f122f156b9142df61be66e734070"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/devzyj/yii2-adminlte/zipball/e79342657cc82c3449dcff8d6292c9b3b4aa0772",
-                "reference": "e79342657cc82c3449dcff8d6292c9b3b4aa0772",
+                "url": "https://api.github.com/repos/devzyj/yii2-adminlte/zipball/52ba155f8ee9f122f156b9142df61be66e734070",
+                "reference": "52ba155f8ee9f122f156b9142df61be66e734070",
                 "shasum": ""
             },
             "require": {
@@ -360,7 +360,7 @@
                 "extension",
                 "yii2"
             ],
-            "time": "2019-03-04T07:53:08+00:00"
+            "time": "2019-03-05T07:10:17+00:00"
         },
         {
             "name": "devzyj/yii2-attribute-cache-behavior",
@@ -3683,9 +3683,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "devzyj/yii2-adminlte": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {

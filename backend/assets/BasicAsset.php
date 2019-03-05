@@ -29,15 +29,15 @@ class BasicAsset extends \yii\web\AssetBundle
      */
     public $css = [
         //'https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic',
+        'font-googleapis/css/font-googleapis.css',
         'css/basic.css',
-        'font-googleapis/css/font-googleapis.css'
     ];
 
     /**
      * {@inheritdoc}
      */
     public $js = [
-        'js/basic.js'
+        'js/basic.js',
     ];
 
     /**
